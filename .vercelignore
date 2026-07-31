@@ -1,0 +1,10 @@
+# Local build and development artifacts
+.next
+.next.turbopack-cache-backup
+node_modules
+coverage
+
+# Secrets and local deployment metadata
+.env*
+.git
+.vercel

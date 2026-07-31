@@ -1,0 +1,222 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AdminRole {
+  ADMIN
+}
+
+enum AuthAuditEvent {
+  LOGIN_SUCCEEDED
+  LOGIN_FAILED
+  LOGIN_LOCKED
+  LOGOUT
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum ArticleType {
+  ARTICLE
+  NEWS
+}
+
+model AdminUser {
+  id               String           @id @default(uuid()) @db.Uuid
+  email            String           @unique @db.VarChar(254)
+  passwordHash     String
+  role             AdminRole        @default(ADMIN)
+  isActive         Boolean          @default(true)
+  tokenVersion     Int              @default(0)
+  failedLoginCount Int              @default(0)
+  lockedUntil      DateTime?
+  lastLoginAt      DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  sessions         AdminSession[]
+  auditEvents      AdminAuthAudit[]
+  articles         Article[]
+
+  @@index([isActive])
+}
+
+model AdminSession {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @db.Uuid
+  tokenHash  String    @unique @db.VarChar(64)
+  expiresAt  DateTime
+  lastUsedAt DateTime  @default(now())
+  revokedAt  DateTime?
+  userAgent  String?   @db.VarChar(64)
+  createdAt  DateTime  @default(now())
+  user       AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+}
+
+model AdminAuthAudit {
+  id        String         @id @default(uuid()) @db.Uuid
+  userId    String?        @db.Uuid
+  emailHash String         @db.VarChar(64)
+  event     AuthAuditEvent
+  createdAt DateTime       @default(now())
+  user      AdminUser?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([emailHash, createdAt])
+  @@index([userId, createdAt])
+}
+
+model Article {
+  id              String            @id @default(uuid()) @db.Uuid
+  title           String            @db.VarChar(200)
+  slug            String            @unique @db.VarChar(220)
+  excerpt         String?           @db.Text
+  content         Json
+  featuredImage   String?           @db.Text
+  tags            String[]          @default([])
+  metaDescription String?           @db.VarChar(160)
+  type            ArticleType       @default(ARTICLE)
+  status          ArticleStatus     @default(DRAFT)
+  publishedAt     DateTime?
+  authorId        String            @db.Uuid
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  author          AdminUser         @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  categories      ArticleCategory[]
+
+  @@index([type, status, publishedAt])
+  @@index([authorId, createdAt])
+}
+
+model Announcement {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String   @db.VarChar(200)
+  description String   @db.Text
+  isActive    Boolean  @default(true)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive, publishedAt])
+}
+
+model ArticleCategory {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String    @unique @db.VarChar(80)
+  slug      String    @unique @db.VarChar(100)
+  createdAt DateTime  @default(now())
+  articles  Article[]
+}
+
+model Insurance {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(100)
+  slug      String   @unique @db.VarChar(120)
+  logoUrl   String?  @db.Text
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model SlideshowSlide {
+  id        String   @id @default(uuid()) @db.Uuid
+  title     String?  @db.VarChar(120)
+  subtitle  String?  @db.VarChar(240)
+  imageUrl  String   @db.Text
+  altText   String   @db.VarChar(160)
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model LabDepartment {
+  id            String   @id @default(uuid()) @db.Uuid
+  title         String   @unique @db.VarChar(100)
+  titleAr       String?  @db.VarChar(100)
+  titleEn       String?  @db.VarChar(100)
+  description   String   @db.Text
+  descriptionAr String?  @db.Text
+  descriptionEn String?  @db.Text
+  imageUrl      String?  @db.Text
+  isActive      Boolean  @default(true)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
+model SiteSettings {
+  id               String        @id @db.VarChar(32)
+  laboratoryName   String?       @db.VarChar(160)
+  shortDescription String?       @db.VarChar(500)
+  province         String?       @db.VarChar(100)
+  city             String?       @db.VarChar(100)
+  instagramUrl     String?       @db.Text
+  whatsappUrl      String?       @db.Text
+  telegramUrl      String?       @db.Text
+  latitude         Decimal?      @db.Decimal(9, 6)
+  longitude        Decimal?      @db.Decimal(9, 6)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  phoneNumbers     SitePhone[]
+  addresses        SiteAddress[]
+  workingHours     SiteWorkingHour[]
+}
+
+model SitePhone {
+  id         String       @id @default(uuid()) @db.Uuid
+  settingsId String       @db.VarChar(32)
+  label      String?      @db.VarChar(80)
+  phone      String       @db.VarChar(40)
+  sortOrder  Int          @default(0)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  settings   SiteSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+
+  @@index([settingsId, sortOrder])
+}
+
+model SiteAddress {
+  id         String       @id @default(uuid()) @db.Uuid
+  settingsId String       @db.VarChar(32)
+  title      String?      @db.VarChar(100)
+  address    String       @db.Text
+  sortOrder  Int          @default(0)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  settings   SiteSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+
+  @@index([settingsId, sortOrder])
+}
+
+model SiteWorkingHour {
+  id         String       @id @default(uuid()) @db.Uuid
+  settingsId String       @db.VarChar(32)
+  label      String       @db.VarChar(80)
+  hours      String       @db.VarChar(100)
+  startDay   String       @default("SATURDAY") @db.VarChar(16)
+  endDay     String       @default("SATURDAY") @db.VarChar(16)
+  startTime  String       @default("08:00") @db.VarChar(5)
+  endTime    String       @default("20:00") @db.VarChar(5)
+  sortOrder  Int          @default(0)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  settings   SiteSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+
+  @@index([settingsId, sortOrder])
+}

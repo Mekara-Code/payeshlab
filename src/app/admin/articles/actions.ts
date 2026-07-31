@@ -1,0 +1,436 @@
+"use server";
+
+import { randomUUID } from "node:crypto";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import { revalidatePath } from "next/cache";
+import { ArticleStatus } from "@/generated/prisma/client";
+import { getAdminSession } from "@/lib/admin-session";
+import { getPrisma } from "@/lib/prisma";
+
+const MAX_BLOCKS = 100;
+const MAX_ARTICLE_IMAGE_SIZE = 5 * 1024 * 1024;
+const VALID_BLOCK_TYPES = new Set([
+  "paragraph",
+  "heading",
+  "list",
+  "quote",
+  "table",
+]);
+const CONTENT_TYPES = new Set(["ARTICLE", "NEWS"]);
+const articleImageTypes = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+} as const;
+const articleImageDirectory = join(
+  process.cwd(),
+  "public",
+  "uploads",
+  "article-images",
+);
+
+export type ManagedContentType = "ARTICLE" | "NEWS";
+
+export type ArticleActionState = {
+  message?: string;
+  success?: boolean;
+};
+
+type ArticleBlock = {
+  content: string;
+  id: string;
+  type: "paragraph" | "heading" | "list" | "quote" | "table";
+};
+
+type SavedArticleImage = {
+  filePath: string;
+  imageUrl: string;
+};
+
+function slugify(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/['"]/g, "")
+    .replace(/[^a-z0-9\u0600-\u06ff]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 100);
+}
+
+function getString(formData: FormData, name: string) {
+  const value = formData.get(name);
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function isValidUuid(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value,
+  );
+}
+
+function parseContentType(value: string): ManagedContentType | null {
+  return CONTENT_TYPES.has(value) ? (value as ManagedContentType) : null;
+}
+
+function isValidTableContent(content: string) {
+  try {
+    const rows = JSON.parse(content) as unknown;
+    return (
+      Array.isArray(rows) &&
+      rows.length > 0 &&
+      rows.length <= 20 &&
+      rows.every(
+        (row) =>
+          Array.isArray(row) &&
+          row.length > 0 &&
+          row.length <= 12 &&
+          row.every((cell) => typeof cell === "string" && cell.length <= 2_000),
+      )
+    );
+  } catch {
+    return false;
+  }
+}
+
+function parseBlocks(raw: string): ArticleBlock[] | null {
+  try {
+    const blocks = JSON.parse(raw) as unknown;
+    if (
+      !Array.isArray(blocks) ||
+      blocks.length === 0 ||
+      blocks.length > MAX_BLOCKS
+    ) {
+      return null;
+    }
+
+    const validBlocks = blocks.every((block) => {
+      if (!block || typeof block !== "object") return false;
+      const value = block as Record<string, unknown>;
+      return (
+        typeof value.id === "string" &&
+        typeof value.content === "string" &&
+        value.content.length <= 10_000 &&
+        typeof value.type === "string" &&
+        VALID_BLOCK_TYPES.has(value.type) &&
+        (value.type !== "table" || isValidTableContent(value.content))
+      );
+    });
+
+    return validBlocks ? (blocks as ArticleBlock[]) : null;
+  } catch {
+    return null;
+  }
+}
+
+function parseStringList(raw: string, limit: number, maxLength: number) {
+  try {
+    const values = JSON.parse(raw) as unknown;
+    if (!Array.isArray(values)) return [];
+    return Array.from(
+      new Set(
+        values
+          .filter((value): value is string => typeof value === "string")
+          .map((value) => value.trim())
+          .filter((value) => value.length > 0 && value.length <= maxLength),
+      ),
+    ).slice(0, limit);
+  } catch {
+    return [];
+  }
+}
+
+function hasValidImageSignature(
+  bytes: Uint8Array,
+  type: keyof typeof articleImageTypes,
+) {
+  if (type === "image/png") {
+    return (
+      bytes.length >= 8 &&
+      bytes[0] === 0x89 &&
+      bytes[1] === 0x50 &&
+      bytes[2] === 0x4e &&
+      bytes[3] === 0x47 &&
+      bytes[4] === 0x0d &&
+      bytes[5] === 0x0a &&
+      bytes[6] === 0x1a &&
+      bytes[7] === 0x0a
+    );
+  }
+
+  if (type === "image/jpeg") {
+    return (
+      bytes.length >= 3 &&
+      bytes[0] === 0xff &&
+      bytes[1] === 0xd8 &&
+      bytes[2] === 0xff
+    );
+  }
+
+  return (
+    bytes.length >= 12 &&
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
+  );
+}
+
+async function saveArticleImage(
+  file: FormDataEntryValue | null,
+): Promise<{ error?: string; savedImage?: SavedArticleImage }> {
+  if (!file || typeof file === "string" || file.size === 0) return {};
+
+  if (!(file.type in articleImageTypes) || file.size > MAX_ARTICLE_IMAGE_SIZE) {
+    return {
+      error: "تصویر شاخص باید PNG، JPG یا WebP و حداکثر ۵ مگابایت باشد.",
+    };
+  }
+
+  const imageType = file.type as keyof typeof articleImageTypes;
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  if (!hasValidImageSignature(bytes, imageType)) {
+    return { error: "فایل انتخاب‌شده یک تصویر معتبر نیست." };
+  }
+
+  const fileName = `${randomUUID()}.${articleImageTypes[imageType]}`;
+  const filePath = join(articleImageDirectory, fileName);
+  await mkdir(articleImageDirectory, { recursive: true });
+  await writeFile(filePath, bytes, { flag: "wx" });
+
+  return {
+    savedImage: { filePath, imageUrl: `/uploads/article-images/${fileName}` },
+  };
+}
+
+async function removeStoredArticleImage(imageUrl: string | null) {
+  const fileName = imageUrl?.match(
+    /^\/uploads\/article-images\/([0-9a-f-]{36}\.(?:jpg|png|webp))$/i,
+  )?.[1];
+  if (!fileName) return;
+
+  await unlink(join(articleImageDirectory, fileName)).catch(() => undefined);
+}
+
+async function requireAdmin() {
+  const session = await getAdminSession();
+  return session?.role === "ADMIN" ? session : null;
+}
+
+function revalidateContentPaths(...slugs: Array<string | null | undefined>) {
+  revalidatePath("/");
+  revalidatePath("/articles");
+  revalidatePath("/admin");
+  slugs.forEach((slug) => {
+    if (slug) revalidatePath(`/articles/${slug}`);
+  });
+}
+
+export async function saveArticle(
+  _previousState: ArticleActionState,
+  formData: FormData,
+): Promise<ArticleActionState> {
+  const session = await requireAdmin();
+  if (!session) {
+    return { message: "دسترسی شما برای مدیریت محتوا معتبر نیست." };
+  }
+
+  const id = getString(formData, "id");
+  const type = parseContentType(getString(formData, "type"));
+  const title = getString(formData, "title");
+  const blocks = parseBlocks(getString(formData, "blocksJson"));
+  const submittedSlug = getString(formData, "slug");
+  const slug = slugify(submittedSlug || title);
+
+  if (
+    !type ||
+    !title ||
+    title.length > 200 ||
+    !slug ||
+    !blocks ||
+    (id && !isValidUuid(id))
+  ) {
+    return { message: "عنوان، نامک و محتوای موردنیاز را بررسی کنید." };
+  }
+
+  const categoryNames = parseStringList(
+    getString(formData, "categoriesJson"),
+    10,
+    80,
+  );
+  const tags = parseStringList(getString(formData, "tagsJson"), 12, 40);
+  const excerpt = getString(formData, "excerpt").slice(0, 2_000) || null;
+  const metaDescription =
+    getString(formData, "metaDescription").slice(0, 160) || null;
+  const status: ArticleStatus =
+    formData.get("status") === "published"
+      ? ArticleStatus.PUBLISHED
+      : ArticleStatus.DRAFT;
+  const prisma = getPrisma();
+  let savedImage: SavedArticleImage | undefined;
+  let previousSlug: string | null = null;
+
+  try {
+    const upload = await saveArticleImage(formData.get("featuredImageFile"));
+    if (upload.error) return { message: upload.error };
+    savedImage = upload.savedImage;
+  } catch {
+    return { message: "آپلود تصویر شاخص انجام نشد. دوباره تلاش کنید." };
+  }
+
+  const featuredImage =
+    savedImage?.imageUrl ??
+    (getString(formData, "featuredImage").slice(0, 2_000) || null);
+  let previousFeaturedImage: string | null = null;
+
+  try {
+    if (id) {
+      const existing = await prisma.article.findUnique({
+        where: { id },
+        select: { featuredImage: true, slug: true, type: true },
+      });
+      if (!existing || existing.type !== type) {
+        if (savedImage) await removeStoredArticleImage(savedImage.imageUrl);
+        return { message: "محتوای موردنظر برای ویرایش پیدا نشد." };
+      }
+      previousFeaturedImage = existing.featuredImage;
+      previousSlug = existing.slug;
+    }
+
+    const categories = await Promise.all(
+      categoryNames.map((name) =>
+        prisma.articleCategory.upsert({
+          where: { name },
+          create: {
+            name,
+            slug: slugify(name) || `category-${crypto.randomUUID()}`,
+          },
+          update: {},
+          select: { id: true },
+        }),
+      ),
+    );
+
+    const data = {
+      content: blocks,
+      excerpt,
+      featuredImage,
+      metaDescription,
+      publishedAt: status === "PUBLISHED" ? new Date() : null,
+      slug,
+      status,
+      tags,
+      title,
+      type,
+    };
+
+    if (id) {
+      await prisma.article.update({
+        data: { ...data, categories: { set: categories } },
+        where: { id },
+      });
+    } else {
+      await prisma.article.create({
+        data: {
+          ...data,
+          authorId: session.userId,
+          categories: { connect: categories },
+        },
+      });
+    }
+  } catch (error) {
+    if (savedImage) await removeStoredArticleImage(savedImage.imageUrl);
+    if (
+      typeof error === "object" &&
+      error &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return { message: "این نامک یا دسته‌بندی قبلاً استفاده شده است." };
+    }
+    return { message: "ذخیره محتوا انجام نشد. دوباره تلاش کنید." };
+  }
+
+  if (previousFeaturedImage && previousFeaturedImage !== featuredImage) {
+    await removeStoredArticleImage(previousFeaturedImage);
+  }
+
+  revalidateContentPaths(slug, previousSlug);
+  const contentLabel = type === "NEWS" ? "خبر" : "مقاله";
+  return {
+    message:
+      status === "PUBLISHED"
+        ? `${contentLabel} منتشر شد.`
+        : `پیش‌نویس ${contentLabel} ذخیره شد.`,
+    success: true,
+  };
+}
+
+export async function toggleArticleStatus(
+  id: string,
+  type: ManagedContentType,
+  isPublished: boolean,
+): Promise<ArticleActionState> {
+  if (!(await requireAdmin()) || !isValidUuid(id) || !parseContentType(type)) {
+    return { message: "درخواست تغییر وضعیت معتبر نیست." };
+  }
+
+  const prisma = getPrisma();
+  const existing = await prisma.article.findUnique({
+    where: { id },
+    select: { slug: true, type: true },
+  });
+  if (!existing || existing.type !== type) {
+    return { message: "محتوای موردنظر پیدا نشد." };
+  }
+
+  try {
+    await prisma.article.update({
+      data: {
+        publishedAt: isPublished ? null : new Date(),
+        status: isPublished ? "DRAFT" : "PUBLISHED",
+      },
+      where: { id },
+    });
+  } catch {
+    return { message: "تغییر وضعیت انجام نشد. دوباره تلاش کنید." };
+  }
+
+  revalidateContentPaths(existing.slug);
+  return {
+    message: isPublished ? "محتوا به پیش‌نویس منتقل شد." : "محتوا منتشر شد.",
+    success: true,
+  };
+}
+
+export async function deleteArticle(
+  id: string,
+  type: ManagedContentType,
+): Promise<ArticleActionState> {
+  if (!(await requireAdmin()) || !isValidUuid(id) || !parseContentType(type)) {
+    return { message: "درخواست حذف معتبر نیست." };
+  }
+
+  const prisma = getPrisma();
+  const existing = await prisma.article.findUnique({
+    where: { id },
+    select: { featuredImage: true, slug: true, type: true },
+  });
+  if (!existing || existing.type !== type) {
+    return { message: "محتوای موردنظر پیدا نشد." };
+  }
+
+  try {
+    await prisma.article.delete({ where: { id } });
+    await removeStoredArticleImage(existing.featuredImage);
+  } catch {
+    return { message: "حذف محتوا انجام نشد. دوباره تلاش کنید." };
+  }
+
+  revalidateContentPaths(existing.slug);
+  return { message: "محتوا حذف شد.", success: true };
+}
