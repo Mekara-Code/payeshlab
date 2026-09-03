@@ -40,3 +40,30 @@ export const ArticleType = {
 } as const
 
 export type ArticleType = (typeof ArticleType)[keyof typeof ArticleType]
+
+
+export const JobApplicationStatus = {
+  PENDING: 'PENDING',
+  REVIEWED: 'REVIEWED',
+  APPROVED: 'APPROVED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type JobApplicationStatus = (typeof JobApplicationStatus)[keyof typeof JobApplicationStatus]
+
+
+export const HomeSamplingStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED'
+} as const
+
+export type HomeSamplingStatus = (typeof HomeSamplingStatus)[keyof typeof HomeSamplingStatus]
+
+
+export const ContentLocale = {
+  FA: 'FA',
+  EN: 'EN',
+  AR: 'AR'
+} as const
+
+export type ContentLocale = (typeof ContentLocale)[keyof typeof ContentLocale]

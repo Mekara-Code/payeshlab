@@ -11,33 +11,41 @@ export type LabDepartmentData = {
   titleEn?: string | null;
 };
 
-export const defaultLabDepartments: LabDepartmentData[] = [
+export function getDefaultLabDepartments(locale: ContentLocale): LabDepartmentData[] {
+  const dictionary = getDictionary(locale);
+  const t = (key: string) => translate(dictionary, key);
+
+  return [
   {
     id: "department-pathology",
-    title: "پاتولوژی",
-    description: "بررسی تخصصی نمونه‌های بافتی و سلولی با تکیه بر دقت تشخیصی، گزارش‌نویسی استاندارد و همراهی نزدیک با پزشک معالج.",
+    title: t("defaults.pathologyTitle"),
+    description: t("defaults.pathologyDescription"),
     imageUrl: null,
     sortOrder: 10,
   },
   {
     id: "department-hematology",
-    title: "هماتولوژی",
-    description: "ارزیابی دقیق شاخص‌های خونی و اختلالات مرتبط با خون‌سازی، با کنترل کیفی مستمر برای نتایجی قابل اتکا.",
+    title: t("defaults.hematologyTitle"),
+    description: t("defaults.hematologyDescription"),
     imageUrl: null,
     sortOrder: 20,
   },
   {
     id: "department-biochemistry",
-    title: "بیوشیمی",
-    description: "پایش شاخص‌های حیاتی بدن از جمله قند، چربی، عملکرد کبد و کلیه با تجهیزات به‌روز و فرآیندهای استاندارد.",
+    title: t("defaults.biochemistryTitle"),
+    description: t("defaults.biochemistryDescription"),
     imageUrl: null,
     sortOrder: 30,
   },
   {
     id: "department-microbiology",
-    title: "میکروب‌شناسی",
-    description: "شناسایی عوامل عفونی و بررسی حساسیت دارویی با رویکردی دقیق، سریع و هماهنگ با نیازهای درمانی بیمار.",
+    title: t("defaults.microbiologyTitle"),
+    description: t("defaults.microbiologyDescription"),
     imageUrl: null,
     sortOrder: 40,
   },
-];
+  ];
+}
+import type { ContentLocale } from "@/lib/content-locale";
+import { getDictionary } from "@/lib/dictionaries";
+import { translate } from "@/lib/dictionaries/types";

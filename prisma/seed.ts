@@ -4,10 +4,13 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { hashAdminPassword, isStrongAdminPassword } from "../src/lib/admin-password";
 import { defaultInsurances } from "../src/lib/insurance-data";
-import { defaultLabDepartments } from "../src/lib/lab-department-data";
-import { defaultSlideshowSlides } from "../src/lib/slideshow-data";
+import { getDefaultLabDepartments } from "../src/lib/lab-department-data";
+import { getDefaultSlideshowSlides } from "../src/lib/slideshow-data";
+import laboratoryTests from "../laboratory_tests.json";
 
 async function main() {
+  const defaultLabDepartments = getDefaultLabDepartments("fa");
+  const defaultSlideshowSlides = getDefaultSlideshowSlides("fa");
   const connectionString = process.env.DIRECT_URL ?? process.env.DATABASE_URL;
   const email = process.env.ADMIN_SEED_EMAIL?.trim().toLowerCase();
   const password = process.env.ADMIN_SEED_PASSWORD;
@@ -94,6 +97,25 @@ async function main() {
       console.info(`${departmentResult.count} laboratory department(s) seeded.`);
     } else {
       console.info("Laboratory departments already have content; no defaults were added.");
+    }
+
+    const existingTests = await prisma.laboratoryTest.count();
+    if (existingTests === 0) {
+      const testResult = await prisma.laboratoryTest.createMany({
+        data: laboratoryTests.tests.map((test, index) => ({
+          clinicalSignificance: test.clinicalSignificance.trim() || null,
+          description: test.description.trim() || null,
+          limitations: test.limitations.trim() || null,
+          name: test.name.trim(),
+          resultInterpretation: test.resultInterpretation.trim() || null,
+          samplingInformation: test.samplingInformation.trim() || null,
+          slug: test.slug.trim(),
+          sortOrder: (index + 1) * 10,
+        })),
+      });
+      console.info(`${testResult.count} laboratory test(s) seeded.`);
+    } else {
+      console.info("Laboratory tests already have content; no defaults were added.");
     }
   } finally {
     await prisma.$disconnect();

@@ -40,11 +40,14 @@ export type SiteSettingsMinAggregateOutputType = {
   id: string | null
   laboratoryName: string | null
   shortDescription: string | null
+  ceoMessage: string | null
   province: string | null
   city: string | null
   instagramUrl: string | null
   whatsappUrl: string | null
-  telegramUrl: string | null
+  rubikaUrl: string | null
+  eitaaUrl: string | null
+  surveyFormUrl: string | null
   latitude: runtime.Decimal | null
   longitude: runtime.Decimal | null
   createdAt: Date | null
@@ -55,11 +58,14 @@ export type SiteSettingsMaxAggregateOutputType = {
   id: string | null
   laboratoryName: string | null
   shortDescription: string | null
+  ceoMessage: string | null
   province: string | null
   city: string | null
   instagramUrl: string | null
   whatsappUrl: string | null
-  telegramUrl: string | null
+  rubikaUrl: string | null
+  eitaaUrl: string | null
+  surveyFormUrl: string | null
   latitude: runtime.Decimal | null
   longitude: runtime.Decimal | null
   createdAt: Date | null
@@ -70,11 +76,14 @@ export type SiteSettingsCountAggregateOutputType = {
   id: number
   laboratoryName: number
   shortDescription: number
+  ceoMessage: number
   province: number
   city: number
   instagramUrl: number
   whatsappUrl: number
-  telegramUrl: number
+  rubikaUrl: number
+  eitaaUrl: number
+  surveyFormUrl: number
   latitude: number
   longitude: number
   createdAt: number
@@ -97,11 +106,14 @@ export type SiteSettingsMinAggregateInputType = {
   id?: true
   laboratoryName?: true
   shortDescription?: true
+  ceoMessage?: true
   province?: true
   city?: true
   instagramUrl?: true
   whatsappUrl?: true
-  telegramUrl?: true
+  rubikaUrl?: true
+  eitaaUrl?: true
+  surveyFormUrl?: true
   latitude?: true
   longitude?: true
   createdAt?: true
@@ -112,11 +124,14 @@ export type SiteSettingsMaxAggregateInputType = {
   id?: true
   laboratoryName?: true
   shortDescription?: true
+  ceoMessage?: true
   province?: true
   city?: true
   instagramUrl?: true
   whatsappUrl?: true
-  telegramUrl?: true
+  rubikaUrl?: true
+  eitaaUrl?: true
+  surveyFormUrl?: true
   latitude?: true
   longitude?: true
   createdAt?: true
@@ -127,11 +142,14 @@ export type SiteSettingsCountAggregateInputType = {
   id?: true
   laboratoryName?: true
   shortDescription?: true
+  ceoMessage?: true
   province?: true
   city?: true
   instagramUrl?: true
   whatsappUrl?: true
-  telegramUrl?: true
+  rubikaUrl?: true
+  eitaaUrl?: true
+  surveyFormUrl?: true
   latitude?: true
   longitude?: true
   createdAt?: true
@@ -229,11 +247,14 @@ export type SiteSettingsGroupByOutputType = {
   id: string
   laboratoryName: string | null
   shortDescription: string | null
+  ceoMessage: string | null
   province: string | null
   city: string | null
   instagramUrl: string | null
   whatsappUrl: string | null
-  telegramUrl: string | null
+  rubikaUrl: string | null
+  eitaaUrl: string | null
+  surveyFormUrl: string | null
   latitude: runtime.Decimal | null
   longitude: runtime.Decimal | null
   createdAt: Date
@@ -267,11 +288,14 @@ export type SiteSettingsWhereInput = {
   id?: Prisma.StringFilter<"SiteSettings"> | string
   laboratoryName?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   shortDescription?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  ceoMessage?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   province?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   city?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   instagramUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   whatsappUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
-  telegramUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  rubikaUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  eitaaUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  surveyFormUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   latitude?: Prisma.DecimalNullableFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.DecimalNullableFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"SiteSettings"> | Date | string
@@ -285,11 +309,14 @@ export type SiteSettingsOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   laboratoryName?: Prisma.SortOrderInput | Prisma.SortOrder
   shortDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  ceoMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   province?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   instagramUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  telegramUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  rubikaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  eitaaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  surveyFormUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
   longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -306,11 +333,14 @@ export type SiteSettingsWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.SiteSettingsWhereInput | Prisma.SiteSettingsWhereInput[]
   laboratoryName?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   shortDescription?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  ceoMessage?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   province?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   city?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   instagramUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   whatsappUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
-  telegramUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  rubikaUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  eitaaUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  surveyFormUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   latitude?: Prisma.DecimalNullableFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.DecimalNullableFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"SiteSettings"> | Date | string
@@ -324,11 +354,14 @@ export type SiteSettingsOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   laboratoryName?: Prisma.SortOrderInput | Prisma.SortOrder
   shortDescription?: Prisma.SortOrderInput | Prisma.SortOrder
+  ceoMessage?: Prisma.SortOrderInput | Prisma.SortOrder
   province?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   instagramUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   whatsappUrl?: Prisma.SortOrderInput | Prisma.SortOrder
-  telegramUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  rubikaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  eitaaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  surveyFormUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
   longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -347,11 +380,14 @@ export type SiteSettingsScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"SiteSettings"> | string
   laboratoryName?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
   shortDescription?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
+  ceoMessage?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
   province?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
   city?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
   instagramUrl?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
   whatsappUrl?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
-  telegramUrl?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
+  rubikaUrl?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
+  eitaaUrl?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
+  surveyFormUrl?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
   latitude?: Prisma.DecimalNullableWithAggregatesFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.DecimalNullableWithAggregatesFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SiteSettings"> | Date | string
@@ -362,11 +398,14 @@ export type SiteSettingsCreateInput = {
   id: string
   laboratoryName?: string | null
   shortDescription?: string | null
+  ceoMessage?: string | null
   province?: string | null
   city?: string | null
   instagramUrl?: string | null
   whatsappUrl?: string | null
-  telegramUrl?: string | null
+  rubikaUrl?: string | null
+  eitaaUrl?: string | null
+  surveyFormUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -380,11 +419,14 @@ export type SiteSettingsUncheckedCreateInput = {
   id: string
   laboratoryName?: string | null
   shortDescription?: string | null
+  ceoMessage?: string | null
   province?: string | null
   city?: string | null
   instagramUrl?: string | null
   whatsappUrl?: string | null
-  telegramUrl?: string | null
+  rubikaUrl?: string | null
+  eitaaUrl?: string | null
+  surveyFormUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -398,11 +440,14 @@ export type SiteSettingsUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  telegramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -416,11 +461,14 @@ export type SiteSettingsUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  telegramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -434,11 +482,14 @@ export type SiteSettingsCreateManyInput = {
   id: string
   laboratoryName?: string | null
   shortDescription?: string | null
+  ceoMessage?: string | null
   province?: string | null
   city?: string | null
   instagramUrl?: string | null
   whatsappUrl?: string | null
-  telegramUrl?: string | null
+  rubikaUrl?: string | null
+  eitaaUrl?: string | null
+  surveyFormUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -449,11 +500,14 @@ export type SiteSettingsUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  telegramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -464,11 +518,14 @@ export type SiteSettingsUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  telegramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -479,11 +536,14 @@ export type SiteSettingsCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   laboratoryName?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  ceoMessage?: Prisma.SortOrder
   province?: Prisma.SortOrder
   city?: Prisma.SortOrder
   instagramUrl?: Prisma.SortOrder
   whatsappUrl?: Prisma.SortOrder
-  telegramUrl?: Prisma.SortOrder
+  rubikaUrl?: Prisma.SortOrder
+  eitaaUrl?: Prisma.SortOrder
+  surveyFormUrl?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -499,11 +559,14 @@ export type SiteSettingsMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   laboratoryName?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  ceoMessage?: Prisma.SortOrder
   province?: Prisma.SortOrder
   city?: Prisma.SortOrder
   instagramUrl?: Prisma.SortOrder
   whatsappUrl?: Prisma.SortOrder
-  telegramUrl?: Prisma.SortOrder
+  rubikaUrl?: Prisma.SortOrder
+  eitaaUrl?: Prisma.SortOrder
+  surveyFormUrl?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -514,11 +577,14 @@ export type SiteSettingsMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   laboratoryName?: Prisma.SortOrder
   shortDescription?: Prisma.SortOrder
+  ceoMessage?: Prisma.SortOrder
   province?: Prisma.SortOrder
   city?: Prisma.SortOrder
   instagramUrl?: Prisma.SortOrder
   whatsappUrl?: Prisma.SortOrder
-  telegramUrl?: Prisma.SortOrder
+  rubikaUrl?: Prisma.SortOrder
+  eitaaUrl?: Prisma.SortOrder
+  surveyFormUrl?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -589,11 +655,14 @@ export type SiteSettingsCreateWithoutPhoneNumbersInput = {
   id: string
   laboratoryName?: string | null
   shortDescription?: string | null
+  ceoMessage?: string | null
   province?: string | null
   city?: string | null
   instagramUrl?: string | null
   whatsappUrl?: string | null
-  telegramUrl?: string | null
+  rubikaUrl?: string | null
+  eitaaUrl?: string | null
+  surveyFormUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -606,11 +675,14 @@ export type SiteSettingsUncheckedCreateWithoutPhoneNumbersInput = {
   id: string
   laboratoryName?: string | null
   shortDescription?: string | null
+  ceoMessage?: string | null
   province?: string | null
   city?: string | null
   instagramUrl?: string | null
   whatsappUrl?: string | null
-  telegramUrl?: string | null
+  rubikaUrl?: string | null
+  eitaaUrl?: string | null
+  surveyFormUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -639,11 +711,14 @@ export type SiteSettingsUpdateWithoutPhoneNumbersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  telegramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -656,11 +731,14 @@ export type SiteSettingsUncheckedUpdateWithoutPhoneNumbersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  telegramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -673,11 +751,14 @@ export type SiteSettingsCreateWithoutAddressesInput = {
   id: string
   laboratoryName?: string | null
   shortDescription?: string | null
+  ceoMessage?: string | null
   province?: string | null
   city?: string | null
   instagramUrl?: string | null
   whatsappUrl?: string | null
-  telegramUrl?: string | null
+  rubikaUrl?: string | null
+  eitaaUrl?: string | null
+  surveyFormUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -690,11 +771,14 @@ export type SiteSettingsUncheckedCreateWithoutAddressesInput = {
   id: string
   laboratoryName?: string | null
   shortDescription?: string | null
+  ceoMessage?: string | null
   province?: string | null
   city?: string | null
   instagramUrl?: string | null
   whatsappUrl?: string | null
-  telegramUrl?: string | null
+  rubikaUrl?: string | null
+  eitaaUrl?: string | null
+  surveyFormUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -723,11 +807,14 @@ export type SiteSettingsUpdateWithoutAddressesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  telegramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -740,11 +827,14 @@ export type SiteSettingsUncheckedUpdateWithoutAddressesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  telegramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -757,11 +847,14 @@ export type SiteSettingsCreateWithoutWorkingHoursInput = {
   id: string
   laboratoryName?: string | null
   shortDescription?: string | null
+  ceoMessage?: string | null
   province?: string | null
   city?: string | null
   instagramUrl?: string | null
   whatsappUrl?: string | null
-  telegramUrl?: string | null
+  rubikaUrl?: string | null
+  eitaaUrl?: string | null
+  surveyFormUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -774,11 +867,14 @@ export type SiteSettingsUncheckedCreateWithoutWorkingHoursInput = {
   id: string
   laboratoryName?: string | null
   shortDescription?: string | null
+  ceoMessage?: string | null
   province?: string | null
   city?: string | null
   instagramUrl?: string | null
   whatsappUrl?: string | null
-  telegramUrl?: string | null
+  rubikaUrl?: string | null
+  eitaaUrl?: string | null
+  surveyFormUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -807,11 +903,14 @@ export type SiteSettingsUpdateWithoutWorkingHoursInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  telegramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -824,11 +923,14 @@ export type SiteSettingsUncheckedUpdateWithoutWorkingHoursInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  telegramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -890,11 +992,14 @@ export type SiteSettingsSelect<ExtArgs extends runtime.Types.Extensions.Internal
   id?: boolean
   laboratoryName?: boolean
   shortDescription?: boolean
+  ceoMessage?: boolean
   province?: boolean
   city?: boolean
   instagramUrl?: boolean
   whatsappUrl?: boolean
-  telegramUrl?: boolean
+  rubikaUrl?: boolean
+  eitaaUrl?: boolean
+  surveyFormUrl?: boolean
   latitude?: boolean
   longitude?: boolean
   createdAt?: boolean
@@ -909,11 +1014,14 @@ export type SiteSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   laboratoryName?: boolean
   shortDescription?: boolean
+  ceoMessage?: boolean
   province?: boolean
   city?: boolean
   instagramUrl?: boolean
   whatsappUrl?: boolean
-  telegramUrl?: boolean
+  rubikaUrl?: boolean
+  eitaaUrl?: boolean
+  surveyFormUrl?: boolean
   latitude?: boolean
   longitude?: boolean
   createdAt?: boolean
@@ -924,11 +1032,14 @@ export type SiteSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   id?: boolean
   laboratoryName?: boolean
   shortDescription?: boolean
+  ceoMessage?: boolean
   province?: boolean
   city?: boolean
   instagramUrl?: boolean
   whatsappUrl?: boolean
-  telegramUrl?: boolean
+  rubikaUrl?: boolean
+  eitaaUrl?: boolean
+  surveyFormUrl?: boolean
   latitude?: boolean
   longitude?: boolean
   createdAt?: boolean
@@ -939,18 +1050,21 @@ export type SiteSettingsSelectScalar = {
   id?: boolean
   laboratoryName?: boolean
   shortDescription?: boolean
+  ceoMessage?: boolean
   province?: boolean
   city?: boolean
   instagramUrl?: boolean
   whatsappUrl?: boolean
-  telegramUrl?: boolean
+  rubikaUrl?: boolean
+  eitaaUrl?: boolean
+  surveyFormUrl?: boolean
   latitude?: boolean
   longitude?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SiteSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "laboratoryName" | "shortDescription" | "province" | "city" | "instagramUrl" | "whatsappUrl" | "telegramUrl" | "latitude" | "longitude" | "createdAt" | "updatedAt", ExtArgs["result"]["siteSettings"]>
+export type SiteSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "laboratoryName" | "shortDescription" | "ceoMessage" | "province" | "city" | "instagramUrl" | "whatsappUrl" | "rubikaUrl" | "eitaaUrl" | "surveyFormUrl" | "latitude" | "longitude" | "createdAt" | "updatedAt", ExtArgs["result"]["siteSettings"]>
 export type SiteSettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   phoneNumbers?: boolean | Prisma.SiteSettings$phoneNumbersArgs<ExtArgs>
   addresses?: boolean | Prisma.SiteSettings$addressesArgs<ExtArgs>
@@ -971,11 +1085,14 @@ export type $SiteSettingsPayload<ExtArgs extends runtime.Types.Extensions.Intern
     id: string
     laboratoryName: string | null
     shortDescription: string | null
+    ceoMessage: string | null
     province: string | null
     city: string | null
     instagramUrl: string | null
     whatsappUrl: string | null
-    telegramUrl: string | null
+    rubikaUrl: string | null
+    eitaaUrl: string | null
+    surveyFormUrl: string | null
     latitude: runtime.Decimal | null
     longitude: runtime.Decimal | null
     createdAt: Date
@@ -1409,11 +1526,14 @@ export interface SiteSettingsFieldRefs {
   readonly id: Prisma.FieldRef<"SiteSettings", 'String'>
   readonly laboratoryName: Prisma.FieldRef<"SiteSettings", 'String'>
   readonly shortDescription: Prisma.FieldRef<"SiteSettings", 'String'>
+  readonly ceoMessage: Prisma.FieldRef<"SiteSettings", 'String'>
   readonly province: Prisma.FieldRef<"SiteSettings", 'String'>
   readonly city: Prisma.FieldRef<"SiteSettings", 'String'>
   readonly instagramUrl: Prisma.FieldRef<"SiteSettings", 'String'>
   readonly whatsappUrl: Prisma.FieldRef<"SiteSettings", 'String'>
-  readonly telegramUrl: Prisma.FieldRef<"SiteSettings", 'String'>
+  readonly rubikaUrl: Prisma.FieldRef<"SiteSettings", 'String'>
+  readonly eitaaUrl: Prisma.FieldRef<"SiteSettings", 'String'>
+  readonly surveyFormUrl: Prisma.FieldRef<"SiteSettings", 'String'>
   readonly latitude: Prisma.FieldRef<"SiteSettings", 'Decimal'>
   readonly longitude: Prisma.FieldRef<"SiteSettings", 'Decimal'>
   readonly createdAt: Prisma.FieldRef<"SiteSettings", 'DateTime'>

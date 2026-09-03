@@ -1,18 +1,19 @@
 export const navigationItems = [
-  { href: "/", label: "خانه" },
-  { href: "/#services", label: "خدمات" },
-  { href: "/#news-and-announcements", label: "اخبار و اطلاعیه‌ها" },
-  { href: "/#articles", label: "مجلهٔ پایش" },
-  { href: "/about", label: "درباره ما" },
-  { href: "/contact", label: "تماس با ما" },
+  { href: "/", labelKey: "navigation.home" },
+  { href: "/#services", labelKey: "navigation.services" },
+  { href: "/#news-and-announcements", labelKey: "navigation.news" },
+  { href: "/#articles", labelKey: "navigation.journal" },
+  { href: "/tests", labelKey: "navigation.tests" },
+  { href: "/about", labelKey: "navigation.about" },
+  { href: "/contact", labelKey: "navigation.contact" },
 ] as const;
 
 export const onlineAnswerItems = [
-  { href: "#online-answers-patients", label: "جوابدهی آنلاین بیماران" },
-  { href: "#online-answers-tests", label: "جوابدهی آنلاین آزمایش" },
-  { href: "#online-answers-doctors", label: "جوابدهی آنلاین پزشکان" },
+  { href: "#online-answers-patients", labelKey: "navigation.onlineAnswersPatients" },
+  { href: "#online-answers-tests", labelKey: "navigation.onlineAnswersTests" },
+  { href: "#online-answers-doctors", labelKey: "navigation.onlineAnswersDoctors" },
   {
     href: "#online-answers-partners",
-    label: "جوابدهی آنلاین سازمان‌های همکار",
+    labelKey: "navigation.onlineAnswersPartners",
   },
 ] as const;

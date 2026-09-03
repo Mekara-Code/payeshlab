@@ -198,6 +198,7 @@ export type AnnouncementWhereInput = {
   publishedAt?: Prisma.DateTimeFilter<"Announcement"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Announcement"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Announcement"> | Date | string
+  translations?: Prisma.AnnouncementTranslationListRelationFilter
 }
 
 export type AnnouncementOrderByWithRelationInput = {
@@ -208,6 +209,7 @@ export type AnnouncementOrderByWithRelationInput = {
   publishedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  translations?: Prisma.AnnouncementTranslationOrderByRelationAggregateInput
 }
 
 export type AnnouncementWhereUniqueInput = Prisma.AtLeast<{
@@ -221,6 +223,7 @@ export type AnnouncementWhereUniqueInput = Prisma.AtLeast<{
   publishedAt?: Prisma.DateTimeFilter<"Announcement"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Announcement"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Announcement"> | Date | string
+  translations?: Prisma.AnnouncementTranslationListRelationFilter
 }, "id">
 
 export type AnnouncementOrderByWithAggregationInput = {
@@ -257,6 +260,7 @@ export type AnnouncementCreateInput = {
   publishedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  translations?: Prisma.AnnouncementTranslationCreateNestedManyWithoutAnnouncementInput
 }
 
 export type AnnouncementUncheckedCreateInput = {
@@ -267,6 +271,7 @@ export type AnnouncementUncheckedCreateInput = {
   publishedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  translations?: Prisma.AnnouncementTranslationUncheckedCreateNestedManyWithoutAnnouncementInput
 }
 
 export type AnnouncementUpdateInput = {
@@ -277,6 +282,7 @@ export type AnnouncementUpdateInput = {
   publishedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  translations?: Prisma.AnnouncementTranslationUpdateManyWithoutAnnouncementNestedInput
 }
 
 export type AnnouncementUncheckedUpdateInput = {
@@ -287,6 +293,7 @@ export type AnnouncementUncheckedUpdateInput = {
   publishedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  translations?: Prisma.AnnouncementTranslationUncheckedUpdateManyWithoutAnnouncementNestedInput
 }
 
 export type AnnouncementCreateManyInput = {
@@ -349,6 +356,110 @@ export type AnnouncementMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type AnnouncementScalarRelationFilter = {
+  is?: Prisma.AnnouncementWhereInput
+  isNot?: Prisma.AnnouncementWhereInput
+}
+
+export type AnnouncementCreateNestedOneWithoutTranslationsInput = {
+  create?: Prisma.XOR<Prisma.AnnouncementCreateWithoutTranslationsInput, Prisma.AnnouncementUncheckedCreateWithoutTranslationsInput>
+  connectOrCreate?: Prisma.AnnouncementCreateOrConnectWithoutTranslationsInput
+  connect?: Prisma.AnnouncementWhereUniqueInput
+}
+
+export type AnnouncementUpdateOneRequiredWithoutTranslationsNestedInput = {
+  create?: Prisma.XOR<Prisma.AnnouncementCreateWithoutTranslationsInput, Prisma.AnnouncementUncheckedCreateWithoutTranslationsInput>
+  connectOrCreate?: Prisma.AnnouncementCreateOrConnectWithoutTranslationsInput
+  upsert?: Prisma.AnnouncementUpsertWithoutTranslationsInput
+  connect?: Prisma.AnnouncementWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AnnouncementUpdateToOneWithWhereWithoutTranslationsInput, Prisma.AnnouncementUpdateWithoutTranslationsInput>, Prisma.AnnouncementUncheckedUpdateWithoutTranslationsInput>
+}
+
+export type AnnouncementCreateWithoutTranslationsInput = {
+  id?: string
+  title: string
+  description: string
+  isActive?: boolean
+  publishedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AnnouncementUncheckedCreateWithoutTranslationsInput = {
+  id?: string
+  title: string
+  description: string
+  isActive?: boolean
+  publishedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AnnouncementCreateOrConnectWithoutTranslationsInput = {
+  where: Prisma.AnnouncementWhereUniqueInput
+  create: Prisma.XOR<Prisma.AnnouncementCreateWithoutTranslationsInput, Prisma.AnnouncementUncheckedCreateWithoutTranslationsInput>
+}
+
+export type AnnouncementUpsertWithoutTranslationsInput = {
+  update: Prisma.XOR<Prisma.AnnouncementUpdateWithoutTranslationsInput, Prisma.AnnouncementUncheckedUpdateWithoutTranslationsInput>
+  create: Prisma.XOR<Prisma.AnnouncementCreateWithoutTranslationsInput, Prisma.AnnouncementUncheckedCreateWithoutTranslationsInput>
+  where?: Prisma.AnnouncementWhereInput
+}
+
+export type AnnouncementUpdateToOneWithWhereWithoutTranslationsInput = {
+  where?: Prisma.AnnouncementWhereInput
+  data: Prisma.XOR<Prisma.AnnouncementUpdateWithoutTranslationsInput, Prisma.AnnouncementUncheckedUpdateWithoutTranslationsInput>
+}
+
+export type AnnouncementUpdateWithoutTranslationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publishedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AnnouncementUncheckedUpdateWithoutTranslationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publishedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type AnnouncementCountOutputType
+ */
+
+export type AnnouncementCountOutputType = {
+  translations: number
+}
+
+export type AnnouncementCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  translations?: boolean | AnnouncementCountOutputTypeCountTranslationsArgs
+}
+
+/**
+ * AnnouncementCountOutputType without action
+ */
+export type AnnouncementCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AnnouncementCountOutputType
+   */
+  select?: Prisma.AnnouncementCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * AnnouncementCountOutputType without action
+ */
+export type AnnouncementCountOutputTypeCountTranslationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AnnouncementTranslationWhereInput
+}
 
 
 export type AnnouncementSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -359,6 +470,8 @@ export type AnnouncementSelect<ExtArgs extends runtime.Types.Extensions.Internal
   publishedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  translations?: boolean | Prisma.Announcement$translationsArgs<ExtArgs>
+  _count?: boolean | Prisma.AnnouncementCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["announcement"]>
 
 export type AnnouncementSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -392,10 +505,18 @@ export type AnnouncementSelectScalar = {
 }
 
 export type AnnouncementOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "description" | "isActive" | "publishedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["announcement"]>
+export type AnnouncementInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  translations?: boolean | Prisma.Announcement$translationsArgs<ExtArgs>
+  _count?: boolean | Prisma.AnnouncementCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type AnnouncementIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type AnnouncementIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $AnnouncementPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Announcement"
-  objects: {}
+  objects: {
+    translations: Prisma.$AnnouncementTranslationPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     title: string
@@ -798,6 +919,7 @@ readonly fields: AnnouncementFieldRefs;
  */
 export interface Prisma__AnnouncementClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  translations<T extends Prisma.Announcement$translationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Announcement$translationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnnouncementTranslationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -851,6 +973,10 @@ export type AnnouncementFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.
    */
   omit?: Prisma.AnnouncementOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
+  /**
    * Filter, which Announcement to fetch.
    */
   where: Prisma.AnnouncementWhereUniqueInput
@@ -869,6 +995,10 @@ export type AnnouncementFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Exte
    */
   omit?: Prisma.AnnouncementOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
+  /**
    * Filter, which Announcement to fetch.
    */
   where: Prisma.AnnouncementWhereUniqueInput
@@ -886,6 +1016,10 @@ export type AnnouncementFindFirstArgs<ExtArgs extends runtime.Types.Extensions.I
    * Omit specific fields from the Announcement
    */
   omit?: Prisma.AnnouncementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
   /**
    * Filter, which Announcement to fetch.
    */
@@ -935,6 +1069,10 @@ export type AnnouncementFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Exten
    */
   omit?: Prisma.AnnouncementOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
+  /**
    * Filter, which Announcement to fetch.
    */
   where?: Prisma.AnnouncementWhereInput
@@ -982,6 +1120,10 @@ export type AnnouncementFindManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Omit specific fields from the Announcement
    */
   omit?: Prisma.AnnouncementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
   /**
    * Filter, which Announcements to fetch.
    */
@@ -1031,6 +1173,10 @@ export type AnnouncementCreateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   omit?: Prisma.AnnouncementOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
+  /**
    * The data needed to create a Announcement.
    */
   data: Prisma.XOR<Prisma.AnnouncementCreateInput, Prisma.AnnouncementUncheckedCreateInput>
@@ -1078,6 +1224,10 @@ export type AnnouncementUpdateArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Omit specific fields from the Announcement
    */
   omit?: Prisma.AnnouncementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
   /**
    * The data needed to update a Announcement.
    */
@@ -1145,6 +1295,10 @@ export type AnnouncementUpsertArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   omit?: Prisma.AnnouncementOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
+  /**
    * The filter to search for the Announcement to update in case it exists.
    */
   where: Prisma.AnnouncementWhereUniqueInput
@@ -1171,6 +1325,10 @@ export type AnnouncementDeleteArgs<ExtArgs extends runtime.Types.Extensions.Inte
    */
   omit?: Prisma.AnnouncementOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
+  /**
    * Filter which Announcement to delete.
    */
   where: Prisma.AnnouncementWhereUniqueInput
@@ -1191,6 +1349,30 @@ export type AnnouncementDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
 }
 
 /**
+ * Announcement.translations
+ */
+export type Announcement$translationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AnnouncementTranslation
+   */
+  select?: Prisma.AnnouncementTranslationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AnnouncementTranslation
+   */
+  omit?: Prisma.AnnouncementTranslationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementTranslationInclude<ExtArgs> | null
+  where?: Prisma.AnnouncementTranslationWhereInput
+  orderBy?: Prisma.AnnouncementTranslationOrderByWithRelationInput | Prisma.AnnouncementTranslationOrderByWithRelationInput[]
+  cursor?: Prisma.AnnouncementTranslationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AnnouncementTranslationScalarFieldEnum | Prisma.AnnouncementTranslationScalarFieldEnum[]
+}
+
+/**
  * Announcement without action
  */
 export type AnnouncementDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1202,4 +1384,8 @@ export type AnnouncementDefaultArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Omit specific fields from the Announcement
    */
   omit?: Prisma.AnnouncementOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AnnouncementInclude<ExtArgs> | null
 }

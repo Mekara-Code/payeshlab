@@ -3,8 +3,14 @@
 /* eslint-disable @next/next/no-img-element -- Insurance logos are administrator-configured external URLs. */
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useTranslations } from "@/components/i18n/dictionary-provider";
 import type { InsurancePartner } from "@/lib/insurance-data";
+
+const subscribeToPortal = () => () => {};
+const getPortalContainer = () => document.body;
+const getServerPortalContainer = () => null;
 
 function ShieldIcon() {
   return (
@@ -88,6 +94,7 @@ function getSuggestionScore(name: string, query: string) {
 }
 
 function InsuranceLogo({ logoUrl, name }: Pick<InsurancePartner, "logoUrl" | "name">) {
+  const { t } = useTranslations();
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const hasError = failedUrl === logoUrl;
 
@@ -99,7 +106,7 @@ function InsuranceLogo({ logoUrl, name }: Pick<InsurancePartner, "logoUrl" | "na
     );
   }
 
-  return <img alt={`لوگوی ${name}`} className="max-h-full max-w-full object-contain" onError={() => setFailedUrl(logoUrl)} src={logoUrl} />;
+  return <img alt={t("insurance.logoAlt", { name })} className="max-h-full max-w-full object-contain" onError={() => setFailedUrl(logoUrl)} src={logoUrl} />;
 }
 
 type InsurancePartnersModalProps = {
@@ -107,13 +114,19 @@ type InsurancePartnersModalProps = {
 };
 
 export function InsurancePartnersModal({ insurances }: InsurancePartnersModalProps) {
+  const { locale, t } = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const portalContainer = useSyncExternalStore(subscribeToPortal, getPortalContainer, getServerPortalContainer);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
   const shouldReduceMotion = useReducedMotion() ?? false;
+  const numberFormatter = useMemo(
+    () => new Intl.NumberFormat(locale === "fa" ? "fa-IR" : locale === "ar" ? "ar" : "en-US"),
+    [locale],
+  );
   const normalizedQuery = normalizeSearchValue(searchQuery);
   const matchingInsurances = useMemo(
     () => (normalizedQuery ? insurances.filter((insurance) => normalizeSearchValue(insurance.name).includes(normalizedQuery)) : insurances),
@@ -200,19 +213,20 @@ export function InsurancePartnersModal({ insurances }: InsurancePartnersModalPro
         type="button"
       >
         <ListIcon />
-        مشاهده فهرست بیمه‌ها
+        {t("insurance.viewList")}
       </button>
 
-      <AnimatePresence>
-        {isOpen ? (
-          <motion.div
+      {portalContainer ? createPortal(
+        <AnimatePresence>
+          {isOpen ? (
+            <motion.div
             animate={{ opacity: 1 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-5"
+            className="fixed inset-0 z-[400] flex items-center justify-center p-3 sm:p-5"
             exit={{ opacity: 0 }}
             initial={{ opacity: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.26, ease: [0.22, 1, 0.36, 1] }}
           >
-            <button aria-label="بستن فهرست بیمه‌های طرف قرارداد" className="absolute inset-0 cursor-default bg-slate-950/85 backdrop-blur-md" onClick={closeModal} tabIndex={-1} type="button" />
+            <button aria-label={t("insurance.closeList")} className="absolute inset-0 cursor-default bg-slate-950/85 backdrop-blur-md" onClick={closeModal} tabIndex={-1} type="button" />
 
             <motion.section
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -228,14 +242,14 @@ export function InsurancePartnersModal({ insurances }: InsurancePartnersModalPro
             >
               <header className="flex items-start justify-between gap-4 border-b border-slate-100 px-5 pb-4 pt-5 sm:px-7 sm:pb-5 sm:pt-6">
                 <div>
-                  <span className="inline-flex rounded-full bg-teal-50 px-3 py-1 text-xs font-extrabold text-teal-500">پوشش درمان</span>
+                  <span className="inline-flex rounded-full bg-teal-50 px-3 py-1 text-xs font-extrabold text-teal-500">{t("insurance.coverage")}</span>
                   <h2 className="mt-2 text-xl font-black tracking-[-0.04em] text-slate-950 sm:text-2xl" id="insurance-partners-title">
-                    فهرست بیمه‌های طرف قرارداد
+                    {t("insurance.modalTitle")}
                   </h2>
-                  <p className="mt-1.5 text-sm font-medium leading-6 text-slate-600">پذیرش آزمایش‌ها با پوشش بیمه‌های همکار آزمایشگاه پایش.</p>
+                  <p className="mt-1.5 text-sm font-medium leading-6 text-slate-600">{t("insurance.modalDescription")}</p>
                 </div>
                 <button
-                  aria-label="بستن مودال"
+                  aria-label={t("insurance.closeModal")}
                   className="flex size-11 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition-[background-color,color,transform] duration-200 hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-teal-500 active:scale-95"
                   onClick={closeModal}
                   ref={closeButtonRef}
@@ -246,29 +260,29 @@ export function InsurancePartnersModal({ insurances }: InsurancePartnersModalPro
               </header>
 
               <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/80 px-5 py-3 sm:px-7">
-                <p className="text-sm font-bold text-slate-700">بیمه‌های فعال</p>
-                <span className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-teal-500 ring-1 ring-teal-100">{insurances.length.toLocaleString("fa-IR")} مورد</span>
+                <p className="text-sm font-bold text-slate-700">{t("insurance.active")}</p>
+                <span className="rounded-full bg-white px-3 py-1 text-xs font-extrabold text-teal-500 ring-1 ring-teal-100">{t("insurance.count", { count: numberFormatter.format(insurances.length) })}</span>
               </div>
 
               {insurances.length > 0 ? (
                 <div className="border-b border-slate-100 px-5 py-4 sm:px-7">
-                  <label className="sr-only" htmlFor="insurance-search">جست‌وجوی نام بیمه</label>
+                  <label className="sr-only" htmlFor="insurance-search">{t("insurance.searchLabel")}</label>
                   <div className="relative">
                     <input
                       className="min-h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-11 text-base font-bold text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
                       id="insurance-search"
                       onChange={(event) => setSearchQuery(event.target.value)}
-                      placeholder="نام بیمه را جست‌وجو کنید…"
+                      placeholder={t("insurance.searchPlaceholder")}
                       ref={searchInputRef}
                       type="search"
                       value={searchQuery}
                     />
                     <span aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"><SearchIcon /></span>
                     {searchQuery ? (
-                      <button aria-label="پاک کردن جست‌وجو" className="absolute left-1 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500" onClick={() => setSearchQuery("")} type="button"><CloseIcon /></button>
+                      <button aria-label={t("insurance.clearSearch")} className="absolute left-1 top-1/2 grid size-10 -translate-y-1/2 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-200 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500" onClick={() => setSearchQuery("")} type="button"><CloseIcon /></button>
                     ) : null}
                   </div>
-                  {normalizedQuery ? <p aria-live="polite" className="mt-2 text-xs font-bold text-slate-500">{matchingInsurances.length.toLocaleString("fa-IR")} نتیجهٔ دقیق پیدا شد.</p> : null}
+                  {normalizedQuery ? <p aria-live="polite" className="mt-2 text-xs font-bold text-slate-500">{t("insurance.results", { count: numberFormatter.format(matchingInsurances.length) })}</p> : null}
                 </div>
               ) : null}
 
@@ -278,8 +292,8 @@ export function InsurancePartnersModal({ insurances }: InsurancePartnersModalPro
                     {normalizedQuery && suggestedInsurances.length > 0 ? (
                       <section aria-labelledby="insurance-suggestions-title" className="mb-6">
                         <div className="mb-3 flex items-center justify-between gap-3">
-                          <h3 className="text-sm font-black text-slate-900" id="insurance-suggestions-title">پیشنهادهای نزدیک</h3>
-                          <span className="text-xs font-bold text-teal-500">براساس نام واردشده</span>
+                          <h3 className="text-sm font-black text-slate-900" id="insurance-suggestions-title">{t("insurance.suggestions")}</h3>
+                          <span className="text-xs font-bold text-teal-500">{t("insurance.suggestionHint")}</span>
                         </div>
                         <ul className="grid gap-2 sm:grid-cols-3" role="list">
                           {suggestedInsurances.map((insurance) => (
@@ -307,7 +321,7 @@ export function InsurancePartnersModal({ insurances }: InsurancePartnersModalPro
                         </div>
                         <div className="min-w-0">
                           <p className="truncate text-sm font-extrabold text-slate-900 sm:text-base">{insurance.name}</p>
-                          <p className="mt-1 text-xs font-bold text-teal-500">بیمه طرف قرارداد</p>
+                          <p className="mt-1 text-xs font-bold text-teal-500">{t("insurance.partner")}</p>
                         </div>
                       </motion.li>
                     ))}
@@ -315,8 +329,8 @@ export function InsurancePartnersModal({ insurances }: InsurancePartnersModalPro
                     ) : (
                       <div className="flex min-h-40 flex-col items-center justify-center rounded-2xl bg-slate-50 px-5 text-center">
                         <span className="flex size-12 items-center justify-center rounded-full bg-white text-teal-500 ring-1 ring-teal-100"><SearchIcon /></span>
-                        <p className="mt-3 text-sm font-bold text-slate-700">بیمه‌ای با این نام پیدا نشد.</p>
-                        <p className="mt-1 text-xs font-medium text-slate-500">پیشنهادهای نزدیک را در بالا بررسی کنید.</p>
+                        <p className="mt-3 text-sm font-bold text-slate-700">{t("insurance.notFound")}</p>
+                        <p className="mt-1 text-xs font-medium text-slate-500">{t("insurance.notFoundHint")}</p>
                       </div>
                     )}
                   </>
@@ -325,14 +339,16 @@ export function InsurancePartnersModal({ insurances }: InsurancePartnersModalPro
                     <span className="flex size-14 items-center justify-center rounded-full bg-teal-50 text-teal-500">
                       <ShieldIcon />
                     </span>
-                    <p className="mt-4 text-sm font-bold text-slate-700">هنوز بیمه فعالی ثبت نشده است.</p>
+                    <p className="mt-4 text-sm font-bold text-slate-700">{t("insurance.noneActive")}</p>
                   </div>
                 )}
               </div>
             </motion.section>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>,
+        portalContainer,
+      ) : null}
     </>
   );
 }

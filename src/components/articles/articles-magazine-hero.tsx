@@ -9,10 +9,13 @@ import "swiper/css/pagination";
 import { useReducedMotion } from "framer-motion";
 import { Autoplay, EffectFade, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useTranslations } from "@/components/i18n/dictionary-provider";
 import type { PublicArticle } from "@/lib/public-articles";
 
-function formatPersianDate(dateValue: string) {
-  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+function formatDate(dateValue: string, locale: "ar" | "en" | "fa") {
+  const languageTag = locale === "fa" ? "fa-IR-u-ca-persian" : locale === "ar" ? "ar-SA-u-ca-gregory" : "en-US";
+
+  return new Intl.DateTimeFormat(languageTag, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -61,12 +64,13 @@ export function ArticlesMagazineHero({
   articles: PublicArticle[];
 }) {
   const shouldReduceMotion = useReducedMotion();
+  const { locale, t } = useTranslations();
 
   if (articles.length === 0) return null;
 
   return (
     <section
-      aria-label="مقالات برگزیدهٔ مجله پایش"
+      aria-label={t("articles.featuredList")}
       className="magazine-hero bg-[#f7fbfb] px-5 pb-1 pt-28 sm:px-10 sm:pt-32 lg:px-20 lg:pt-36"
       id="main-content"
       tabIndex={-1}
@@ -105,12 +109,13 @@ export function ArticlesMagazineHero({
               <div className="relative flex min-h-0 flex-col justify-center bg-white px-6 py-8 text-right sm:px-9 sm:py-10 lg:px-11 lg:py-12">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="rounded-full bg-teal-500 px-3 py-1.5 text-xs font-extrabold text-white">
-                    مقالهٔ برگزیده
+                    {t("articles.featured")}
                   </span>
                   <span className="text-xs font-extrabold tracking-[0.12em] text-teal-500">
-                    مجلهٔ پایش ·{" "}
-                    {String(index + 1).padStart(2, "0")} /{" "}
-                    {String(articles.length).padStart(2, "0")}
+                    {t("articles.counter", {
+                      current: String(index + 1).padStart(2, "0"),
+                      total: String(articles.length).padStart(2, "0"),
+                    })}
                   </span>
                 </div>
                 <h2 className="mt-4 line-clamp-3 text-2xl font-black leading-[1.36] tracking-[-0.055em] text-slate-950 sm:text-3xl sm:leading-[1.4] lg:text-4xl">
@@ -122,14 +127,14 @@ export function ArticlesMagazineHero({
 
                 <div className="mt-6 inline-flex items-center gap-2 text-xs font-bold text-slate-500">
                   <CalendarIcon />
-                  {formatPersianDate(article.publishedAt)}
+                  {formatDate(article.publishedAt, locale)}
                 </div>
 
                 <Link
                   className="group mt-7 inline-flex min-h-12 w-fit items-center gap-3 rounded-full bg-teal-500 px-5 py-3 text-sm font-extrabold text-white transition-[background-color,color,transform] duration-200 hover:-translate-y-0.5 hover:bg-slate-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500 active:translate-y-0 motion-reduce:transition-none"
                   href={`/articles/${article.slug}`}
                 >
-                  مطالعهٔ مقاله
+                  {t("articles.readCta")}
                   <span className="transition-transform duration-200 group-hover:-translate-x-1 motion-reduce:transition-none">
                     <ArrowIcon />
                   </span>

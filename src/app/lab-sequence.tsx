@@ -3,11 +3,12 @@
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useTranslations } from "@/components/i18n/dictionary-provider";
 
 const stages = [
   {
     src: "/lab-sequence/stage.png",
-    alt: "سکوی آزمایشگاهی",
+    altKey: "labSequence.stage",
     frame: { left: "25.2%", top: "31.35%", width: "76%", height: "66%" },
     sizes:
       "(max-width: 639px) 118vw, (max-width: 1023px) 95vw, (max-width: 1279px) 85vw, (max-width: 1535px) 76vw, 1167px",
@@ -15,7 +16,7 @@ const stages = [
   },
   {
     src: "/lab-sequence/circle.png",
-    alt: "حلقهٔ علمی درخشان",
+    altKey: "labSequence.circle",
     frame: { left: "16.86%", top: "4.49%", width: "78%", height: "78%" },
     sizes:
       "(max-width: 639px) 121vw, (max-width: 1023px) 98vw, (max-width: 1279px) 87vw, (max-width: 1535px) 78vw, 1198px",
@@ -23,7 +24,7 @@ const stages = [
   },
   {
     src: "/lab-sequence/glass.png",
-    alt: "شیشه‌آلات آزمایشگاهی",
+    altKey: "labSequence.glass",
     frame: { left: "34.77%", top: "24.41%", width: "58%", height: "56%" },
     sizes:
       "(max-width: 639px) 90vw, (max-width: 1023px) 73vw, (max-width: 1279px) 65vw, (max-width: 1535px) 58vw, 891px",
@@ -31,7 +32,7 @@ const stages = [
   },
   {
     src: "/lab-sequence/microscope.png",
-    alt: "میکروسکوپ آزمایشگاهی",
+    altKey: "labSequence.microscope",
     frame: { left: "30.4%", top: "19.2%", width: "61.5%", height: "61.5%" },
     sizes:
       "(max-width: 639px) 95vw, (max-width: 1023px) 77vw, (max-width: 1279px) 69vw, (max-width: 1535px) 62vw, 945px",
@@ -65,6 +66,7 @@ export function LabSequence() {
   const [stageIndex, setStageIndex] = useState(0);
   const shouldReduceMotion = useReducedMotion();
   const visibleStage = shouldReduceMotion ? finalStage : stageIndex;
+  const { t } = useTranslations();
 
   useEffect(() => {
     if (shouldReduceMotion || stageIndex === finalStage) {
@@ -80,10 +82,10 @@ export function LabSequence() {
 
   return (
     <section
-      aria-label="نمایش مرحله‌ای تجهیزات آزمایشگاه"
+      aria-label={t("hero.labSequence")}
       className="absolute inset-0 z-10 grid place-items-center overflow-hidden"
     >
-      <div className="relative isolate aspect-[3/2] w-[min(155vw,150dvh,96rem)] -translate-x-[14.5%] translate-y-[27%] [perspective:1400px] sm:w-[min(125vw,150dvh,96rem)] sm:-translate-x-[12%] sm:translate-y-[18%] lg:w-[min(112vw,150dvh,96rem)] lg:-translate-x-[8%] lg:translate-y-0 xl:w-[min(100vw,150dvh,96rem)] xl:translate-x-0">
+      <div className="relative isolate aspect-[3/2] w-[min(155vw,150dvh,96rem)] -translate-x-[14.5%] translate-y-[37%] [perspective:1400px] sm:w-[min(125vw,150dvh,96rem)] sm:-translate-x-[12%] sm:translate-y-[28%] lg:w-[min(112vw,150dvh,96rem)] lg:-translate-x-[8%] lg:translate-y-12 xl:w-[min(100vw,150dvh,96rem)] xl:translate-x-0">
         {stages.map((stage, index) => {
           const currentMotion = stageMotion[index];
           const isVisible = index <= visibleStage;
@@ -110,7 +112,7 @@ export function LabSequence() {
                 }
               >
                 <Image
-                  alt={stage.alt}
+                  alt={t(stage.altKey)}
                   className="object-fill"
                   fill
                   loading={index === 0 ? undefined : "eager"}
@@ -125,7 +127,10 @@ export function LabSequence() {
       </div>
 
       <span className="sr-only" aria-live="polite">
-        مرحلهٔ {visibleStage + 1} از {stages.length}
+        {t("labSequence.progress", {
+          current: visibleStage + 1,
+          total: stages.length,
+        })}
       </span>
     </section>
   );

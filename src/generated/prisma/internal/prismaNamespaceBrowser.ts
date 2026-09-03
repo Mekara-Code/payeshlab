@@ -56,14 +56,20 @@ export const ModelName = {
   AdminAuthAudit: 'AdminAuthAudit',
   Article: 'Article',
   Announcement: 'Announcement',
+  ArticleTranslation: 'ArticleTranslation',
+  AnnouncementTranslation: 'AnnouncementTranslation',
   ArticleCategory: 'ArticleCategory',
   Insurance: 'Insurance',
   SlideshowSlide: 'SlideshowSlide',
   LabDepartment: 'LabDepartment',
+  LaboratoryTest: 'LaboratoryTest',
   SiteSettings: 'SiteSettings',
   SitePhone: 'SitePhone',
   SiteAddress: 'SiteAddress',
-  SiteWorkingHour: 'SiteWorkingHour'
+  SiteWorkingHour: 'SiteWorkingHour',
+  PatientTestResult: 'PatientTestResult',
+  HomeSamplingRequest: 'HomeSamplingRequest',
+  JobApplication: 'JobApplication'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -157,6 +163,35 @@ export const AnnouncementScalarFieldEnum = {
 export type AnnouncementScalarFieldEnum = (typeof AnnouncementScalarFieldEnum)[keyof typeof AnnouncementScalarFieldEnum]
 
 
+export const ArticleTranslationScalarFieldEnum = {
+  id: 'id',
+  articleId: 'articleId',
+  locale: 'locale',
+  title: 'title',
+  excerpt: 'excerpt',
+  content: 'content',
+  tags: 'tags',
+  metaDescription: 'metaDescription',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ArticleTranslationScalarFieldEnum = (typeof ArticleTranslationScalarFieldEnum)[keyof typeof ArticleTranslationScalarFieldEnum]
+
+
+export const AnnouncementTranslationScalarFieldEnum = {
+  id: 'id',
+  announcementId: 'announcementId',
+  locale: 'locale',
+  title: 'title',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AnnouncementTranslationScalarFieldEnum = (typeof AnnouncementTranslationScalarFieldEnum)[keyof typeof AnnouncementTranslationScalarFieldEnum]
+
+
 export const ArticleCategoryScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -214,15 +249,36 @@ export const LabDepartmentScalarFieldEnum = {
 export type LabDepartmentScalarFieldEnum = (typeof LabDepartmentScalarFieldEnum)[keyof typeof LabDepartmentScalarFieldEnum]
 
 
+export const LaboratoryTestScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  clinicalSignificance: 'clinicalSignificance',
+  resultInterpretation: 'resultInterpretation',
+  samplingInformation: 'samplingInformation',
+  limitations: 'limitations',
+  isActive: 'isActive',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LaboratoryTestScalarFieldEnum = (typeof LaboratoryTestScalarFieldEnum)[keyof typeof LaboratoryTestScalarFieldEnum]
+
+
 export const SiteSettingsScalarFieldEnum = {
   id: 'id',
   laboratoryName: 'laboratoryName',
   shortDescription: 'shortDescription',
+  ceoMessage: 'ceoMessage',
   province: 'province',
   city: 'city',
   instagramUrl: 'instagramUrl',
   whatsappUrl: 'whatsappUrl',
-  telegramUrl: 'telegramUrl',
+  rubikaUrl: 'rubikaUrl',
+  eitaaUrl: 'eitaaUrl',
+  surveyFormUrl: 'surveyFormUrl',
   latitude: 'latitude',
   longitude: 'longitude',
   createdAt: 'createdAt',
@@ -267,12 +323,128 @@ export const SiteWorkingHourScalarFieldEnum = {
   endDay: 'endDay',
   startTime: 'startTime',
   endTime: 'endTime',
+  startPeriod: 'startPeriod',
+  endPeriod: 'endPeriod',
   sortOrder: 'sortOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type SiteWorkingHourScalarFieldEnum = (typeof SiteWorkingHourScalarFieldEnum)[keyof typeof SiteWorkingHourScalarFieldEnum]
+
+
+export const PatientTestResultScalarFieldEnum = {
+  id: 'id',
+  nationalCode: 'nationalCode',
+  patientName: 'patientName',
+  fileName: 'fileName',
+  storedName: 'storedName',
+  fileSize: 'fileSize',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PatientTestResultScalarFieldEnum = (typeof PatientTestResultScalarFieldEnum)[keyof typeof PatientTestResultScalarFieldEnum]
+
+
+export const HomeSamplingRequestScalarFieldEnum = {
+  id: 'id',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  nationalCode: 'nationalCode',
+  birthDate: 'birthDate',
+  mobile: 'mobile',
+  phone: 'phone',
+  address: 'address',
+  primaryInsurance: 'primaryInsurance',
+  supplementaryInsurance: 'supplementaryInsurance',
+  prescriptionName: 'prescriptionName',
+  prescriptionStoredName: 'prescriptionStoredName',
+  description: 'description',
+  isPersonalRequest: 'isPersonalRequest',
+  status: 'status',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HomeSamplingRequestScalarFieldEnum = (typeof HomeSamplingRequestScalarFieldEnum)[keyof typeof HomeSamplingRequestScalarFieldEnum]
+
+
+export const JobApplicationScalarFieldEnum = {
+  id: 'id',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  fatherName: 'fatherName',
+  identityNumber: 'identityNumber',
+  nationalCode: 'nationalCode',
+  birthDate: 'birthDate',
+  birthPlace: 'birthPlace',
+  issuePlace: 'issuePlace',
+  gender: 'gender',
+  maritalStatus: 'maritalStatus',
+  nationality: 'nationality',
+  militaryStatus: 'militaryStatus',
+  exemptionType: 'exemptionType',
+  healthStatus: 'healthStatus',
+  healthNote: 'healthNote',
+  email: 'email',
+  address: 'address',
+  homePhone: 'homePhone',
+  mobile: 'mobile',
+  emergencyPhone: 'emergencyPhone',
+  spouseName: 'spouseName',
+  spouseJob: 'spouseJob',
+  spousePhone: 'spousePhone',
+  sonsCount: 'sonsCount',
+  daughtersCount: 'daughtersCount',
+  dependents: 'dependents',
+  referees: 'referees',
+  educations: 'educations',
+  workExperiences: 'workExperiences',
+  trainingCourses: 'trainingCourses',
+  competencies: 'competencies',
+  foreignLanguages: 'foreignLanguages',
+  referralSource: 'referralSource',
+  referralDetail: 'referralDetail',
+  canProvideConsent: 'canProvideConsent',
+  isCurrentlyEmployed: 'isCurrentlyEmployed',
+  currentWorkplace: 'currentWorkplace',
+  plansFurtherStudy: 'plansFurtherStudy',
+  furtherStudyField: 'furtherStudyField',
+  furtherStudyTime: 'furtherStudyTime',
+  plansEmigration: 'plansEmigration',
+  emigrationCountry: 'emigrationCountry',
+  emigrationTime: 'emigrationTime',
+  insuranceHistory: 'insuranceHistory',
+  insuranceNumber: 'insuranceNumber',
+  expectedSalary: 'expectedSalary',
+  availableFrom: 'availableFrom',
+  cooperationDuration: 'cooperationDuration',
+  specialties: 'specialties',
+  additionalSkills: 'additionalSkills',
+  favoriteHobby: 'favoriteHobby',
+  favoriteArt: 'favoriteArt',
+  admiredPeople: 'admiredPeople',
+  readingHabit: 'readingHabit',
+  lastBook: 'lastBook',
+  traits: 'traits',
+  goodEmployeeTraits: 'goodEmployeeTraits',
+  goodManagerTraits: 'goodManagerTraits',
+  bestAchievement: 'bestAchievement',
+  roleModel: 'roleModel',
+  selfPaidTraining: 'selfPaidTraining',
+  achievementStory: 'achievementStory',
+  resumeName: 'resumeName',
+  resumeStoredName: 'resumeStoredName',
+  status: 'status',
+  adminNote: 'adminNote',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type JobApplicationScalarFieldEnum = (typeof JobApplicationScalarFieldEnum)[keyof typeof JobApplicationScalarFieldEnum]
 
 
 export const SortOrder = {

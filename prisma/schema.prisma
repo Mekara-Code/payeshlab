@@ -28,6 +28,24 @@ enum ArticleType {
   NEWS
 }
 
+enum JobApplicationStatus {
+  PENDING
+  REVIEWED
+  APPROVED
+  REJECTED
+}
+
+enum HomeSamplingStatus {
+  PENDING
+  COMPLETED
+}
+
+enum ContentLocale {
+  FA
+  EN
+  AR
+}
+
 model AdminUser {
   id               String           @id @default(uuid()) @db.Uuid
   email            String           @unique @db.VarChar(254)
@@ -91,6 +109,7 @@ model Article {
   updatedAt       DateTime          @updatedAt
   author          AdminUser         @relation(fields: [authorId], references: [id], onDelete: Restrict)
   categories      ArticleCategory[]
+  translations    ArticleTranslation[]
 
   @@index([type, status, publishedAt])
   @@index([authorId, createdAt])
@@ -104,8 +123,40 @@ model Announcement {
   publishedAt DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  translations AnnouncementTranslation[]
 
   @@index([isActive, publishedAt])
+}
+
+model ArticleTranslation {
+  id              String        @id @default(uuid()) @db.Uuid
+  articleId       String        @db.Uuid
+  locale          ContentLocale
+  title           String        @db.VarChar(200)
+  excerpt         String?       @db.Text
+  content         Json
+  tags            String[]      @default([])
+  metaDescription String?       @db.VarChar(160)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  article         Article       @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, locale])
+  @@index([locale])
+}
+
+model AnnouncementTranslation {
+  id             String        @id @default(uuid()) @db.Uuid
+  announcementId String        @db.Uuid
+  locale         ContentLocale
+  title          String        @db.VarChar(200)
+  description    String        @db.Text
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  announcement   Announcement  @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+
+  @@unique([announcementId, locale])
+  @@index([locale])
 }
 
 model ArticleCategory {
@@ -160,15 +211,35 @@ model LabDepartment {
   @@index([isActive, sortOrder])
 }
 
+model LaboratoryTest {
+  id                   String   @id @default(uuid()) @db.Uuid
+  name                 String   @db.VarChar(160)
+  slug                 String   @unique @db.VarChar(180)
+  description          String?  @db.Text
+  clinicalSignificance String?  @db.Text
+  resultInterpretation String?  @db.Text
+  samplingInformation  String?  @db.Text
+  limitations          String?  @db.Text
+  isActive             Boolean  @default(true)
+  sortOrder            Int      @default(0)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
 model SiteSettings {
   id               String        @id @db.VarChar(32)
   laboratoryName   String?       @db.VarChar(160)
   shortDescription String?       @db.VarChar(500)
+  ceoMessage       String?       @db.Text
   province         String?       @db.VarChar(100)
   city             String?       @db.VarChar(100)
   instagramUrl     String?       @db.Text
   whatsappUrl      String?       @db.Text
-  telegramUrl      String?       @db.Text
+  rubikaUrl        String?       @db.Text
+  eitaaUrl         String?       @db.Text
+  surveyFormUrl    String?       @db.Text
   latitude         Decimal?      @db.Decimal(9, 6)
   longitude        Decimal?      @db.Decimal(9, 6)
   createdAt        DateTime      @default(now())
@@ -213,10 +284,126 @@ model SiteWorkingHour {
   endDay     String       @default("SATURDAY") @db.VarChar(16)
   startTime  String       @default("08:00") @db.VarChar(5)
   endTime    String       @default("20:00") @db.VarChar(5)
+  startPeriod String      @default("MORNING") @db.VarChar(16)
+  endPeriod   String      @default("NIGHT") @db.VarChar(16)
   sortOrder  Int          @default(0)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
   settings   SiteSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
 
   @@index([settingsId, sortOrder])
+}
+
+model PatientTestResult {
+  id           String   @id @default(uuid()) @db.Uuid
+  nationalCode String   @db.VarChar(10)
+  patientName  String?  @db.VarChar(160)
+  fileName     String   @db.VarChar(255)
+  storedName   String   @unique @db.VarChar(64)
+  fileSize     Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([nationalCode, createdAt])
+  @@index([createdAt])
+}
+
+model HomeSamplingRequest {
+  id                     String             @id @default(uuid()) @db.Uuid
+  firstName              String             @db.VarChar(80)
+  lastName               String             @db.VarChar(80)
+  nationalCode           String             @db.VarChar(10)
+  birthDate              String             @db.VarChar(10)
+  mobile                 String             @db.VarChar(11)
+  phone                  String?            @db.VarChar(20)
+  address                String?            @db.Text
+  primaryInsurance       String?            @db.VarChar(100)
+  supplementaryInsurance String?            @db.VarChar(100)
+  prescriptionName       String?            @db.VarChar(255)
+  prescriptionStoredName String?            @unique @db.VarChar(64)
+  description            String?            @db.Text
+  isPersonalRequest      Boolean            @default(false)
+  status                 HomeSamplingStatus @default(PENDING)
+  completedAt            DateTime?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  @@index([status, createdAt])
+  @@index([createdAt])
+}
+
+model JobApplication {
+  id                     String               @id @default(uuid()) @db.Uuid
+  firstName              String               @db.VarChar(80)
+  lastName               String               @db.VarChar(80)
+  fatherName             String?              @db.VarChar(80)
+  identityNumber         String?              @db.VarChar(20)
+  nationalCode           String               @db.VarChar(10)
+  birthDate              String               @db.VarChar(10)
+  birthPlace             String?              @db.VarChar(100)
+  issuePlace             String?              @db.VarChar(100)
+  gender                 String               @db.VarChar(10)
+  maritalStatus          String               @db.VarChar(16)
+  nationality            String?              @db.VarChar(60)
+  militaryStatus         String?              @db.VarChar(20)
+  exemptionType          String?              @db.VarChar(120)
+  healthStatus           String?              @db.VarChar(20)
+  healthNote             String?              @db.VarChar(200)
+  email                  String?              @db.VarChar(254)
+  address                String?              @db.Text
+  homePhone              String?              @db.VarChar(20)
+  mobile                 String               @db.VarChar(11)
+  emergencyPhone         String?              @db.VarChar(20)
+  spouseName             String?              @db.VarChar(120)
+  spouseJob              String?              @db.VarChar(120)
+  spousePhone            String?              @db.VarChar(20)
+  sonsCount              Int?
+  daughtersCount         Int?
+  dependents             Json                 @default("[]")
+  referees               Json                 @default("[]")
+  educations             Json                 @default("[]")
+  workExperiences        Json                 @default("[]")
+  trainingCourses        Json                 @default("[]")
+  competencies           Json                 @default("[]")
+  foreignLanguages       Json                 @default("[]")
+  referralSource         String?              @db.VarChar(40)
+  referralDetail         String?              @db.VarChar(160)
+  canProvideConsent      Boolean?
+  isCurrentlyEmployed    Boolean?
+  currentWorkplace       String?              @db.Text
+  plansFurtherStudy      Boolean?
+  furtherStudyField      String?              @db.VarChar(120)
+  furtherStudyTime       String?              @db.VarChar(120)
+  plansEmigration        Boolean?
+  emigrationCountry      String?              @db.VarChar(80)
+  emigrationTime         String?              @db.VarChar(120)
+  insuranceHistory       String?              @db.VarChar(80)
+  insuranceNumber        String?              @db.VarChar(40)
+  expectedSalary         String?              @db.VarChar(80)
+  availableFrom          String?              @db.VarChar(80)
+  cooperationDuration    String?              @db.VarChar(120)
+  specialties            String[]             @default([])
+  additionalSkills       String?              @db.Text
+  favoriteHobby          String?              @db.VarChar(160)
+  favoriteArt            String?              @db.VarChar(160)
+  admiredPeople          String?              @db.VarChar(200)
+  readingHabit           String?              @db.VarChar(80)
+  lastBook               String?              @db.VarChar(160)
+  traits                 String[]             @default([])
+  goodEmployeeTraits     String?              @db.Text
+  goodManagerTraits      String?              @db.Text
+  bestAchievement        String?              @db.Text
+  roleModel              String?              @db.Text
+  selfPaidTraining       String?              @db.VarChar(20)
+  achievementStory       String?              @db.Text
+  resumeName             String?              @db.VarChar(255)
+  resumeStoredName       String?              @unique @db.VarChar(64)
+  status                 JobApplicationStatus @default(PENDING)
+  adminNote              String?              @db.Text
+  reviewedAt             DateTime?
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+
+  @@index([status, createdAt])
+  @@index([createdAt])
 }

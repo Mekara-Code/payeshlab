@@ -8,7 +8,15 @@ type ActionMessageState = {
   success?: boolean;
 };
 
-export function useActionToast(state: ActionMessageState) {
+type ActionToastTitles = {
+  error?: string;
+  success?: string;
+};
+
+export function useActionToast(
+  state: ActionMessageState,
+  titles: ActionToastTitles = {},
+) {
   const { toast } = useToast();
   const lastMessage = useRef<string | null>(null);
 
@@ -23,6 +31,9 @@ export function useActionToast(state: ActionMessageState) {
     if (lastMessage.current === messageKey) return;
 
     lastMessage.current = messageKey;
-    toast(message, { variant: state.success ? "success" : "error" });
-  }, [state.message, state.success, toast]);
+    toast(message, {
+      title: state.success ? titles.success : titles.error,
+      variant: state.success ? "success" : "error",
+    });
+  }, [state.message, state.success, titles.error, titles.success, toast]);
 }

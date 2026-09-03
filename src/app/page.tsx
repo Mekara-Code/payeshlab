@@ -6,26 +6,31 @@ import { HomeSampleCollection } from "@/components/home/home-sample-collection";
 import { NewsAndAnnouncements } from "@/components/home/news-and-announcements";
 import { PayeshArticles } from "@/components/home/payesh-articles";
 import { SiteFooter } from "@/components/site-footer";
-import { SidebarNavigation } from "@/components/navigation/sidebar-navigation";
+import { LocalBusinessJsonLd } from "@/components/seo/local-business-json-ld";
+import { SiteNavigation } from "@/components/navigation/site-navigation";
 import { ScrollScene } from "@/components/motion/scroll-scene";
+import { StaggerItem, StaggerScene } from "@/components/motion/stagger-scene";
 import { defaultInsurances, type InsurancePartner } from "@/lib/insurance-data";
+import { getDefaultLabDepartments, type LabDepartmentData } from "@/lib/lab-department-data";
 import {
-  defaultLabDepartments,
-  type LabDepartmentData,
-} from "@/lib/lab-department-data";
-import {
-  defaultAnnouncements,
-  defaultNews,
+  getDefaultAnnouncements,
+  getDefaultNews,
   type AnnouncementItem,
   type NewsItem,
 } from "@/lib/news-data";
 import { getPrisma } from "@/lib/prisma";
 import { getPublishedArticles } from "@/lib/public-articles";
+import { getSelectedContentLocale } from "@/lib/content-locale-server";
+import { getDictionary } from "@/lib/dictionaries";
+import { translate } from "@/lib/dictionaries/types";
+import { createSeoMetadata } from "@/lib/seo";
 import {
-  defaultSlideshowSlides,
-  type SlideshowSlideData,
-} from "@/lib/slideshow-data";
+  toDatabaseContentLocale,
+  type ContentLocale,
+} from "@/lib/content-locale";
+import { getDefaultSlideshowSlides, type SlideshowSlideData } from "@/lib/slideshow-data";
 import { getSiteSettings } from "@/lib/site-settings";
+import { formatWorkingHourRange } from "@/lib/working-hours";
 
 async function getHomepageInsurances(): Promise<InsurancePartner[]> {
   try {
@@ -47,7 +52,7 @@ async function getHomepageInsurances(): Promise<InsurancePartner[]> {
   }
 }
 
-async function getHomepageSlides(): Promise<SlideshowSlideData[]> {
+async function getHomepageSlides(locale: ContentLocale): Promise<SlideshowSlideData[]> {
   try {
     const slides = await getPrisma().slideshowSlide.findMany({
       orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
@@ -62,13 +67,13 @@ async function getHomepageSlides(): Promise<SlideshowSlideData[]> {
       where: { isActive: true },
     });
 
-    return slides.length > 0 ? slides : defaultSlideshowSlides;
+    return slides.length > 0 ? slides : getDefaultSlideshowSlides(locale);
   } catch {
-    return defaultSlideshowSlides;
+    return getDefaultSlideshowSlides(locale);
   }
 }
 
-async function getHomepageDepartments(): Promise<LabDepartmentData[]> {
+async function getHomepageDepartments(locale: ContentLocale): Promise<LabDepartmentData[]> {
   try {
     const departments = await getPrisma().labDepartment.findMany({
       orderBy: [{ sortOrder: "asc" }, { title: "asc" }],
@@ -82,13 +87,13 @@ async function getHomepageDepartments(): Promise<LabDepartmentData[]> {
       where: { isActive: true },
     });
 
-    return departments.length > 0 ? departments : defaultLabDepartments;
+    return departments.length > 0 ? departments : getDefaultLabDepartments(locale);
   } catch {
-    return defaultLabDepartments;
+    return getDefaultLabDepartments(locale);
   }
 }
 
-async function getHomepageNews(): Promise<NewsItem[]> {
+async function getHomepageNews(locale: ContentLocale): Promise<NewsItem[]> {
   try {
     const articles = await getPrisma().article.findMany({
       orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
@@ -99,50 +104,88 @@ async function getHomepageNews(): Promise<NewsItem[]> {
         id: true,
         publishedAt: true,
         title: true,
+        translations: {
+          select: { excerpt: true, title: true },
+          where: { locale: toDatabaseContentLocale(locale) },
+        },
       },
       take: 8,
       where: { status: "PUBLISHED", type: "NEWS" },
     });
 
-    const news = articles.map((article) => ({
+    const news = articles.map((article) => {
+      const translation = article.translations[0];
+      return {
       excerpt:
+        translation?.excerpt ??
         article.excerpt ??
-        "آخرین جزئیات و اطلاعات موردنیاز را در این خبر بخوانید.",
+        translate(getDictionary(locale), "defaults.newsExcerpt"),
       id: article.id,
       imageUrl: article.featuredImage,
       publishedAt: (article.publishedAt ?? article.createdAt).toISOString(),
-      title: article.title,
-    }));
+      title: translation?.title ?? article.title,
+    };
+    });
 
-    return news.length > 0 ? news : defaultNews;
+    return news.length > 0 ? news : getDefaultNews(locale);
   } catch {
-    return defaultNews;
+    return getDefaultNews(locale);
   }
 }
 
-async function getHomepageAnnouncements(): Promise<AnnouncementItem[]> {
+async function getHomepageAnnouncements(
+  locale: ContentLocale,
+): Promise<AnnouncementItem[]> {
   try {
     const announcements = await getPrisma().announcement.findMany({
       orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
-      select: { description: true, id: true, publishedAt: true, title: true },
+      select: {
+        description: true,
+        id: true,
+        publishedAt: true,
+        title: true,
+        translations: {
+          select: { description: true, title: true },
+          where: { locale: toDatabaseContentLocale(locale) },
+        },
+      },
       take: 8,
       where: { isActive: true },
     });
 
     return announcements.length > 0
-      ? announcements.map((announcement) => ({
+      ? announcements.map((announcement) => {
+          const translation = announcement.translations[0];
+          return {
           date: announcement.publishedAt.toISOString(),
-          description: announcement.description,
+          description: translation?.description ?? announcement.description,
           id: announcement.id,
-          title: announcement.title,
-        }))
-      : defaultAnnouncements;
+          title: translation?.title ?? announcement.title,
+        };
+        })
+      : getDefaultAnnouncements(locale);
   } catch {
-    return defaultAnnouncements;
+    return getDefaultAnnouncements(locale);
   }
 }
 
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getSelectedContentLocale();
+  const dictionary = getDictionary(locale);
+
+  return createSeoMetadata({
+    description: translate(dictionary, "seo.homeDescription"),
+    keywords: dictionary["seo.keywords"].split(",").map((keyword) => keyword.trim()),
+    locale,
+    path: "/",
+    title: translate(dictionary, "seo.homeTitle"),
+  });
+}
+
 export default async function Home() {
+  const locale = await getSelectedContentLocale();
+  const dictionary = getDictionary(locale);
+  const t = (key: string) => translate(dictionary, key);
   const [
     insurances,
     slides,
@@ -153,24 +196,36 @@ export default async function Home() {
     settings,
   ] = await Promise.all([
     getHomepageInsurances(),
-    getHomepageSlides(),
-    getHomepageDepartments(),
-    getHomepageNews(),
-    getHomepageAnnouncements(),
-    getPublishedArticles(),
+    getHomepageSlides(locale),
+    getHomepageDepartments(locale),
+    getHomepageNews(locale),
+    getHomepageAnnouncements(locale),
+    getPublishedArticles(8, locale),
     getSiteSettings(),
   ]);
+  const heroContactDetails = {
+    addresses: settings.addresses.map(({ address, id, title }) => ({
+      address,
+      id,
+      title,
+    })),
+    workingHours: settings.workingHours.map((workingHour) => ({
+      id: workingHour.id,
+      label: formatWorkingHourRange(workingHour, locale),
+    })),
+  };
 
   return (
     <main className="relative bg-[#f7fbfb]" id="home">
+      <LocalBusinessJsonLd settings={settings} />
       <a
         className="sr-only fixed left-4 top-4 z-[60] rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white focus:not-sr-only focus:outline-2 focus:outline-offset-4 focus:outline-teal-400"
         href="#main-content"
       >
-        عبور از ناوبری
+        {t("skipNavigation")}
       </a>
-      <SidebarNavigation />
-      <HomeSlideshow slides={slides} />
+      <SiteNavigation />
+      <HomeSlideshow contactDetails={heroContactDetails} slides={slides} />
 
       <section
         className="bg-white px-5 py-16 sm:px-10 sm:py-20 lg:px-20 lg:py-28"
@@ -184,17 +239,28 @@ export default async function Home() {
             <LabDepartments departments={departments} />
           </ScrollScene>
 
-          <div className="mt-14 border-t border-teal-100 pt-12 sm:mt-16 sm:pt-14">
-            <div className="mb-7 text-center sm:mb-9">
+          <section className="mx-auto mt-14 max-w-4xl rounded-[2rem] border border-teal-100 bg-[#f7fbfb] px-6 py-8 text-center sm:mt-16 sm:px-10 sm:py-10">
+            <h2 className="text-2xl font-black leading-9 tracking-[-0.05em] text-slate-950 sm:text-3xl">
+              {t("seo.homeContentTitle")}
+            </h2>
+            <p className="mx-auto mt-4 max-w-3xl text-sm font-medium leading-8 text-slate-600 sm:text-base">
+              {t("seo.homeContentDescription")}
+            </p>
+          </section>
+
+          <StaggerScene className="mt-14 border-t border-teal-100 pt-12 sm:mt-16 sm:pt-14">
+            <StaggerItem className="mb-7 text-center sm:mb-9">
               <span className="inline-flex rounded-full bg-teal-500/10 px-4 py-2 text-sm font-extrabold text-teal-500">
-                پایش در یک نگاه
+                {t("stats.badge")}
               </span>
               <h3 className="mt-4 text-2xl font-black tracking-[-0.05em] text-slate-950 sm:text-3xl">
-                آمار آزمایشگاه
+                {t("stats.label")}
               </h3>
-            </div>
-            <HeroStatistics />
-          </div>
+            </StaggerItem>
+            <StaggerItem>
+              <HeroStatistics />
+            </StaggerItem>
+          </StaggerScene>
           <HomeSampleCollection />
         </div>
       </section>
@@ -208,3 +274,4 @@ export default async function Home() {
     </main>
   );
 }
+import type { Metadata } from "next";

@@ -6,7 +6,9 @@ import { getPrisma } from "@/lib/prisma";
 import { SITE_SETTINGS_ID } from "@/lib/site-settings";
 import {
   formatWorkingDayRange,
+  formatWorkingHourRange,
   isWorkingDayId,
+  isWorkingTimePeriodId,
 } from "@/lib/working-hours";
 
 export type SettingsActionState = {
@@ -49,6 +51,7 @@ async function isAuthorizedAdmin() {
 
 function revalidateSettingsPaths() {
   revalidatePath("/");
+  revalidatePath("/about");
   revalidatePath("/articles");
   revalidatePath("/contact");
   revalidatePath("/admin");
@@ -212,28 +215,45 @@ export async function saveSiteSettings(
 
   const laboratoryName = getString(formData, "laboratoryName");
   const shortDescription = getString(formData, "shortDescription");
+  const ceoMessage = getString(formData, "ceoMessage");
   const province = getString(formData, "province");
   const city = getString(formData, "city");
   const instagramUrl = normalizeOptionalUrl(
     getString(formData, "instagramUrl"),
   );
   const whatsappUrl = normalizeOptionalUrl(getString(formData, "whatsappUrl"));
-  const telegramUrl = normalizeOptionalUrl(getString(formData, "telegramUrl"));
+  const rubikaUrl = normalizeOptionalUrl(getString(formData, "rubikaUrl"));
+  const eitaaUrl = normalizeOptionalUrl(getString(formData, "eitaaUrl"));
+  const surveyFormUrl = normalizeOptionalUrl(
+    getString(formData, "surveyFormUrl"),
+  );
   const latitude = getCoordinate(getString(formData, "latitude"), -90, 90);
   const longitude = getCoordinate(getString(formData, "longitude"), -180, 180);
 
   if (
     laboratoryName.length > 160 ||
     shortDescription.length > 500 ||
+    ceoMessage.length > 5_000 ||
     province.length > 100 ||
     city.length > 100
   )
     return {
       message: "نام، توضیح کوتاه، استان یا شهر بیش از اندازه طولانی است.",
     };
-  if (instagramUrl.error || whatsappUrl.error || telegramUrl.error)
+  if (
+    instagramUrl.error ||
+    whatsappUrl.error ||
+    rubikaUrl.error ||
+    eitaaUrl.error ||
+    surveyFormUrl.error
+  )
     return {
-      message: instagramUrl.error ?? whatsappUrl.error ?? telegramUrl.error,
+      message:
+        instagramUrl.error ??
+        whatsappUrl.error ??
+        rubikaUrl.error ??
+        eitaaUrl.error ??
+        surveyFormUrl.error,
     };
   if (
     latitude.error ||
@@ -249,24 +269,30 @@ export async function saveSiteSettings(
       create: {
         id: SITE_SETTINGS_ID,
         city: city || null,
+        ceoMessage: ceoMessage || null,
+        eitaaUrl: eitaaUrl.value,
         instagramUrl: instagramUrl.value,
         laboratoryName: laboratoryName || null,
         latitude: latitude.value,
         longitude: longitude.value,
         province: province || null,
+        rubikaUrl: rubikaUrl.value,
         shortDescription: shortDescription || null,
-        telegramUrl: telegramUrl.value,
+        surveyFormUrl: surveyFormUrl.value,
         whatsappUrl: whatsappUrl.value,
       },
       update: {
+        ceoMessage: ceoMessage || null,
+        eitaaUrl: eitaaUrl.value,
         instagramUrl: instagramUrl.value,
         city: city || null,
         laboratoryName: laboratoryName || null,
         latitude: latitude.value,
         longitude: longitude.value,
         province: province || null,
+        rubikaUrl: rubikaUrl.value,
         shortDescription: shortDescription || null,
-        telegramUrl: telegramUrl.value,
+        surveyFormUrl: surveyFormUrl.value,
         whatsappUrl: whatsappUrl.value,
       },
       where: { id: SITE_SETTINGS_ID },
@@ -449,22 +475,35 @@ function getWorkingHourData(formData: FormData) {
   const endDay = getString(formData, "endDay");
   const startTime = getString(formData, "startTime");
   const endTime = getString(formData, "endTime");
+  const startPeriod = getString(formData, "startPeriod");
+  const endPeriod = getString(formData, "endPeriod");
   const isValidTime = (value: string) => /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value);
 
   if (
     !isWorkingDayId(startDay) ||
     !isWorkingDayId(endDay) ||
     !isValidTime(startTime) ||
-    !isValidTime(endTime)
+    !isValidTime(endTime) ||
+    !isWorkingTimePeriodId(startPeriod) ||
+    !isWorkingTimePeriodId(endPeriod)
   )
     return null;
 
   return {
     endDay,
+    endPeriod,
     endTime,
-    hours: `${startTime} تا ${endTime}`,
+    hours: formatWorkingHourRange({
+      endDay,
+      endPeriod,
+      endTime,
+      startDay,
+      startPeriod,
+      startTime,
+    }),
     label: formatWorkingDayRange(startDay, endDay),
     startDay,
+    startPeriod,
     startTime,
   };
 }

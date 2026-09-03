@@ -46,3 +46,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# patient-uploaded and administrator-uploaded private files
+/private-uploads/

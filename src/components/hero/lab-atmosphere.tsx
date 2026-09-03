@@ -2,7 +2,7 @@
 // @refresh reset
 
 import { useReducedMotion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 type Bubble = {
@@ -79,6 +79,30 @@ function smoothstep(start: number, end: number, value: number) {
   return progress * progress * (3 - 2 * progress);
 }
 
+function BubbleFallback({
+  isWebGLActive,
+  scale,
+  tone,
+}: {
+  isWebGLActive: boolean;
+  scale: number;
+  tone: LabAtmosphereTone;
+}) {
+  const accent = tone === "on-teal" ? "rgba(204,251,241,0.72)" : "rgba(94,234,212,0.62)";
+
+  return (
+    <div
+      aria-hidden="true"
+      className={`pointer-events-none absolute inset-0 z-[4] transition-opacity duration-200 ${isWebGLActive ? "opacity-0" : "opacity-100"}`}
+      style={{
+        backgroundImage: `radial-gradient(circle at 72% 25%, rgba(255,255,255,0.92), ${accent} 16%, rgba(45,212,191,0.2) 28%, transparent 46%), radial-gradient(circle at 61% 62%, rgba(255,255,255,0.86), ${accent} 12%, rgba(20,184,166,0.18) 23%, transparent 39%), radial-gradient(circle at 88% 70%, rgba(255,255,255,0.8), ${accent} 9%, rgba(153,246,228,0.16) 19%, transparent 33%)`,
+        transform: `scale(${scale})`,
+        transformOrigin: "center",
+      }}
+    />
+  );
+}
+
 export function LabAtmosphere({
   density = "standard",
   scale = 1,
@@ -90,6 +114,7 @@ export function LabAtmosphere({
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const shouldReduceMotion = useReducedMotion();
+  const [isWebGLActive, setIsWebGLActive] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -97,12 +122,20 @@ export function LabAtmosphere({
       return;
     }
 
-    const renderer = new THREE.WebGLRenderer({
+    setIsWebGLActive(false);
+    let renderer: THREE.WebGLRenderer;
+
+    try {
+      renderer = new THREE.WebGLRenderer({
       alpha: true,
       antialias: true,
       canvas,
       powerPreference: "high-performance",
-    });
+      });
+    } catch {
+      return;
+    }
+
     renderer.setClearColor(0x000000, 0);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -204,7 +237,7 @@ export function LabAtmosphere({
         const rise = 1 - (1 - progress) ** 1.65;
         const fadeIn = smoothstep(0, 0.14, progress);
         const fadeOut = 1 - smoothstep(0.72, 1, progress);
-        const opacity = fadeIn * fadeOut;
+        const opacity = 0.24 + fadeIn * fadeOut * 0.76;
         const verticalPosition = rise * 2 - 1;
         const availableWidth = regionRadiusX * Math.sqrt(Math.max(0, 1 - verticalPosition ** 2));
         const baseX = regionCenterX + availableWidth * (bubble.horizontalBias + Math.sin(seconds * 1.35 + bubble.phase * 12) * bubble.sway);
@@ -237,26 +270,81 @@ export function LabAtmosphere({
     };
 
     let animationFrame = 0;
+    let isContextLost = false;
+    let isInViewport = true;
     let isPageVisible = !document.hidden;
+    let hasRendered = false;
 
-    const render = (time = 0) => {
-      const seconds = shouldReduceMotion ? 0 : time * 0.001;
-      updateBubbles(seconds);
-      renderer.render(scene, camera);
+    const canAnimate = () =>
+      !shouldReduceMotion && isPageVisible && isInViewport && !isContextLost;
 
-      if (!shouldReduceMotion && isPageVisible) {
+    const draw = (time = 0) => {
+      if (isContextLost || !canvas.clientWidth || !canvas.clientHeight) {
+        return;
+      }
+
+      try {
+        const seconds = shouldReduceMotion ? 0 : time * 0.001;
+        updateBubbles(seconds);
+        renderer.render(scene, camera);
+
+        if (!hasRendered) {
+          hasRendered = true;
+          setIsWebGLActive(true);
+        }
+      } catch {
+        isContextLost = true;
+        hasRendered = false;
+        setIsWebGLActive(false);
+      }
+    };
+
+    const scheduleFrame = () => {
+      if (canAnimate() && !animationFrame) {
         animationFrame = window.requestAnimationFrame(render);
       }
     };
 
-    const resizeObserver = new ResizeObserver(() => {
+    const render = (time = 0) => {
+      animationFrame = 0;
+      draw(time);
+      scheduleFrame();
+    };
+
+    const renderOnce = () => draw(performance.now());
+
+    const resumeRendering = () => {
+      renderOnce();
+      scheduleFrame();
+    };
+
+    const onResize = () => {
       resize();
-      if (shouldReduceMotion) {
-        render();
-      }
-    });
-    resizeObserver.observe(canvas);
+      renderOnce();
+    };
+
+    const resizeObserver =
+      typeof ResizeObserver === "undefined" ? null : new ResizeObserver(onResize);
+    resizeObserver?.observe(canvas);
+    window.addEventListener("resize", onResize, { passive: true });
     resize();
+
+    const intersectionObserver =
+      typeof IntersectionObserver === "undefined" ? null : new IntersectionObserver(
+      ([entry]) => {
+        isInViewport = entry?.isIntersecting ?? false;
+
+        if (isInViewport) {
+          resize();
+          resumeRendering();
+        } else {
+          window.cancelAnimationFrame(animationFrame);
+          animationFrame = 0;
+        }
+      },
+      { threshold: 0 },
+    );
+    intersectionObserver?.observe(canvas);
 
     const onPointerMove = (event: PointerEvent) => {
       const bounds = canvas.getBoundingClientRect();
@@ -281,21 +369,58 @@ export function LabAtmosphere({
 
     const onVisibilityChange = () => {
       isPageVisible = !document.hidden;
-      if (isPageVisible && !shouldReduceMotion) {
+
+      if (isPageVisible) {
+        resize();
+        resumeRendering();
+      } else {
         window.cancelAnimationFrame(animationFrame);
-        animationFrame = window.requestAnimationFrame(render);
+        animationFrame = 0;
       }
     };
 
+    const onPageShow = () => {
+      isPageVisible = true;
+      resize();
+      resumeRendering();
+    };
+
+    const onContextLost = (event: Event) => {
+      event.preventDefault();
+      isContextLost = true;
+      hasRendered = false;
+      setIsWebGLActive(false);
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = 0;
+    };
+
+    const onContextRestored = () => {
+      isContextLost = false;
+      hasRendered = false;
+      setIsWebGLActive(false);
+      renderer.resetState();
+
+      resize();
+      resumeRendering();
+    };
+
     document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pageshow", onPageShow);
     window.addEventListener("pointermove", onPointerMove, { passive: true });
-    render();
+    canvas.addEventListener("webglcontextlost", onContextLost);
+    canvas.addEventListener("webglcontextrestored", onContextRestored);
+    resumeRendering();
 
     return () => {
       window.cancelAnimationFrame(animationFrame);
-      resizeObserver.disconnect();
+      resizeObserver?.disconnect();
+      intersectionObserver?.disconnect();
       document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("webglcontextlost", onContextLost);
+      canvas.removeEventListener("webglcontextrestored", onContextRestored);
       bubbles.forEach((bubble) => {
         bubble.material.dispose();
         bubble.glowMaterial.dispose();
@@ -306,5 +431,10 @@ export function LabAtmosphere({
     };
   }, [density, scale, shouldReduceMotion, tone]);
 
-  return <canvas aria-hidden="true" className="pointer-events-none absolute inset-0 z-[5] size-full" ref={canvasRef} />;
+  return (
+    <>
+      <BubbleFallback isWebGLActive={isWebGLActive} scale={scale} tone={tone} />
+      <canvas aria-hidden="true" className="pointer-events-none absolute inset-0 z-[5] size-full" ref={canvasRef} />
+    </>
+  );
 }

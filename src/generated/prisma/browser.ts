@@ -43,6 +43,16 @@ export type Article = Prisma.ArticleModel
  */
 export type Announcement = Prisma.AnnouncementModel
 /**
+ * Model ArticleTranslation
+ * 
+ */
+export type ArticleTranslation = Prisma.ArticleTranslationModel
+/**
+ * Model AnnouncementTranslation
+ * 
+ */
+export type AnnouncementTranslation = Prisma.AnnouncementTranslationModel
+/**
  * Model ArticleCategory
  * 
  */
@@ -63,6 +73,11 @@ export type SlideshowSlide = Prisma.SlideshowSlideModel
  */
 export type LabDepartment = Prisma.LabDepartmentModel
 /**
+ * Model LaboratoryTest
+ * 
+ */
+export type LaboratoryTest = Prisma.LaboratoryTestModel
+/**
  * Model SiteSettings
  * 
  */
@@ -82,3 +97,18 @@ export type SiteAddress = Prisma.SiteAddressModel
  * 
  */
 export type SiteWorkingHour = Prisma.SiteWorkingHourModel
+/**
+ * Model PatientTestResult
+ * 
+ */
+export type PatientTestResult = Prisma.PatientTestResultModel
+/**
+ * Model HomeSamplingRequest
+ * 
+ */
+export type HomeSamplingRequest = Prisma.HomeSamplingRequestModel
+/**
+ * Model JobApplication
+ * 
+ */
+export type JobApplication = Prisma.JobApplicationModel

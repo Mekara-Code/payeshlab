@@ -4,8 +4,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PayeshArticles } from "@/components/home/payesh-articles";
-import { SidebarNavigation } from "@/components/navigation/sidebar-navigation";
+import { SiteNavigation } from "@/components/navigation/site-navigation";
+import { getSelectedContentLocale } from "@/lib/content-locale-server";
+import { getDictionary } from "@/lib/dictionaries";
+import { translate } from "@/lib/dictionaries/types";
+import { createSeoMetadata } from "@/lib/seo";
 import { SiteFooter } from "@/components/site-footer";
+import { ArticleJsonLd } from "@/components/seo/article-json-ld";
 import {
   getPublishedArticleBySlug,
   getPublishedArticles,
@@ -70,8 +75,10 @@ function TagIcon() {
   );
 }
 
-function formatPersianDate(value: string) {
-  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+function formatDate(value: string, locale: "ar" | "en" | "fa") {
+  const languageTag = locale === "fa" ? "fa-IR-u-ca-persian" : locale === "ar" ? "ar-SA-u-ca-gregory" : "en-US";
+
+  return new Intl.DateTimeFormat(languageTag, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -233,36 +240,53 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { slug: rawSlug } = await params;
   const slug = normalizeSlug(rawSlug);
-  const article = await getPublishedArticleBySlug(slug);
+  const locale = await getSelectedContentLocale();
+  const dictionary = getDictionary(locale);
+  const article = await getPublishedArticleBySlug(slug, locale);
 
   if (!article) {
-    return { title: "مقاله یافت نشد | آزمایشگاه پایش" };
+    return {
+      robots: { follow: false, index: false },
+      title: translate(dictionary, "articles.notFoundTitle"),
+    };
   }
 
-  return {
+  return createSeoMetadata({
     description: article.metaDescription ?? article.excerpt,
-    title: `${article.title} | مجله پایش`,
-  };
+    image: article.imageUrl,
+    keywords: [
+      ...dictionary["seo.keywords"].split(",").map((keyword) => keyword.trim()),
+      ...article.tags,
+    ],
+    locale,
+    path: `/articles/${encodeURIComponent(article.slug)}`,
+    title: translate(dictionary, "articles.metaTitle", { title: article.title }),
+    type: "article",
+  });
 }
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { slug: rawSlug } = await params;
   const slug = normalizeSlug(rawSlug);
+  const locale = await getSelectedContentLocale();
   const [article, allArticles, settings] = await Promise.all([
-    getPublishedArticleBySlug(slug),
-    getPublishedArticles(8),
+    getPublishedArticleBySlug(slug, locale),
+    getPublishedArticles(8, locale),
     getSiteSettings(),
   ]);
 
   if (!article) notFound();
 
+  const dictionary = getDictionary(locale);
+  const t = (key: string, values?: Record<string, number | string>) => translate(dictionary, key, values);
   const relatedArticles = allArticles.filter((item) => item.slug !== article.slug).slice(0, 3);
   const readingTime = getReadingTime(article.content);
-  const category = article.categories[0] ?? "مجله پایش";
+  const category = article.categories[0] ?? t("articles.defaultCategory");
 
   return (
     <main className="min-h-dvh bg-[#f7fbfb] text-slate-950">
-      <SidebarNavigation />
+      <ArticleJsonLd article={article} />
+      <SiteNavigation />
 
       <article>
         <header className="overflow-hidden bg-[#edf9f8] px-5 pb-14 pt-28 sm:px-10 sm:pb-20 sm:pt-36 lg:px-20 lg:pb-24">
@@ -272,7 +296,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               href="/articles"
             >
               <ArrowIcon />
-              بازگشت به مجلهٔ پایش
+              {t("articles.back")}
             </Link>
 
             <div className="mt-8 grid items-end gap-10 lg:mt-12 lg:grid-cols-[minmax(0,1.06fr)_minmax(0,0.94fr)] lg:gap-16">
@@ -289,11 +313,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                 <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-bold text-slate-600">
                   <span className="inline-flex items-center gap-2">
                     <CalendarIcon />
-                    {formatPersianDate(article.publishedAt)}
+                    {formatDate(article.publishedAt, locale)}
                   </span>
                   <span className="inline-flex items-center gap-2">
                     <ClockIcon />
-                    حدود {readingTime} دقیقه مطالعه
+                    {t("articles.readingTime", { minutes: readingTime })}
                   </span>
                 </div>
               </div>
@@ -307,7 +331,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   src={article.imageUrl ?? "/background-hq.png"}
                 />
                 <figcaption className="absolute bottom-0 right-0 bg-teal-500 px-5 py-3 text-xs font-extrabold text-white sm:px-6 sm:py-4 sm:text-sm">
-                  مجلهٔ پایش
+                  {t("articles.figureCaption")}
                 </figcaption>
               </figure>
             </div>
@@ -325,11 +349,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
             <aside className="mx-auto h-fit w-full max-w-[56rem] 2xl:sticky 2xl:top-28 2xl:order-2 2xl:mx-0 2xl:max-w-none">
               <div className="rounded-tl-[2.5rem] rounded-br-[2.5rem] bg-teal-50 p-6 sm:p-7">
-                <p className="text-xs font-black tracking-wide text-teal-500">در این مقاله</p>
+                <p className="text-xs font-black tracking-wide text-teal-500">{t("articles.inThisArticle")}</p>
                 <div className="mt-5 grid gap-4 text-sm font-bold text-slate-700">
                   <span className="inline-flex items-center gap-2 text-teal-500">
                     <ClockIcon />
-                    {readingTime} دقیقه مطالعه
+                    {t("articles.readingTime", { minutes: readingTime })}
                   </span>
                   {article.tags.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
@@ -346,7 +370,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-2xl bg-teal-500 px-4 text-sm font-extrabold text-white transition hover:bg-teal-500 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-teal-500"
                   href="/contact"
                 >
-                  ارتباط با ما
+                  {t("articles.contactCta")}
                   <ArrowIcon />
                 </Link>
               </div>
@@ -359,7 +383,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <PayeshArticles
           articles={relatedArticles}
           maxArticles={relatedArticles.length}
-          title="مطالب بیشتر از مجلهٔ پایش"
+          title={t("articles.more")}
         />
       ) : null}
       <SiteFooter settings={settings} />

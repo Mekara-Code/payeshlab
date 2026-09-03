@@ -1,12 +1,23 @@
+"use client";
+
 /* eslint-disable @next/next/no-img-element -- Article images are administrator-configured URLs. */
 
 import Link from "next/link";
 import { ArticleTitleOrbs } from "@/components/decorative/article-title-orbs";
 import { AtmosphereOrbs } from "@/components/decorative/atmosphere-orbs";
+import { useTranslations } from "@/components/i18n/dictionary-provider";
+import { StaggerItem, StaggerScene } from "@/components/motion/stagger-scene";
 import type { PublicArticle } from "@/lib/public-articles";
 
-function formatPersianDate(dateValue: string) {
-  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+function formatDate(dateValue: string, locale: "ar" | "en" | "fa") {
+  const dateLocale =
+    locale === "fa"
+      ? "fa-IR-u-ca-persian"
+      : locale === "ar"
+        ? "ar-SA-u-ca-gregory"
+        : "en-US";
+
+  return new Intl.DateTimeFormat(dateLocale, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -37,37 +48,42 @@ type PayeshArticlesProps = {
   title?: string;
 };
 
-export function PayeshArticles({ articleTitleOrbs = false, articles, maxArticles = 4, showAllLink = true, title = "مجله پایش" }: PayeshArticlesProps) {
+export function PayeshArticles({ articleTitleOrbs = false, articles, maxArticles = 4, showAllLink = true, title }: PayeshArticlesProps) {
   const visibleArticles = articles.slice(0, maxArticles);
+  const { locale, t } = useTranslations();
+  const sectionTitle = title ?? t("articles.title");
 
   return (
     <section aria-labelledby="payesh-articles-title" className="scroll-mt-28 bg-white px-5 py-16 sm:px-10 sm:py-20 lg:px-20 lg:py-28" id="articles">
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-8 flex flex-col gap-5 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
+      <StaggerScene className="mx-auto max-w-5xl">
+        <StaggerItem className="mb-8 sm:mb-10">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div className="relative isolate max-w-2xl overflow-hidden">
             <AtmosphereOrbs className="absolute -right-8 -top-7 h-28 w-48 opacity-40 sm:h-36 sm:w-60" scale={1.08} />
             <div className="relative z-10">
-              <span className="inline-flex rounded-full bg-teal-500/10 px-4 py-2 text-sm font-extrabold text-teal-500">دانش برای سلامت</span>
-              <h2 className="mt-4 text-3xl font-black tracking-[-0.05em] text-slate-950 sm:text-4xl" id="payesh-articles-title">{title}</h2>
-              <p className="mt-3 text-sm font-medium leading-7 text-slate-600 sm:text-base">تازه‌ترین راهنمایی‌ها و نکته‌های کاربردی آزمایشگاه پایش، برای انتخاب‌های آگاهانه‌تر در مسیر سلامت.</p>
+              <span className="inline-flex rounded-full bg-teal-500/10 px-4 py-2 text-sm font-extrabold text-teal-500">{t("articles.badge")}</span>
+              <h2 className="mt-4 text-3xl font-black tracking-[-0.05em] text-slate-950 sm:text-4xl" id="payesh-articles-title">{sectionTitle}</h2>
+              <p className="mt-3 text-sm font-medium leading-7 text-slate-600 sm:text-base">{t("articles.description")}</p>
             </div>
           </div>
           {showAllLink ? (
             <Link className="group inline-flex min-h-12 w-fit items-center gap-2 rounded-2xl px-5 py-3 text-sm font-extrabold text-teal-500 transition-[background-color,color,transform] duration-200 hover:-translate-y-0.5 hover:bg-teal-500 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500 active:translate-y-0" href="/articles">
-              مشاهده همه مقالات
+              {t("articles.all")}
               <ArrowIcon className="transition-transform duration-200 group-hover:-translate-x-1 motion-reduce:transition-none" />
             </Link>
           ) : null}
-        </div>
+          </div>
+        </StaggerItem>
 
-        <div className="grid auto-rows-[14.5rem] grid-cols-1 gap-3 sm:auto-rows-[15rem] sm:grid-cols-2 sm:gap-4 lg:auto-rows-[21rem] lg:grid-cols-3 lg:gap-5">
+        <StaggerScene className="grid auto-rows-[14.5rem] grid-cols-1 gap-3 sm:auto-rows-[15rem] sm:grid-cols-2 sm:gap-4 lg:auto-rows-[21rem] lg:grid-cols-3 lg:gap-5" delay={0.12}>
           {visibleArticles.map((article, index) => (
-            <article className={`group relative min-h-0 overflow-hidden ${articleTileClass(index)}`} key={article.id}>
+            <StaggerItem className={`min-h-0 ${articleTileClass(index)}`} key={article.id}>
+            <article className={`group relative flex h-full min-h-0 overflow-hidden ${articleTileClass(index)}`}>
               <img alt={article.title} className="absolute inset-0 size-full object-cover transition-transform duration-300 ease-out motion-reduce:transition-none group-hover:scale-[1.03] trantion-colors motion-reduce:group-hover:scale-100" decoding="async" loading="lazy" src={article.imageUrl ?? "/background-hq.png"} />
               <div className="relative flex h-full flex-col justify-between text-white ">
                 <div className="flex items-start justify-between gap-3">
-                  <span className="m-4 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-extrabold text-white/90 backdrop-blur-sm">مقالهٔ پایش</span>
-                  <time className="m-4 text-left text-[11px] font-extrabold text-white [text-shadow:0_1px_5px_rgb(15_23_42_/_0.9)]" dateTime={article.publishedAt}>{formatPersianDate(article.publishedAt)}</time>
+                  <span className="m-4 rounded-full bg-white/15 px-2.5 py-1 text-[10px] font-extrabold text-white/90 backdrop-blur-sm">{t("articles.type")}</span>
+                  <time className="m-4 text-left text-[11px] font-extrabold text-white [text-shadow:0_1px_5px_rgb(15_23_42_/_0.9)]" dateTime={article.publishedAt}>{formatDate(article.publishedAt, locale)}</time>
                 </div>
                 <div className="relative overflow-hidden bg-teal-500 p-4">
                   {articleTitleOrbs ? <ArticleTitleOrbs /> : null}
@@ -78,16 +94,17 @@ export function PayeshArticles({ articleTitleOrbs = false, articles, maxArticles
                 </div>
               </div>
               <Link
-                aria-label={`مطالعهٔ مقالهٔ ${article.title}`}
+                aria-label={t("articles.read", { title: article.title })}
                 className="absolute inset-0 z-20 rounded-[inherit] focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-white"
                 href={`/articles/${article.slug}`}
               >
-                <span className="sr-only">مطالعهٔ مقالهٔ {article.title}</span>
+                <span className="sr-only">{t("articles.read", { title: article.title })}</span>
               </Link>
             </article>
+            </StaggerItem>
           ))}
-        </div>
-      </div>
+        </StaggerScene>
+      </StaggerScene>
     </section>
   );
 }

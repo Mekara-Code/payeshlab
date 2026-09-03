@@ -2,8 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { FooterBackground, FooterReveal } from "@/components/motion/footer-motion";
+import { EitaaIcon } from "@/components/icons/eitaa-icon";
+import { RubikaIcon } from "@/components/icons/rubika-icon";
+import { getSelectedContentLocale } from "@/lib/content-locale-server";
+import { getDictionary } from "@/lib/dictionaries";
+import { translate } from "@/lib/dictionaries/types";
 import type { SiteSettingsData } from "@/lib/site-settings";
-import { formatWorkingDayRange } from "@/lib/working-hours";
+import { formatWorkingHourRange } from "@/lib/working-hours";
 
 function PhoneIcon() {
   return (
@@ -67,17 +72,6 @@ function InstagramIcon() {
   );
 }
 
-function TelegramIcon() {
-  return (
-    <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 24 24">
-      <path
-        d="m20.5 4.3-3.1 15.1c-.2 1.1-1.1 1.3-1.9.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.2-8.3c.4-.4-.1-.6-.6-.3L5 12.9.2 11.4c-1-.3-1-1 .2-1.5L19 2.7c.9-.3 1.8.2 1.5 1.6Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
 function WhatsAppIcon() {
   return (
     <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 24 24">
@@ -114,22 +108,29 @@ function getMapEmbedUrl(settings: SiteSettingsData) {
   return `https://www.openstreetmap.org/export/embed.html?${params.toString()}`;
 }
 
-export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
+export async function SiteFooter({ settings }: { settings: SiteSettingsData }) {
+  const locale = await getSelectedContentLocale();
+  const dictionary = getDictionary(locale);
+  const t = (key: string, values?: Record<string, number | string>) =>
+    translate(dictionary, key, values);
   const laboratoryName =
-    settings.laboratoryName || "آزمایشگاه پاتولوژی پایش اکسین";
+    settings.laboratoryName || t("brand.name");
   const socialLinks = [
     settings.instagramUrl
       ? {
           href: settings.instagramUrl,
           icon: <InstagramIcon />,
-          label: "اینستاگرام",
+          label: t("footer.socialInstagram"),
         }
       : null,
     settings.whatsappUrl
-      ? { href: settings.whatsappUrl, icon: <WhatsAppIcon />, label: "واتساپ" }
+      ? { href: settings.whatsappUrl, icon: <WhatsAppIcon />, label: t("footer.socialWhatsapp") }
       : null,
-    settings.telegramUrl
-      ? { href: settings.telegramUrl, icon: <TelegramIcon />, label: "تلگرام" }
+    settings.rubikaUrl
+      ? { href: settings.rubikaUrl, icon: <RubikaIcon />, label: t("footer.socialRubika") }
+      : null,
+    settings.eitaaUrl
+      ? { href: settings.eitaaUrl, icon: <EitaaIcon />, label: t("footer.socialEitaa") }
       : null,
   ].filter(Boolean) as Array<{ href: string; icon: ReactNode; label: string }>;
   const mapHref =
@@ -161,13 +162,12 @@ export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
               </p>
             ) : (
               <p className="mt-4 max-w-md text-sm font-medium leading-7 text-teal-50/95">
-                همراه شما برای دسترسی آسان‌تر به خدمات آزمایشگاهی و اطلاعات
-                سلامت.
+                {t("footer.summary")}
               </p>
             )}
             {socialLinks.length > 0 ? (
               <div
-                aria-label="شبکه‌های اجتماعی"
+                aria-label={t("navigation.social")}
                 className="mt-6 flex flex-wrap gap-2"
               >
                 {socialLinks.map((social) => (
@@ -189,31 +189,17 @@ export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
 
           <FooterReveal>
             <section>
-            <h2 className="text-sm font-black text-white">تماس با ما</h2>
+            <h2 className="text-sm font-black text-white">{t("footer.contact")}</h2>
             {settings.workingHours.length > 0 ? (
               <div className="mt-5">
                 <h3 className="flex items-center gap-2 text-xs font-black text-white">
                   <ClockIcon />
-                  ساعات کاری
+                  {t("footer.workingHours")}
                 </h3>
                 <ul className="mt-3 grid gap-2 text-sm font-medium text-teal-50">
                   {settings.workingHours.map((workingHour) => (
-                    <li
-                      className="flex items-center justify-between gap-3"
-                      key={workingHour.id}
-                    >
-                      <span className="font-bold text-white">
-                        {formatWorkingDayRange(
-                          workingHour.startDay,
-                          workingHour.endDay,
-                        )}
-                      </span>
-                      <bdi
-                        className="shrink-0 font-mono text-xs font-bold tabular-nums text-teal-50"
-                        dir="ltr"
-                      >
-                        {workingHour.startTime} — {workingHour.endTime}
-                      </bdi>
+                    <li className="font-bold leading-7 text-white" key={workingHour.id}>
+                      {formatWorkingHourRange(workingHour, locale)}
                     </li>
                   ))}
                 </ul>
@@ -242,7 +228,7 @@ export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
               </ul>
             ) : (
               <p className="mt-4 text-sm font-medium leading-7 text-teal-50/90">
-                راه‌های تماس پس از ثبت در تنظیمات، اینجا نمایش داده می‌شوند.
+                {t("footer.noContact")}
               </p>
             )}
             </section>
@@ -250,7 +236,7 @@ export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
 
           <FooterReveal>
             <section>
-            <h2 className="text-sm font-black text-white">آدرس‌ها</h2>
+            <h2 className="text-sm font-black text-white">{t("footer.address")}</h2>
             {settings.addresses.length > 0 ? (
               <ul className="mt-4 grid gap-4">
                 {settings.addresses.map((item) => (
@@ -263,7 +249,7 @@ export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
                     </span>
                     <address className="not-italic">
                       <strong className="font-extrabold text-white">
-                        {item.title || "آدرس آزمایشگاه"}
+                        {item.title || t("footer.defaultAddress")}
                       </strong>
                       <br />
                       {item.address}
@@ -273,7 +259,7 @@ export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
               </ul>
             ) : (
               <p className="mt-4 text-sm font-medium leading-7 text-teal-50/90">
-                آدرس‌های ثبت‌شده در تنظیمات در این بخش نمایش داده می‌شوند.
+                {t("footer.noAddress")}
               </p>
             )}
             {mapHref && mapEmbedUrl ? (
@@ -284,7 +270,7 @@ export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
                   loading="lazy"
                   src={mapEmbedUrl}
                   tabIndex={-1}
-                  title="پیش‌نمایش موقعیت آزمایشگاه روی نقشه"
+                  title={t("footer.mapPreview")}
                 />
                 <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(95deg,rgba(13,148,136,0.94)_0%,rgba(13,148,136,0.72)_48%,rgba(13,148,136,0.16)_100%)]" />
                 <div className="pointer-events-none absolute inset-x-4 bottom-3 flex items-center justify-between gap-3 text-white">
@@ -292,18 +278,18 @@ export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
                     <span className="grid size-8 shrink-0 place-items-center rounded-full bg-white/20 backdrop-blur-sm">
                       <PinIcon />
                     </span>
-                    <span className="text-sm font-black">موقعیت آزمایشگاه</span>
+                    <span className="text-sm font-black">{t("footer.location")}</span>
                   </span>
-                  <span className="shrink-0 text-xs font-extrabold text-white/90">مسیریاب</span>
+                  <span className="shrink-0 text-xs font-extrabold text-white/90">{t("footer.directions")}</span>
                 </div>
                 <a
-                  aria-label="مشاهده موقعیت آزمایشگاه در مسیریاب"
+                  aria-label={t("footer.viewLocation")}
                   className="absolute inset-0 z-10 focus-visible:outline-2 focus-visible:outline-offset-[-3px] focus-visible:outline-white"
                   href={mapHref}
                   rel="noreferrer"
                   target="_blank"
                 >
-                  <span className="sr-only">مشاهده موقعیت آزمایشگاه در مسیریاب</span>
+                  <span className="sr-only">{t("footer.viewLocation")}</span>
                 </a>
               </div>
             ) : null}
@@ -314,11 +300,11 @@ export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
           <div className="flex flex-col gap-2 py-5 text-xs font-bold text-teal-50/90 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
               <p>
-            © {new Date().getFullYear()} {laboratoryName}. همه حقوق محفوظ است.
+            © {new Date().getFullYear()} {laboratoryName}. {t("footer.rights")}
               </p>
               <span aria-hidden="true" className="hidden h-1 w-1 rounded-full bg-white/65 sm:block" />
               <a
-                aria-label="طراحی شده توسط شرکت زیلبر"
+                aria-label={`${t("footer.designedBy")} ${t("footer.designedByCompany")}`}
                 className="group inline-flex min-h-11 items-center gap-2 rounded-full px-1.5 py-1 text-teal-50 transition-[background-color,color,transform] duration-200 hover:-translate-y-px hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-white active:translate-y-0"
                 href="https://zilber.ir"
               >
@@ -332,7 +318,7 @@ export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
                   />
                 </span>
                 <span className="whitespace-nowrap leading-5">
-                  طراحی شده توسط <strong className="font-black text-white">شرکت زیلبر</strong>
+                  {t("footer.designedBy")} <strong className="font-black text-white">{t("footer.designedByCompany")}</strong>
                 </span>
                 <svg aria-hidden="true" className="size-3.5 opacity-0 transition-[opacity,transform] duration-200 group-hover:-translate-x-0.5 group-hover:opacity-100" fill="none" viewBox="0 0 24 24">
                   <path d="M19 12H5m7-7-7 7 7 7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" />
@@ -343,7 +329,7 @@ export function SiteFooter({ settings }: { settings: SiteSettingsData }) {
             className="w-fit rounded-lg text-white transition hover:text-teal-50 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-white"
             href="/articles"
           >
-            مجله پایش
+            {t("footer.journal")}
           </Link>
           </div>
         </FooterReveal>

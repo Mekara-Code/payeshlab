@@ -9,7 +9,23 @@ import {
   type ManagedAnnouncement,
 } from "@/components/admin/announcement-manager";
 import { InsuranceManager } from "@/components/admin/insurance-manager";
+import {
+  LaboratoryTestManager,
+  type ManagedLaboratoryTest,
+} from "@/components/admin/laboratory-test-manager";
+import {
+  HomeSamplingManager,
+  type ManagedHomeSamplingRequest,
+} from "@/components/admin/home-sampling-manager";
+import {
+  JobApplicationManager,
+  type ManagedJobApplication,
+} from "@/components/admin/job-application-manager";
 import { ServiceManager } from "@/components/admin/lab-department-manager";
+import {
+  TestResultManager,
+  type ManagedTestResult,
+} from "@/components/admin/test-result-manager";
 import { SlideshowManager } from "@/components/admin/slideshow-manager";
 import { SettingsManager } from "@/components/admin/settings-manager";
 import { BrandMark } from "@/components/brand-mark";
@@ -24,6 +40,10 @@ const navigationItems = [
   { id: "articles", label: "مدیریت مقاله" },
   { id: "news", label: "مدیریت اخبار" },
   { id: "services", label: "مدیریت خدمات" },
+  { id: "tests", label: "مدیریت آزمایش‌ها" },
+  { id: "results", label: "جواب آزمایش‌ها" },
+  { id: "sampling", label: "نمونه‌گیری در منزل" },
+  { id: "careers", label: "درخواست‌های استخدام" },
   { id: "announcements", label: "مدیریت اطلاعیه‌ها" },
   { id: "insurances", label: "مدیریت بیمه‌ها" },
   { id: "slideshow", label: "مدیریت اسلایدشو" },
@@ -44,6 +64,7 @@ type DashboardSlide = SlideshowSlideData & {
   isActive: boolean;
   updatedAt: string;
 };
+type DashboardLaboratoryTest = ManagedLaboratoryTest;
 type DashboardActivity = {
   id: string;
   label: string;
@@ -153,6 +174,37 @@ function NavigationIcon({ id }: { id: NavigationId }) {
       </svg>
     );
   }
+  if (id === "tests") {
+    return (
+      <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 24 24">
+        <path {...common} d="M9 3h6M10 3v6.1L5.6 17a2.5 2.5 0 0 0 2.2 3.7h8.4a2.5 2.5 0 0 0 2.2-3.7L14 9.1V3" />
+        <path {...common} d="M8.5 15h7M9.5 12h5" />
+      </svg>
+    );
+  }
+  if (id === "results") {
+    return (
+      <svg aria-hidden="true" className="size-5" viewBox="0 0 24 24">
+        <path {...common} d="M5 3.5h9l5 5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z" />
+        <path {...common} d="M14 3.5V9h5M8 13h8M8 17h5" />
+      </svg>
+    );
+  }
+  if (id === "sampling") {
+    return (
+      <svg aria-hidden="true" className="size-5" viewBox="0 0 24 24">
+        <path {...common} d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1v-8.5Z" />
+      </svg>
+    );
+  }
+  if (id === "careers") {
+    return (
+      <svg aria-hidden="true" className="size-5" viewBox="0 0 24 24">
+        <rect {...common} height="12" rx="2" width="18" x="3" y="7" />
+        <path {...common} d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12h18" />
+      </svg>
+    );
+  }
   if (id === "insurances") {
     return (
       <svg aria-hidden="true" className="size-5" viewBox="0 0 24 24">
@@ -197,6 +249,7 @@ function NavigationIcon({ id }: { id: NavigationId }) {
 type SidebarContentProps = {
   activeItem: NavigationId;
   email: string;
+  laboratoryName: string | null;
   onNavigate: (id: NavigationId) => void;
   onClose?: () => void;
 };
@@ -204,13 +257,14 @@ type SidebarContentProps = {
 function SidebarContent({
   activeItem,
   email,
+  laboratoryName,
   onClose,
   onNavigate,
 }: SidebarContentProps) {
   return (
     <div className="flex h-full min-h-0 flex-col p-4 sm:p-5">
       <div className="flex items-start justify-between gap-3 border-b border-slate-200 pb-5">
-        <BrandMark />
+        <BrandMark laboratoryName={laboratoryName} />
         {onClose && (
           <button
             aria-label="بستن منو"
@@ -271,16 +325,24 @@ export function AdminDashboard({
   departments,
   email,
   insurances,
+  jobApplications,
+  samplingRequests,
   settings,
   slides,
+  testResults,
+  tests,
 }: {
   announcements: ManagedAnnouncement[];
   articles: Array<ManagedArticle & { type: "ARTICLE" | "NEWS" }>;
   departments: DashboardDepartment[];
   email: string;
   insurances: DashboardInsurance[];
+  jobApplications: ManagedJobApplication[];
+  samplingRequests: ManagedHomeSamplingRequest[];
   settings: SiteSettingsData;
   slides: DashboardSlide[];
+  testResults: ManagedTestResult[];
+  tests: DashboardLaboratoryTest[];
 }) {
   const [activeItem, setActiveItem] = useState<NavigationId>("dashboard");
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -315,6 +377,13 @@ export function AdminDashboard({
     (insurance) => insurance.isActive,
   ).length;
   const activeSlides = slides.filter((slide) => slide.isActive).length;
+  const activeTests = tests.filter((test) => test.isActive).length;
+  const pendingSamplingRequests = samplingRequests.filter(
+    (request) => request.status === "PENDING",
+  ).length;
+  const pendingJobApplications = jobApplications.filter(
+    (application) => application.status === "PENDING",
+  ).length;
   const overviewCards: Array<{
     detail: string;
     label: string;
@@ -358,11 +427,39 @@ export function AdminDashboard({
       value: insurances.length,
     },
     {
+      detail: `${formatNumber(activeTests)} فعال`,
+      label: "آزمایش‌ها",
+      target: "tests",
+      tone: "bg-violet-50 text-violet-800",
+      value: tests.length,
+    },
+    {
       detail: `${formatNumber(activeSlides)} فعال`,
       label: "اسلایدها",
       target: "slideshow",
       tone: "bg-teal-50 text-teal-500",
       value: slides.length,
+    },
+    {
+      detail: `${formatNumber(testResults.length)} فایل بارگذاری‌شده`,
+      label: "جواب آزمایش‌ها",
+      target: "results",
+      tone: "bg-sky-50 text-sky-800",
+      value: testResults.length,
+    },
+    {
+      detail: `${formatNumber(pendingSamplingRequests)} در انتظار پیگیری`,
+      label: "نمونه‌گیری در منزل",
+      target: "sampling",
+      tone: "bg-amber-50 text-amber-800",
+      value: samplingRequests.length,
+    },
+    {
+      detail: `${formatNumber(pendingJobApplications)} در انتظار بررسی`,
+      label: "درخواست‌های استخدام",
+      target: "careers",
+      tone: "bg-indigo-50 text-indigo-800",
+      value: jobApplications.length,
     },
   ];
   const readinessChecks = [
@@ -422,6 +519,40 @@ export function AdminDashboard({
       title: slide.title ?? "اسلاید بدون عنوان",
       updatedAt: slide.updatedAt,
     })),
+    ...tests.map((test) => ({
+      id: `test-${test.id}`,
+      label: "آزمایش به‌روزرسانی شد",
+      target: "tests" as const,
+      title: test.name,
+      updatedAt: test.updatedAt,
+    })),
+    ...testResults.map((result) => ({
+      id: `result-${result.id}`,
+      label: "جواب آزمایش بارگذاری شد",
+      target: "results" as const,
+      title: result.patientName ?? result.nationalCode,
+      updatedAt: result.createdAt,
+    })),
+    ...jobApplications.map((application) => ({
+      id: `job-${application.id}`,
+      label:
+        application.status === "PENDING"
+          ? "درخواست استخدام ثبت شد"
+          : "درخواست استخدام بررسی شد",
+      target: "careers" as const,
+      title: `${application.firstName} ${application.lastName}`,
+      updatedAt: application.createdAt,
+    })),
+    ...samplingRequests.map((request) => ({
+      id: `sampling-${request.id}`,
+      label:
+        request.status === "COMPLETED"
+          ? "نمونه‌گیری در منزل انجام شد"
+          : "درخواست نمونه‌گیری در منزل ثبت شد",
+      target: "sampling" as const,
+      title: `${request.firstName} ${request.lastName}`,
+      updatedAt: request.completedAt ?? request.createdAt,
+    })),
   ]
     .sort(
       (first, second) =>
@@ -439,6 +570,7 @@ export function AdminDashboard({
         <SidebarContent
           activeItem={activeItem}
           email={email}
+          laboratoryName={settings.laboratoryName}
           onNavigate={navigate}
         />
       </aside>
@@ -479,6 +611,14 @@ export function AdminDashboard({
           <AnnouncementManager announcements={announcements} />
         ) : activeItem === "services" ? (
           <ServiceManager departments={departments} />
+        ) : activeItem === "tests" ? (
+          <LaboratoryTestManager tests={tests} />
+        ) : activeItem === "results" ? (
+          <TestResultManager results={testResults} />
+        ) : activeItem === "sampling" ? (
+          <HomeSamplingManager requests={samplingRequests} />
+        ) : activeItem === "careers" ? (
+          <JobApplicationManager applications={jobApplications} />
         ) : activeItem === "insurances" ? (
           <InsuranceManager insurances={insurances} />
         ) : activeItem === "slideshow" ? (
@@ -504,7 +644,11 @@ export function AdminDashboard({
                         announcements.length +
                         departments.length +
                         insurances.length +
-                        slides.length,
+                        slides.length +
+                        tests.length +
+                        testResults.length +
+                        samplingRequests.length +
+                        jobApplications.length,
                     )} {" "}
                     آیتم قابل‌مدیریت در سامانه ثبت شده است. وضعیت انتشار و
                     آخرین تغییرات را از همین‌جا دنبال کنید.
@@ -710,6 +854,7 @@ export function AdminDashboard({
               <SidebarContent
                 activeItem={activeItem}
                 email={email}
+                laboratoryName={settings.laboratoryName}
                 onClose={() => setIsMobileSidebarOpen(false)}
                 onNavigate={navigate}
               />

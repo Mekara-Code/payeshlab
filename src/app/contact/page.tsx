@@ -3,16 +3,30 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { AtmosphereOrbs } from "@/components/decorative/atmosphere-orbs";
-import { SidebarNavigation } from "@/components/navigation/sidebar-navigation";
+import { EitaaIcon } from "@/components/icons/eitaa-icon";
+import { RubikaIcon } from "@/components/icons/rubika-icon";
+import { SiteNavigation } from "@/components/navigation/site-navigation";
 import { SiteFooter } from "@/components/site-footer";
+import { getSelectedContentLocale } from "@/lib/content-locale-server";
+import { getDictionary } from "@/lib/dictionaries";
+import { translate } from "@/lib/dictionaries/types";
+import { createSeoMetadata } from "@/lib/seo";
 import type { SiteSettingsData } from "@/lib/site-settings";
 import { getSiteSettings } from "@/lib/site-settings";
 
-export const metadata: Metadata = {
-  description:
-    "راه‌های تماس، آدرس‌ها و موقعیت آزمایشگاه پاتولوژی پایش اکسین.",
-  title: "ارتباط با ما | آزمایشگاه پاتولوژی پایش اکسین",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getSelectedContentLocale();
+  const dictionary = getDictionary(locale);
+
+  return createSeoMetadata({
+    description: translate(dictionary, "seo.contactDescription"),
+    image: "/contact/reception-desk.jpg",
+    keywords: dictionary["seo.keywords"].split(",").map((keyword) => keyword.trim()),
+    locale,
+    path: "/contact",
+    title: translate(dictionary, "seo.contactTitle"),
+  });
+}
 
 function PhoneIcon() {
   return (
@@ -63,17 +77,6 @@ function InstagramIcon() {
       <rect height="16" rx="4" stroke="currentColor" strokeWidth="1.8" width="16" x="4" y="4" />
       <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="1.8" />
       <circle cx="17.2" cy="6.9" fill="currentColor" r="1" />
-    </svg>
-  );
-}
-
-function TelegramIcon() {
-  return (
-    <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 24 24">
-      <path
-        d="m20.5 4.3-3.1 15.1c-.2 1.1-1.1 1.3-1.9.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.2-8.3c.4-.4-.1-.6-.6-.3L5 12.9.2 11.4c-1-.3-1-1 .2-1.5L19 2.7c.9-.3 1.8.2 1.5 1.6Z"
-        fill="currentColor"
-      />
     </svg>
   );
 }
@@ -147,8 +150,10 @@ function SocialLink({
 }
 
 export default async function ContactPage() {
-  const settings = await getSiteSettings();
-  const laboratoryName = settings.laboratoryName || "آزمایشگاه پاتولوژی پایش اکسین";
+  const [locale, settings] = await Promise.all([getSelectedContentLocale(), getSiteSettings()]);
+  const dictionary = getDictionary(locale);
+  const t = (key: string, values?: Record<string, number | string>) => translate(dictionary, key, values);
+  const laboratoryName = settings.laboratoryName || t("brand.name");
   const locationName = [settings.city, settings.province]
     .filter((value): value is string => Boolean(value))
     .join("، ");
@@ -157,13 +162,16 @@ export default async function ContactPage() {
   const primaryPhone = settings.phoneNumbers[0];
   const socialLinks = [
     settings.instagramUrl
-      ? { href: settings.instagramUrl, icon: <InstagramIcon />, label: "اینستاگرام" }
+      ? { href: settings.instagramUrl, icon: <InstagramIcon />, label: t("footer.socialInstagram") }
       : null,
     settings.whatsappUrl
-      ? { href: settings.whatsappUrl, icon: <WhatsAppIcon />, label: "واتس‌اپ" }
+      ? { href: settings.whatsappUrl, icon: <WhatsAppIcon />, label: t("footer.socialWhatsapp") }
       : null,
-    settings.telegramUrl
-      ? { href: settings.telegramUrl, icon: <TelegramIcon />, label: "تلگرام" }
+    settings.rubikaUrl
+      ? { href: settings.rubikaUrl, icon: <RubikaIcon />, label: t("footer.socialRubika") }
+      : null,
+    settings.eitaaUrl
+      ? { href: settings.eitaaUrl, icon: <EitaaIcon />, label: t("footer.socialEitaa") }
       : null,
   ].filter(Boolean) as Array<{ href: string; icon: ReactNode; label: string }>;
 
@@ -173,9 +181,9 @@ export default async function ContactPage() {
         className="sr-only fixed left-4 top-4 z-[60] bg-slate-950 px-4 py-3 text-sm font-bold text-white focus:not-sr-only focus:outline-2 focus:outline-offset-4 focus:outline-teal-400"
         href="#main-content"
       >
-        عبور از ناوبری
+        {t("skipNavigation")}
       </a>
-      <SidebarNavigation />
+      <SiteNavigation />
 
       <section
         className="relative isolate overflow-hidden px-5 pb-0 pt-32 sm:px-10 sm:pt-40 lg:px-20 lg:pt-44"
@@ -185,14 +193,14 @@ export default async function ContactPage() {
         <AtmosphereOrbs className="absolute right-2 top-28 z-0 h-40 w-64 opacity-45 sm:right-8 sm:top-36 sm:h-52 sm:w-80" scale={1.18} />
         <div className="relative z-10 mx-auto grid max-w-7xl gap-10 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:items-end lg:gap-16">
           <div className="pb-10 lg:pb-16">
-            <p className="text-sm font-extrabold tracking-[0.16em] text-teal-500">ارتباط با ما</p>
+            <p className="text-sm font-extrabold tracking-[0.16em] text-teal-500">{t("contact.kicker")}</p>
             <h1 className="mt-5 max-w-3xl text-5xl font-black leading-[1.08] tracking-[-0.08em] text-slate-950 sm:text-6xl lg:text-7xl">
-              کنار شما،
+              {t("contact.titleFirst")}
               <br />
-              برای هر پاسخ.
+              {t("contact.titleSecond")}
             </h1>
             <p className="mt-7 max-w-xl text-base font-medium leading-8 text-slate-600 sm:text-lg">
-              برای دریافت راهنمایی، هماهنگی مراجعه و ارتباط با {laboratoryName}، از راه‌های زیر با ما در تماس باشید.
+              {t("contact.description", { laboratoryName })}
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               {primaryPhone ? (
@@ -209,7 +217,7 @@ export default async function ContactPage() {
                   className="inline-flex min-h-12 items-center rounded-full bg-teal-500 px-5 text-sm font-extrabold text-white transition duration-200 hover:bg-teal-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500"
                   href="#contact-details"
                 >
-                  راه‌های تماس
+                  {t("contact.contactMethods")}
                 </a>
               )}
               {mapHref ? (
@@ -219,7 +227,7 @@ export default async function ContactPage() {
                   rel="noreferrer"
                   target="_blank"
                 >
-                  دریافت مسیر
+                  {t("contact.getDirections")}
                   <ArrowUpLeftIcon />
                 </a>
               ) : null}
@@ -228,7 +236,7 @@ export default async function ContactPage() {
 
           <div className="relative min-h-[22rem] overflow-hidden bg-teal-100 sm:min-h-[32rem] lg:min-h-[39rem]">
             <Image
-              alt="بخش پذیرش آزمایشگاه پاتولوژی پایش"
+              alt={t("contact.heroImageAlt")}
               className="object-cover object-[32%_center]"
               fill
               priority
@@ -242,9 +250,9 @@ export default async function ContactPage() {
       <section className="bg-teal-500 px-5 py-16 text-white sm:px-10 sm:py-24 lg:px-20" id="contact-details">
         <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(18rem,0.72fr)] lg:gap-20">
           <div>
-            <p className="text-sm font-extrabold tracking-[0.16em] text-teal-200">تماس مستقیم</p>
+            <p className="text-sm font-extrabold tracking-[0.16em] text-teal-200">{t("contact.directKicker")}</p>
             <h2 className="mt-4 text-3xl font-black tracking-[-0.06em] sm:text-5xl">
-              راه‌های ارتباطی
+              {t("contact.directTitle")}
             </h2>
             {settings.phoneNumbers.length > 0 ? (
               <ul className="mt-10 grid gap-3 sm:grid-cols-2">
@@ -255,7 +263,7 @@ export default async function ContactPage() {
                       href={`tel:${cleanPhoneHref(phone.phone)}`}
                     >
                       <span className="flex items-center justify-between gap-3 text-xs font-extrabold tracking-wide text-teal-100 group-hover:text-teal-500">
-                        {phone.label || "شماره تماس"}
+                        {phone.label || t("contact.phoneLabel")}
                         <PhoneIcon />
                       </span>
                       <span className="mt-4 text-right text-lg font-black tracking-tight sm:text-xl" dir="ltr">
@@ -267,14 +275,14 @@ export default async function ContactPage() {
               </ul>
             ) : (
               <p className="mt-8 max-w-lg text-base font-medium leading-8 text-teal-50">
-                شماره‌های تماس پس از ثبت در تنظیمات سایت، در این قسمت نمایش داده می‌شوند.
+                {t("contact.noPhones")}
               </p>
             )}
           </div>
 
           <aside className="bg-teal-500 p-7 sm:p-8">
-            <p className="text-sm font-extrabold tracking-[0.14em] text-teal-200">در فضای آنلاین</p>
-            <h3 className="mt-4 text-2xl font-black tracking-[-0.05em]">همراه‌تان هستیم</h3>
+            <p className="text-sm font-extrabold tracking-[0.14em] text-teal-200">{t("contact.onlineKicker")}</p>
+            <h3 className="mt-4 text-2xl font-black tracking-[-0.05em]">{t("contact.onlineTitle")}</h3>
             {socialLinks.length > 0 ? (
               <div className="mt-7 flex flex-wrap gap-2">
                 {socialLinks.map((social) => (
@@ -283,7 +291,7 @@ export default async function ContactPage() {
               </div>
             ) : (
               <p className="mt-6 text-sm font-medium leading-7 text-teal-50">
-                لینک شبکه‌های اجتماعی پس از ثبت در تنظیمات سایت، اینجا در دسترس خواهد بود.
+                {t("contact.noSocial")}
               </p>
             )}
           </aside>
@@ -294,9 +302,9 @@ export default async function ContactPage() {
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-7 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:items-start lg:gap-16">
             <div>
-              <p className="text-sm font-extrabold tracking-[0.16em] text-teal-500">مراجعه حضوری</p>
+              <p className="text-sm font-extrabold tracking-[0.16em] text-teal-500">{t("contact.visitKicker")}</p>
               <h2 className="mt-4 text-3xl font-black tracking-[-0.06em] text-slate-950 sm:text-5xl">
-                آدرس‌های آزمایشگاه
+                {t("contact.addressesTitle")}
               </h2>
               {locationName ? (
                 <p className="mt-5 text-base font-bold text-teal-500">{locationName}</p>
@@ -311,7 +319,7 @@ export default async function ContactPage() {
                         </span>
                         <address className="text-sm font-medium leading-8 text-slate-700 not-italic sm:text-base">
                           <strong className="block text-base font-black text-slate-950">
-                            {address.title || `شعبه ${index + 1}`}
+                            {address.title || t("contact.branch", { number: index + 1 })}
                           </strong>
                           <span className="mt-2 block">{address.address}</span>
                         </address>
@@ -321,7 +329,7 @@ export default async function ContactPage() {
                 </ul>
               ) : (
                 <p className="mt-8 max-w-lg text-base font-medium leading-8 text-slate-600">
-                  آدرس‌های آزمایشگاه پس از ثبت در تنظیمات سایت، در این قسمت نمایش داده می‌شوند.
+                  {t("contact.noAddresses")}
                 </p>
               )}
               {mapHref ? (
@@ -331,7 +339,7 @@ export default async function ContactPage() {
                   rel="noreferrer"
                   target="_blank"
                 >
-                  باز کردن مسیریاب
+                  {t("contact.openDirections")}
                   <ArrowUpLeftIcon />
                 </a>
               ) : null}
@@ -340,7 +348,7 @@ export default async function ContactPage() {
             <div className="grid gap-4 sm:grid-cols-[minmax(0,0.84fr)_minmax(0,1.16fr)]">
               <div className="relative min-h-[19rem] overflow-hidden bg-teal-100 sm:min-h-[32rem]">
                 <Image
-                  alt="نمای بیرونی و تابلو آزمایشگاه پاتولوژی پایش"
+                  alt={t("contact.entranceImageAlt")}
                   className="object-cover"
                   fill
                   sizes="(min-width: 1024px) 22vw, (min-width: 640px) 35vw, 100vw"
@@ -349,7 +357,7 @@ export default async function ContactPage() {
               </div>
               <div className="relative min-h-[19rem] overflow-hidden bg-teal-100 sm:min-h-[32rem]">
                 <Image
-                  alt="فضای انتظار آرام و مدرن آزمایشگاه پایش"
+                  alt={t("contact.waitingImageAlt")}
                   className="object-cover"
                   fill
                   sizes="(min-width: 1024px) 30vw, (min-width: 640px) 42vw, 100vw"
@@ -365,8 +373,8 @@ export default async function ContactPage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm font-extrabold tracking-[0.16em] text-teal-500">موقعیت مکانی</p>
-              <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] text-slate-950 sm:text-5xl">روی نقشه</h2>
+              <p className="text-sm font-extrabold tracking-[0.16em] text-teal-500">{t("contact.mapKicker")}</p>
+              <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] text-slate-950 sm:text-5xl">{t("contact.mapTitle")}</h2>
             </div>
             {mapHref ? (
               <a
@@ -375,7 +383,7 @@ export default async function ContactPage() {
                 rel="noreferrer"
                 target="_blank"
               >
-                مشاهده در مسیریاب
+                {t("contact.viewDirections")}
                 <ArrowUpLeftIcon />
               </a>
             ) : null}
@@ -385,7 +393,7 @@ export default async function ContactPage() {
               className="h-[22rem] w-full border-0 bg-teal-100 sm:h-[32rem]"
               loading="lazy"
               src={mapEmbedUrl}
-              title="نقشه موقعیت آزمایشگاه پاتولوژی پایش"
+              title={t("contact.mapFrameTitle")}
             />
           ) : (
             <div className="grid min-h-[22rem] place-items-center bg-teal-100 p-8 text-center sm:min-h-[32rem]">
@@ -393,9 +401,9 @@ export default async function ContactPage() {
                 <span className="mx-auto grid size-14 place-items-center bg-teal-500 text-white">
                   <PinIcon />
                 </span>
-                <p className="mt-5 text-lg font-black text-slate-950">موقعیت نقشه در حال تکمیل است</p>
+                <p className="mt-5 text-lg font-black text-slate-950">{t("contact.mapPendingTitle")}</p>
                 <p className="mt-3 text-sm font-medium leading-7 text-slate-600">
-                  با ثبت مختصات دقیق در تنظیمات سایت، نقشه و لینک مسیریابی همین‌جا نمایش داده می‌شود.
+                  {t("contact.mapPendingDescription")}
                 </p>
               </div>
             </div>
@@ -406,8 +414,8 @@ export default async function ContactPage() {
       <section className="bg-slate-950 px-5 py-14 text-white sm:px-10 sm:py-20 lg:px-20">
         <div className="mx-auto flex max-w-7xl flex-col gap-7 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-extrabold tracking-[0.16em] text-teal-300">پایش اکسین</p>
-            <h2 className="mt-3 text-2xl font-black tracking-[-0.05em] sm:text-3xl">برای راهنمایی بیشتر، با ما در تماس باشید.</h2>
+            <p className="text-sm font-extrabold tracking-[0.16em] text-teal-300">{t("contact.brandKicker")}</p>
+            <h2 className="mt-3 text-2xl font-black tracking-[-0.05em] sm:text-3xl">{t("contact.finalCta")}</h2>
           </div>
           {primaryPhone ? (
             <a
@@ -423,7 +431,7 @@ export default async function ContactPage() {
               className="inline-flex min-h-12 items-center justify-center rounded-full bg-white px-5 text-sm font-extrabold text-slate-950 transition duration-200 hover:bg-teal-100 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
               href="#contact-details"
             >
-              راه‌های تماس
+              {t("contact.contactMethods")}
             </Link>
           )}
         </div>

@@ -9,14 +9,23 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { AtmosphereOrbs } from "@/components/decorative/atmosphere-orbs";
+import { useTranslations } from "@/components/i18n/dictionary-provider";
+import { StaggerItem, StaggerScene } from "@/components/motion/stagger-scene";
 import type { AnnouncementItem, NewsItem } from "@/lib/news-data";
 
 const subscribeToPortal = () => () => {};
 const getPortalContainer = () => document.body;
 const getServerPortalContainer = () => null;
 
-function formatPersianDate(dateValue: string) {
-  return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+function formatDate(dateValue: string, locale: "ar" | "en" | "fa") {
+  const dateLocale =
+    locale === "fa"
+      ? "fa-IR-u-ca-persian"
+      : locale === "ar"
+        ? "ar-SA-u-ca-gregory"
+        : "en-US";
+
+  return new Intl.DateTimeFormat(dateLocale, {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -50,6 +59,7 @@ function CloseIcon() {
 
 export function NewsAndAnnouncements({ announcements, news }: { announcements: AnnouncementItem[]; news: NewsItem[] }) {
   const shouldReduceMotion = useReducedMotion();
+  const { locale, t } = useTranslations();
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<AnnouncementItem | null>(null);
   const portalContainer = useSyncExternalStore(subscribeToPortal, getPortalContainer, getServerPortalContainer);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -116,23 +126,24 @@ export function NewsAndAnnouncements({ announcements, news }: { announcements: A
   return (
     <>
       <section aria-labelledby="news-and-announcements-title" className="scroll-mt-28 bg-white px-5 py-16 sm:px-10 sm:py-20 lg:px-20 lg:py-28" id="news-and-announcements">
-      <div className="mx-auto max-w-5xl">
-        <div className="relative isolate mb-8 overflow-hidden sm:mb-10">
+      <StaggerScene className="mx-auto max-w-5xl">
+        <StaggerItem className="relative isolate mb-8 overflow-hidden sm:mb-10">
           <AtmosphereOrbs className="absolute -right-8 -top-7 h-28 w-48 opacity-40 sm:h-36 sm:w-60" scale={1.08} />
           <div className="relative z-10 text-center">
-            <span className="inline-flex rounded-full bg-teal-500/10 px-4 py-2 text-sm font-extrabold text-teal-500">تازه‌های پایش</span>
-            <h2 className="mt-4 text-3xl font-black tracking-[-0.05em] text-slate-950 sm:text-4xl" id="news-and-announcements-title">اخبار و اطلاعیه‌ها</h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm font-medium leading-7 text-slate-600 sm:text-base">آخرین خبرها، تغییرات خدمات و اطلاعیه‌های مهم آزمایشگاه را در یک نگاه دنبال کنید.</p>
+            <span className="inline-flex rounded-full bg-teal-500/10 px-4 py-2 text-sm font-extrabold text-teal-500">{t("news.badge")}</span>
+            <h2 className="mt-4 text-3xl font-black tracking-[-0.05em] text-slate-950 sm:text-4xl" id="news-and-announcements-title">{t("news.title")}</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm font-medium leading-7 text-slate-600 sm:text-base">{t("news.description")}</p>
           </div>
-        </div>
+        </StaggerItem>
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-8">
-          <aside aria-labelledby="announcements-title" className="rounded-[1.9rem] border border-teal-100 bg-[#f7fbfb] p-5 sm:p-6">
+        <StaggerScene className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-8" delay={0.12}>
+          <StaggerItem>
+            <aside aria-labelledby="announcements-title" className="rounded-[1.9rem] border border-teal-100 bg-[#f7fbfb] p-5 sm:p-6">
             <div className="flex items-center gap-2 text-teal-500">
               <span className="grid size-10 place-items-center rounded-2xl bg-teal-100"><CalendarIcon /></span>
               <div>
-                <p className="text-xs font-extrabold text-teal-500">به‌روز بمانید</p>
-                <h3 className="text-lg font-black text-slate-950" id="announcements-title">اطلاعیه‌ها</h3>
+                <p className="text-xs font-extrabold text-teal-500">{t("news.stayUpdated")}</p>
+                <h3 className="text-lg font-black text-slate-950" id="announcements-title">{t("news.announcements")}</h3>
               </div>
             </div>
 
@@ -146,25 +157,27 @@ export function NewsAndAnnouncements({ announcements, news }: { announcements: A
                     onClick={(event) => openAnnouncement(announcement, event.currentTarget)}
                     type="button"
                   >
-                    <time className="text-xs font-bold text-teal-500" dateTime={announcement.date}>{formatPersianDate(announcement.date)}</time>
+                    <time className="text-xs font-bold text-teal-500" dateTime={announcement.date}>{formatDate(announcement.date, locale)}</time>
                     <span className="mt-2 block text-sm font-extrabold leading-6 text-slate-800 transition-colors duration-200 group-hover:text-teal-500">{announcement.title}</span>
                   </button>
                 </article>
               ))}
             </div>
-          </aside>
+            </aside>
+          </StaggerItem>
 
-          <div aria-labelledby="news-title" className="min-w-0">
+          <StaggerItem className="min-w-0">
+          <div aria-labelledby="news-title">
             <div className="mb-4 flex items-center gap-2 text-teal-500">
               <span className="grid size-10 place-items-center rounded-2xl bg-teal-100"><NewsIcon /></span>
               <div>
-                <p className="text-xs font-extrabold text-teal-500">مطالب خواندنی</p>
-                <h3 className="text-lg font-black text-slate-950" id="news-title">آخرین اخبار</h3>
+                <p className="text-xs font-extrabold text-teal-500">{t("news.reading")}</p>
+                <h3 className="text-lg font-black text-slate-950" id="news-title">{t("news.latest")}</h3>
               </div>
             </div>
 
             <Swiper
-              aria-label="اسلایدر آخرین اخبار آزمایشگاه"
+              aria-label={t("news.slider")}
               autoplay={shouldReduceMotion ? false : { delay: 4600, disableOnInteraction: false, pauseOnMouseEnter: true }}
               breakpoints={{
                 520: { slidesPerView: 1.3, spaceBetween: 16 },
@@ -193,14 +206,14 @@ export function NewsAndAnnouncements({ announcements, news }: { announcements: A
                       />
                       <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[11px] font-extrabold text-teal-500">
                         <NewsIcon className="size-3.5" />
-                        خبر سلامت
+                        {t("news.health")}
                       </span>
                     </div>
 
                     <div className="flex flex-1 flex-col px-4 pb-5 pt-4 sm:px-5 sm:pb-6 sm:pt-5">
                       <time className="inline-flex w-fit items-center gap-1.5 text-xs font-extrabold text-teal-500" dateTime={item.publishedAt}>
                         <CalendarIcon className="size-3.5" />
-                        {formatPersianDate(item.publishedAt)}
+                        {formatDate(item.publishedAt, locale)}
                       </time>
                       <h4 className="mt-4 line-clamp-2 text-lg font-black leading-8 tracking-[-0.04em] text-slate-950 sm:text-xl">
                         {item.title}
@@ -215,8 +228,9 @@ export function NewsAndAnnouncements({ announcements, news }: { announcements: A
               ))}
             </Swiper>
           </div>
-        </div>
-      </div>
+          </StaggerItem>
+        </StaggerScene>
+      </StaggerScene>
 
       </section>
 
@@ -230,7 +244,7 @@ export function NewsAndAnnouncements({ announcements, news }: { announcements: A
             initial={{ opacity: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.2, ease: "easeOut" }}
           >
-            <button aria-label="بستن اطلاعیه" className="absolute inset-0 cursor-default bg-slate-950/60 backdrop-blur-[2px]" onClick={closeAnnouncement} tabIndex={-1} type="button" />
+            <button aria-label={t("news.closeAnnouncement")} className="absolute inset-0 cursor-default bg-slate-950/60 backdrop-blur-[2px]" onClick={closeAnnouncement} tabIndex={-1} type="button" />
             <motion.article
               animate={{ opacity: 1, scale: 1, y: 0 }}
               aria-labelledby="announcement-dialog-title"
@@ -246,10 +260,10 @@ export function NewsAndAnnouncements({ announcements, news }: { announcements: A
               <div className="border-b border-teal-100 bg-[#f7fbfb] px-5 pb-5 pt-6 sm:px-7 sm:pb-6 sm:pt-7">
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <time className="inline-flex rounded-full bg-teal-100 px-3 py-1.5 text-xs font-extrabold text-teal-500" dateTime={selectedAnnouncement.date}>{formatPersianDate(selectedAnnouncement.date)}</time>
+                    <time className="inline-flex rounded-full bg-teal-100 px-3 py-1.5 text-xs font-extrabold text-teal-500" dateTime={selectedAnnouncement.date}>{formatDate(selectedAnnouncement.date, locale)}</time>
                     <h3 className="mt-3 text-xl font-black leading-8 tracking-[-0.04em] text-slate-950 sm:text-2xl" id="announcement-dialog-title">{selectedAnnouncement.title}</h3>
                   </div>
-                  <button aria-label="بستن مودال" className="grid size-11 shrink-0 place-items-center rounded-full border border-slate-200 text-slate-600 transition-[background-color,color,transform] duration-200 hover:bg-teal-100 hover:text-teal-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-teal-500 active:scale-95" onClick={closeAnnouncement} ref={closeButtonRef} type="button">
+                  <button aria-label={t("common.close")} className="grid size-11 shrink-0 place-items-center rounded-full border border-slate-200 text-slate-600 transition-[background-color,color,transform] duration-200 hover:bg-teal-100 hover:text-teal-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-teal-500 active:scale-95" onClick={closeAnnouncement} ref={closeButtonRef} type="button">
                     <CloseIcon />
                   </button>
                 </div>

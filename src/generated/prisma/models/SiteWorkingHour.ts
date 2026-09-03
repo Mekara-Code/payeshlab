@@ -43,6 +43,8 @@ export type SiteWorkingHourMinAggregateOutputType = {
   endDay: string | null
   startTime: string | null
   endTime: string | null
+  startPeriod: string | null
+  endPeriod: string | null
   sortOrder: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -57,6 +59,8 @@ export type SiteWorkingHourMaxAggregateOutputType = {
   endDay: string | null
   startTime: string | null
   endTime: string | null
+  startPeriod: string | null
+  endPeriod: string | null
   sortOrder: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -71,6 +75,8 @@ export type SiteWorkingHourCountAggregateOutputType = {
   endDay: number
   startTime: number
   endTime: number
+  startPeriod: number
+  endPeriod: number
   sortOrder: number
   createdAt: number
   updatedAt: number
@@ -95,6 +101,8 @@ export type SiteWorkingHourMinAggregateInputType = {
   endDay?: true
   startTime?: true
   endTime?: true
+  startPeriod?: true
+  endPeriod?: true
   sortOrder?: true
   createdAt?: true
   updatedAt?: true
@@ -109,6 +117,8 @@ export type SiteWorkingHourMaxAggregateInputType = {
   endDay?: true
   startTime?: true
   endTime?: true
+  startPeriod?: true
+  endPeriod?: true
   sortOrder?: true
   createdAt?: true
   updatedAt?: true
@@ -123,6 +133,8 @@ export type SiteWorkingHourCountAggregateInputType = {
   endDay?: true
   startTime?: true
   endTime?: true
+  startPeriod?: true
+  endPeriod?: true
   sortOrder?: true
   createdAt?: true
   updatedAt?: true
@@ -224,6 +236,8 @@ export type SiteWorkingHourGroupByOutputType = {
   endDay: string
   startTime: string
   endTime: string
+  startPeriod: string
+  endPeriod: string
   sortOrder: number
   createdAt: Date
   updatedAt: Date
@@ -261,6 +275,8 @@ export type SiteWorkingHourWhereInput = {
   endDay?: Prisma.StringFilter<"SiteWorkingHour"> | string
   startTime?: Prisma.StringFilter<"SiteWorkingHour"> | string
   endTime?: Prisma.StringFilter<"SiteWorkingHour"> | string
+  startPeriod?: Prisma.StringFilter<"SiteWorkingHour"> | string
+  endPeriod?: Prisma.StringFilter<"SiteWorkingHour"> | string
   sortOrder?: Prisma.IntFilter<"SiteWorkingHour"> | number
   createdAt?: Prisma.DateTimeFilter<"SiteWorkingHour"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SiteWorkingHour"> | Date | string
@@ -276,6 +292,8 @@ export type SiteWorkingHourOrderByWithRelationInput = {
   endDay?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
+  startPeriod?: Prisma.SortOrder
+  endPeriod?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -294,6 +312,8 @@ export type SiteWorkingHourWhereUniqueInput = Prisma.AtLeast<{
   endDay?: Prisma.StringFilter<"SiteWorkingHour"> | string
   startTime?: Prisma.StringFilter<"SiteWorkingHour"> | string
   endTime?: Prisma.StringFilter<"SiteWorkingHour"> | string
+  startPeriod?: Prisma.StringFilter<"SiteWorkingHour"> | string
+  endPeriod?: Prisma.StringFilter<"SiteWorkingHour"> | string
   sortOrder?: Prisma.IntFilter<"SiteWorkingHour"> | number
   createdAt?: Prisma.DateTimeFilter<"SiteWorkingHour"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SiteWorkingHour"> | Date | string
@@ -309,6 +329,8 @@ export type SiteWorkingHourOrderByWithAggregationInput = {
   endDay?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
+  startPeriod?: Prisma.SortOrder
+  endPeriod?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -331,6 +353,8 @@ export type SiteWorkingHourScalarWhereWithAggregatesInput = {
   endDay?: Prisma.StringWithAggregatesFilter<"SiteWorkingHour"> | string
   startTime?: Prisma.StringWithAggregatesFilter<"SiteWorkingHour"> | string
   endTime?: Prisma.StringWithAggregatesFilter<"SiteWorkingHour"> | string
+  startPeriod?: Prisma.StringWithAggregatesFilter<"SiteWorkingHour"> | string
+  endPeriod?: Prisma.StringWithAggregatesFilter<"SiteWorkingHour"> | string
   sortOrder?: Prisma.IntWithAggregatesFilter<"SiteWorkingHour"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SiteWorkingHour"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"SiteWorkingHour"> | Date | string
@@ -344,6 +368,8 @@ export type SiteWorkingHourCreateInput = {
   endDay?: string
   startTime?: string
   endTime?: string
+  startPeriod?: string
+  endPeriod?: string
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -359,6 +385,8 @@ export type SiteWorkingHourUncheckedCreateInput = {
   endDay?: string
   startTime?: string
   endTime?: string
+  startPeriod?: string
+  endPeriod?: string
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -372,6 +400,8 @@ export type SiteWorkingHourUpdateInput = {
   endDay?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
+  startPeriod?: Prisma.StringFieldUpdateOperationsInput | string
+  endPeriod?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -387,6 +417,8 @@ export type SiteWorkingHourUncheckedUpdateInput = {
   endDay?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
+  startPeriod?: Prisma.StringFieldUpdateOperationsInput | string
+  endPeriod?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -401,6 +433,8 @@ export type SiteWorkingHourCreateManyInput = {
   endDay?: string
   startTime?: string
   endTime?: string
+  startPeriod?: string
+  endPeriod?: string
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -414,6 +448,8 @@ export type SiteWorkingHourUpdateManyMutationInput = {
   endDay?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
+  startPeriod?: Prisma.StringFieldUpdateOperationsInput | string
+  endPeriod?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -428,6 +464,8 @@ export type SiteWorkingHourUncheckedUpdateManyInput = {
   endDay?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
+  startPeriod?: Prisma.StringFieldUpdateOperationsInput | string
+  endPeriod?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -452,6 +490,8 @@ export type SiteWorkingHourCountOrderByAggregateInput = {
   endDay?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
+  startPeriod?: Prisma.SortOrder
+  endPeriod?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -470,6 +510,8 @@ export type SiteWorkingHourMaxOrderByAggregateInput = {
   endDay?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
+  startPeriod?: Prisma.SortOrder
+  endPeriod?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -484,6 +526,8 @@ export type SiteWorkingHourMinOrderByAggregateInput = {
   endDay?: Prisma.SortOrder
   startTime?: Prisma.SortOrder
   endTime?: Prisma.SortOrder
+  startPeriod?: Prisma.SortOrder
+  endPeriod?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -543,6 +587,8 @@ export type SiteWorkingHourCreateWithoutSettingsInput = {
   endDay?: string
   startTime?: string
   endTime?: string
+  startPeriod?: string
+  endPeriod?: string
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -556,6 +602,8 @@ export type SiteWorkingHourUncheckedCreateWithoutSettingsInput = {
   endDay?: string
   startTime?: string
   endTime?: string
+  startPeriod?: string
+  endPeriod?: string
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -599,6 +647,8 @@ export type SiteWorkingHourScalarWhereInput = {
   endDay?: Prisma.StringFilter<"SiteWorkingHour"> | string
   startTime?: Prisma.StringFilter<"SiteWorkingHour"> | string
   endTime?: Prisma.StringFilter<"SiteWorkingHour"> | string
+  startPeriod?: Prisma.StringFilter<"SiteWorkingHour"> | string
+  endPeriod?: Prisma.StringFilter<"SiteWorkingHour"> | string
   sortOrder?: Prisma.IntFilter<"SiteWorkingHour"> | number
   createdAt?: Prisma.DateTimeFilter<"SiteWorkingHour"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SiteWorkingHour"> | Date | string
@@ -612,6 +662,8 @@ export type SiteWorkingHourCreateManySettingsInput = {
   endDay?: string
   startTime?: string
   endTime?: string
+  startPeriod?: string
+  endPeriod?: string
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -625,6 +677,8 @@ export type SiteWorkingHourUpdateWithoutSettingsInput = {
   endDay?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
+  startPeriod?: Prisma.StringFieldUpdateOperationsInput | string
+  endPeriod?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -638,6 +692,8 @@ export type SiteWorkingHourUncheckedUpdateWithoutSettingsInput = {
   endDay?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
+  startPeriod?: Prisma.StringFieldUpdateOperationsInput | string
+  endPeriod?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -651,6 +707,8 @@ export type SiteWorkingHourUncheckedUpdateManyWithoutSettingsInput = {
   endDay?: Prisma.StringFieldUpdateOperationsInput | string
   startTime?: Prisma.StringFieldUpdateOperationsInput | string
   endTime?: Prisma.StringFieldUpdateOperationsInput | string
+  startPeriod?: Prisma.StringFieldUpdateOperationsInput | string
+  endPeriod?: Prisma.StringFieldUpdateOperationsInput | string
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -667,6 +725,8 @@ export type SiteWorkingHourSelect<ExtArgs extends runtime.Types.Extensions.Inter
   endDay?: boolean
   startTime?: boolean
   endTime?: boolean
+  startPeriod?: boolean
+  endPeriod?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -682,6 +742,8 @@ export type SiteWorkingHourSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   endDay?: boolean
   startTime?: boolean
   endTime?: boolean
+  startPeriod?: boolean
+  endPeriod?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -697,6 +759,8 @@ export type SiteWorkingHourSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   endDay?: boolean
   startTime?: boolean
   endTime?: boolean
+  startPeriod?: boolean
+  endPeriod?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -712,12 +776,14 @@ export type SiteWorkingHourSelectScalar = {
   endDay?: boolean
   startTime?: boolean
   endTime?: boolean
+  startPeriod?: boolean
+  endPeriod?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SiteWorkingHourOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settingsId" | "label" | "hours" | "startDay" | "endDay" | "startTime" | "endTime" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["siteWorkingHour"]>
+export type SiteWorkingHourOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "settingsId" | "label" | "hours" | "startDay" | "endDay" | "startTime" | "endTime" | "startPeriod" | "endPeriod" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["siteWorkingHour"]>
 export type SiteWorkingHourInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   settings?: boolean | Prisma.SiteSettingsDefaultArgs<ExtArgs>
 }
@@ -742,6 +808,8 @@ export type $SiteWorkingHourPayload<ExtArgs extends runtime.Types.Extensions.Int
     endDay: string
     startTime: string
     endTime: string
+    startPeriod: string
+    endPeriod: string
     sortOrder: number
     createdAt: Date
     updatedAt: Date
@@ -1177,6 +1245,8 @@ export interface SiteWorkingHourFieldRefs {
   readonly endDay: Prisma.FieldRef<"SiteWorkingHour", 'String'>
   readonly startTime: Prisma.FieldRef<"SiteWorkingHour", 'String'>
   readonly endTime: Prisma.FieldRef<"SiteWorkingHour", 'String'>
+  readonly startPeriod: Prisma.FieldRef<"SiteWorkingHour", 'String'>
+  readonly endPeriod: Prisma.FieldRef<"SiteWorkingHour", 'String'>
   readonly sortOrder: Prisma.FieldRef<"SiteWorkingHour", 'Int'>
   readonly createdAt: Prisma.FieldRef<"SiteWorkingHour", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"SiteWorkingHour", 'DateTime'>

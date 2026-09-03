@@ -5,6 +5,8 @@
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState, type KeyboardEvent } from "react";
 import { AtmosphereOrbs } from "@/components/decorative/atmosphere-orbs";
+import { useTranslations } from "@/components/i18n/dictionary-provider";
+import { StaggerItem, StaggerScene } from "@/components/motion/stagger-scene";
 import type { LabDepartmentData } from "@/lib/lab-department-data";
 
 function LaboratoryIcon() {
@@ -27,6 +29,7 @@ function ServiceListIcon({ className }: { className: string }) {
 export function LabDepartments({ departments }: { departments: LabDepartmentData[] }) {
   const [selectedId, setSelectedId] = useState(departments[0]?.id ?? "");
   const shouldReduceMotion = useReducedMotion();
+  const { t } = useTranslations();
   const activeDepartment = departments.find((department) => department.id === selectedId) ?? departments[0];
 
   if (!activeDepartment) return null;
@@ -74,17 +77,18 @@ export function LabDepartments({ departments }: { departments: LabDepartmentData
 
   return (
     <section aria-labelledby="lab-departments-heading" className="mt-14 scroll-mt-28 border-t border-teal-100 pt-12 sm:mt-16 sm:pt-14" id="services">
-      <div dir="rtl">
-        <div className="relative isolate max-w-2xl overflow-hidden">
+      <StaggerScene dir="rtl">
+        <StaggerItem className="relative isolate max-w-2xl overflow-hidden">
           <AtmosphereOrbs className="absolute -right-8 -top-2 h-36 w-56 opacity-55 sm:h-44 sm:w-72" scale={1.28} />
           <div className="relative z-10">
-            <span className="inline-flex rounded-full bg-teal-500/10 px-4 py-2 text-sm font-extrabold text-teal-500">تخصص در هر گام</span>
-            <h2 className="mt-4 text-3xl font-black tracking-[-0.055em] text-slate-950 sm:text-4xl" id="lab-departments-heading">خدمات تخصصی آزمایشگاه</h2>
-            <p className="mt-4 text-base font-medium leading-8 text-slate-600 sm:text-lg">تمامی بخش‌های آزمایشگاه تحت پوشش سیستم جامع تضمین کیفیت فعالیت می‌کنند. کنترل کیفیت داخلی روزانه، شرکت در برنامه‌های ارزیابی خارجی، کالیبراسیون منظم تجهیزات، پایش شاخص‌های عملکرد و آموزش مستمر پرسنل، تضمین‌کننده صحت و قابلیت اعتماد نتایج آزمایش‌هاست.</p>
+            <span className="inline-flex rounded-full bg-teal-500/10 px-4 py-2 text-sm font-extrabold text-teal-500">{t("services.badge")}</span>
+            <h2 className="mt-4 text-3xl font-black tracking-[-0.055em] text-slate-950 sm:text-4xl" id="lab-departments-heading">{t("services.title")}</h2>
+            <p className="mt-4 text-base font-medium leading-8 text-slate-600 sm:text-lg">{t("services.description")}</p>
           </div>
-        </div>
+        </StaggerItem>
 
-        <div className="mt-10 flex flex-col gap-5 lg:flex-row lg:items-stretch lg:gap-12">
+        <StaggerItem className="mt-10">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-stretch lg:gap-12">
           <article aria-labelledby="lab-department-title" className="order-3 flex min-h-64 flex-1 flex-col justify-center py-4 sm:py-6 lg:order-1 lg:py-10">
             <AnimatePresence mode="wait">
               <motion.div
@@ -94,15 +98,15 @@ export function LabDepartments({ departments }: { departments: LabDepartmentData
                 key={activeDepartment.id}
                 transition={{ duration: shouldReduceMotion ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] }}
               >
-                <span className="inline-flex py-1.5 text-xs font-extrabold text-teal-500">خدمت تخصصی</span>
+                <span className="inline-flex py-1.5 text-xs font-extrabold text-teal-500">{t("services.specialized")}</span>
                 <h3 className="mt-5 text-2xl font-black tracking-[-0.05em] text-slate-950 sm:text-3xl" id="lab-department-title">{activeDepartment.title}</h3>
                 <p className="mt-5 text-base font-medium leading-8 text-slate-700 sm:text-lg sm:leading-9">{activeDepartment.description}</p>
-                <div aria-hidden="true" className="mt-8 flex items-center gap-3 text-sm font-extrabold text-teal-500"><span className="h-px w-12 bg-teal-500/50" />دقت، دانش و پاسخ‌گویی</div>
+                <div aria-hidden="true" className="mt-8 flex items-center gap-3 text-sm font-extrabold text-teal-500"><span className="h-px w-12 bg-teal-500/50" />{t("services.promise")}</div>
               </motion.div>
             </AnimatePresence>
           </article>
 
-          <div aria-label="انتخاب بخش آزمایشگاه" className="order-2 -mx-1 overflow-x-auto pb-1 lg:hidden" role="tablist">
+          <div aria-label={t("services.select")} className="order-2 -mx-1 overflow-x-auto pb-1 lg:hidden" role="tablist">
             <div className="flex min-w-max gap-2 px-1">{tabButtons(true)}</div>
           </div>
 
@@ -116,18 +120,19 @@ export function LabDepartments({ departments }: { departments: LabDepartmentData
                 key={activeDepartment.id}
                 transition={{ duration: shouldReduceMotion ? 0 : 0.34, ease: [0.22, 1, 0.36, 1] }}
               >
-                {activeDepartment.imageUrl ? <img alt={`تصویر خدمت ${activeDepartment.title}`} className="size-full object-cover" loading="lazy" src={activeDepartment.imageUrl} /> : <div className="grid size-full place-items-center bg-[radial-gradient(circle_at_22%_18%,rgba(153,246,228,0.58),transparent_26%),radial-gradient(circle_at_72%_78%,rgba(45,212,191,0.28),transparent_32%),linear-gradient(140deg,#0f766e,#134e4a)] text-white"><LaboratoryIcon /></div>}
+                {activeDepartment.imageUrl ? <img alt={t("services.imageAlt", { title: activeDepartment.title })} className="size-full object-cover" loading="lazy" src={activeDepartment.imageUrl} /> : <div className="grid size-full place-items-center bg-[radial-gradient(circle_at_22%_18%,rgba(153,246,228,0.58),transparent_26%),radial-gradient(circle_at_72%_78%,rgba(45,212,191,0.28),transparent_32%),linear-gradient(140deg,#0f766e,#134e4a)] text-white"><LaboratoryIcon /></div>}
                 <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(105deg,rgba(15,23,42,0.6)_0%,rgba(15,23,42,0.08)_58%,rgba(15,23,42,0.16)_100%)]" />
-                <div className="absolute bottom-6 right-6 rounded-2xl border border-white/25 bg-white/10 px-4 py-3 text-sm font-extrabold text-white backdrop-blur-md sm:bottom-8 sm:right-8">آزمایشگاه پایش</div>
+                <div className="absolute bottom-6 right-6 rounded-2xl border border-white/25 bg-white/10 px-4 py-3 text-sm font-extrabold text-white backdrop-blur-md sm:bottom-8 sm:right-8">{t("services.imageLabel")}</div>
               </motion.div>
             </AnimatePresence>
 
-            <div aria-label="انتخاب بخش آزمایشگاه" className="absolute left-0 top-1/2 z-20 hidden w-60 -translate-x-[55%] -translate-y-1/2 rounded-[1.75rem] border border-teal-100 bg-white p-2.5 ring-1 ring-white/80 lg:flex lg:flex-col lg:gap-1.5" role="tablist">
+            <div aria-label={t("services.select")} className="absolute left-0 top-1/2 z-20 hidden w-60 -translate-x-[55%] -translate-y-1/2 rounded-[1.75rem] border border-teal-100 bg-white p-2.5 ring-1 ring-white/80 lg:flex lg:flex-col lg:gap-1.5" role="tablist">
               {tabButtons()}
             </div>
           </div>
-        </div>
-      </div>
+          </div>
+        </StaggerItem>
+      </StaggerScene>
     </section>
   );
 }

@@ -8,13 +8,21 @@ export type SlideshowSlideData = {
   title: string | null;
 };
 
-export const defaultSlideshowSlides: SlideshowSlideData[] = [
+export function getDefaultSlideshowSlides(locale: ContentLocale): SlideshowSlideData[] {
+  const dictionary = getDictionary(locale);
+  const t = (key: string) => translate(dictionary, key);
+
+  return [
   {
     id: "default-lab-slide",
     imageUrl: "/background.png",
-    altText: "محیط آزمایشگاه پایش",
-    title: "دقت امروز، سلامت فردا",
-    subtitle: "آزمایش‌های تخصصی با استانداردهای جهانی، تیمی متعهد و پاسخ‌دهی آنلاین.",
+    altText: t("defaults.slideAlt"),
+    title: t("defaults.slideTitle"),
+    subtitle: t("defaults.slideSubtitle"),
     sortOrder: 10,
   },
-];
+  ];
+}
+import type { ContentLocale } from "@/lib/content-locale";
+import { getDictionary } from "@/lib/dictionaries";
+import { translate } from "@/lib/dictionaries/types";

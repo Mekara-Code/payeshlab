@@ -1,6 +1,6 @@
 "use client";
 
-import { type FormEvent, useState, useTransition } from "react";
+import { type FormEvent, useActionState, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   clearLaboratoryIdentity,
@@ -20,12 +20,22 @@ import {
 } from "@/app/admin/settings/actions";
 import { ClockTimePickerModal } from "@/components/admin/clock-time-picker-modal";
 import { LocationPicker } from "@/components/admin/location-picker";
+import { EitaaIcon } from "@/components/icons/eitaa-icon";
+import { RubikaIcon } from "@/components/icons/rubika-icon";
+import { useActionToast } from "@/components/ui/use-action-toast";
 import { useToast } from "@/components/ui/toast-provider";
+import { defaultCeoMessage } from "@/lib/site-settings-content";
 import type {
   SiteSettingsData,
   SiteWorkingHourData,
 } from "@/lib/site-settings";
-import { formatWorkingDayRange, workingDays } from "@/lib/working-hours";
+import {
+  formatWorkingHourRange,
+  getWorkingDayLabel,
+  getWorkingTimePeriodLabel,
+  workingDays,
+  workingTimePeriods,
+} from "@/lib/working-hours";
 
 function BuildingIcon() {
   return (
@@ -123,12 +133,22 @@ function InstagramIcon() {
   );
 }
 
-function TelegramIcon() {
+function SurveyIcon() {
   return (
     <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 24 24">
       <path
-        d="m20.5 4.3-3.1 15.1c-.2 1.1-1.1 1.3-1.9.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.2-8.3c.4-.4-.1-.6-.6-.3L5 12.9.2 11.4c-1-.3-1-1 .2-1.5L19 2.7c.9-.3 1.8.2 1.5 1.6Z"
-        fill="currentColor"
+        d="M6 3.5h9l4 4V20a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+      <path
+        d="M14 3.5V8h5M8.5 12.5l1.4 1.4 2.6-2.6M8.5 17l1.4 1.4 2.6-2.6"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.6"
       />
     </svg>
   );
@@ -178,16 +198,25 @@ function toCoordinate(value: string) {
 
 type WorkingHourValues = Pick<
   SiteWorkingHourData,
-  "endDay" | "endTime" | "startDay" | "startTime"
+  | "endDay"
+  | "endPeriod"
+  | "endTime"
+  | "startDay"
+  | "startPeriod"
+  | "startTime"
 >;
 type WorkingHourTimeField = "startTime" | "endTime";
 
 const defaultWorkingHourValues: WorkingHourValues = {
   endDay: "THURSDAY",
+  endPeriod: "NIGHT",
   endTime: "20:00",
   startDay: "SATURDAY",
+  startPeriod: "MORNING",
   startTime: "08:00",
 };
+
+const initialSettingsActionState: SettingsActionState = {};
 
 function WorkingHourFields({
   compact = false,
@@ -220,27 +249,7 @@ function WorkingHourFields({
         >
           {workingDays.map((day) => (
             <option key={day.id} value={day.id}>
-              {day.label}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className={labelClassName}>
-        تا پایان:
-        <select
-          className={inputClassName}
-          name="endDay"
-          onChange={(event) =>
-            onChange({
-              endDay: event.target.value as WorkingHourValues["endDay"],
-            })
-          }
-          value={values.endDay}
-        >
-          {workingDays.map((day) => (
-            <option key={day.id} value={day.id}>
-              {day.label}
+              {getWorkingDayLabel(day.id)}
             </option>
           ))}
         </select>
@@ -262,6 +271,46 @@ function WorkingHourFields({
         </bdi>
       </button>
 
+      <label className={labelClassName}>
+        بازهٔ شروع:
+        <select
+          className={inputClassName}
+          name="startPeriod"
+          onChange={(event) =>
+            onChange({
+              startPeriod: event.target.value as WorkingHourValues["startPeriod"],
+            })
+          }
+          value={values.startPeriod}
+        >
+          {workingTimePeriods.map((period) => (
+            <option key={period.id} value={period.id}>
+              {getWorkingTimePeriodLabel(period.id)}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className={labelClassName}>
+        تا پایان:
+        <select
+          className={inputClassName}
+          name="endDay"
+          onChange={(event) =>
+            onChange({
+              endDay: event.target.value as WorkingHourValues["endDay"],
+            })
+          }
+          value={values.endDay}
+        >
+          {workingDays.map((day) => (
+            <option key={day.id} value={day.id}>
+              {getWorkingDayLabel(day.id)}
+            </option>
+          ))}
+        </select>
+      </label>
+
       <input name="endTime" type="hidden" value={values.endTime} />
       <button
         aria-label={`انتخاب ساعت پایان؛ ${values.endTime}`}
@@ -277,6 +326,26 @@ function WorkingHourFields({
           {values.endTime}
         </bdi>
       </button>
+
+      <label className={labelClassName}>
+        بازهٔ پایان:
+        <select
+          className={inputClassName}
+          name="endPeriod"
+          onChange={(event) =>
+            onChange({
+              endPeriod: event.target.value as WorkingHourValues["endPeriod"],
+            })
+          }
+          value={values.endPeriod}
+        >
+          {workingTimePeriods.map((period) => (
+            <option key={period.id} value={period.id}>
+              {getWorkingTimePeriodLabel(period.id)}
+            </option>
+          ))}
+        </select>
+      </label>
     </>
   );
 }
@@ -294,16 +363,15 @@ function WorkingHourRow({
 }) {
   const [values, setValues] = useState<WorkingHourValues>({
     endDay: workingHour.endDay,
+    endPeriod: workingHour.endPeriod,
     endTime: workingHour.endTime,
     startDay: workingHour.startDay,
+    startPeriod: workingHour.startPeriod,
     startTime: workingHour.startTime,
   });
   const [timePickerField, setTimePickerField] =
     useState<WorkingHourTimeField | null>(null);
-  const workingDayRange = formatWorkingDayRange(
-    values.startDay,
-    values.endDay,
-  );
+  const workingHourSummary = formatWorkingHourRange(values);
 
   return (
     <>
@@ -315,7 +383,7 @@ function WorkingHourRow({
         }}
       >
         <input name="id" type="hidden" value={workingHour.id} />
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
           <WorkingHourFields
             compact
             onChange={(nextValues) =>
@@ -327,7 +395,7 @@ function WorkingHourRow({
         </div>
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs font-bold text-slate-500">
-            بازهٔ انتخاب‌شده: {workingDayRange}
+            نمایش در سایت: {workingHourSummary}
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -338,11 +406,11 @@ function WorkingHourRow({
               ذخیره
             </button>
             <button
-              aria-label={`حذف بازهٔ ${workingDayRange}`}
+              aria-label={`حذف بازهٔ ${workingHourSummary}`}
               className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-extrabold text-rose-700 transition hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 disabled:opacity-60"
               disabled={isPending}
               onClick={() => {
-                if (window.confirm(`بازهٔ «${workingDayRange}» حذف شود؟`))
+                if (window.confirm(`بازهٔ «${workingHourSummary}» حذف شود؟`))
                   onDelete();
               }}
               type="button"
@@ -379,6 +447,8 @@ function WorkingHourRow({
 export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [settingsActionState, saveSettingsAction, isSavingSettings] =
+    useActionState(saveSiteSettings, initialSettingsActionState);
   const [isLocationSearching, startLocationSearch] = useTransition();
   const [locationSearch, setLocationSearch] = useState<LocationSearchState>({});
   const [newWorkingHour, setNewWorkingHour] =
@@ -386,15 +456,22 @@ export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
   const [newWorkingHourPicker, setNewWorkingHourPicker] =
     useState<WorkingHourTimeField | null>(null);
   const { toast } = useToast();
+  useActionToast(settingsActionState, {
+    error: "ذخیره انجام نشد",
+    success: "تنظیمات ذخیره شد",
+  });
   const [identity, setIdentity] = useState({
+    ceoMessage: settings.ceoMessage ?? defaultCeoMessage,
     city: settings.city ?? "",
+    eitaaUrl: settings.eitaaUrl ?? "",
     instagramUrl: settings.instagramUrl ?? "",
     laboratoryName: settings.laboratoryName ?? "",
     latitude: settings.latitude === null ? "" : String(settings.latitude),
     longitude: settings.longitude === null ? "" : String(settings.longitude),
     province: settings.province ?? "",
+    rubikaUrl: settings.rubikaUrl ?? "",
     shortDescription: settings.shortDescription ?? "",
-    telegramUrl: settings.telegramUrl ?? "",
+    surveyFormUrl: settings.surveyFormUrl ?? "",
     whatsappUrl: settings.whatsappUrl ?? "",
   });
 
@@ -411,12 +488,6 @@ export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
         router.refresh();
       }
     });
-  }
-
-  function handleSettingsSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    runAction(() => saveSiteSettings({}, new FormData(form)));
   }
 
   function handleAddPhone(event: FormEvent<HTMLFormElement>) {
@@ -525,8 +596,8 @@ export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
       </section>
 
       <form
+        action={saveSettingsAction}
         className={`${panelClassName} mt-6`}
-        onSubmit={handleSettingsSubmit}
       >
         <div className="flex flex-col gap-3 border-b border-slate-100 pb-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -539,7 +610,7 @@ export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
           </div>
           <button
             className="min-h-11 rounded-xl px-4 text-sm font-extrabold text-rose-700 transition hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-600 disabled:opacity-60"
-            disabled={isPending}
+            disabled={isPending || isSavingSettings}
             onClick={() => {
               if (window.confirm("نام و توضیح آزمایشگاه حذف شود؟"))
                 runAction(clearLaboratoryIdentity, () =>
@@ -589,6 +660,25 @@ export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
               value={identity.shortDescription}
             />
           </label>
+          <label className="grid gap-2 text-sm font-black text-slate-950 md:col-span-2">
+            سخن مدیرعامل برای صفحه درباره ما
+            <textarea
+              className={`${inputClassName} min-h-72 resize-y py-3 leading-8`}
+              maxLength={5000}
+              name="ceoMessage"
+              onChange={(event) =>
+                setIdentity((current) => ({
+                  ...current,
+                  ceoMessage: event.target.value,
+                }))
+              }
+              placeholder="متن سخن مدیرعامل"
+              value={identity.ceoMessage}
+            />
+            <span className="text-xs font-medium leading-6 text-slate-500">
+              برای جدا کردن پاراگراف‌ها یک خط خالی بگذارید. متن در صفحه «درباره ما» نمایش داده می‌شود.
+            </span>
+          </label>
           <label className="grid gap-2 text-sm font-black text-slate-950">
             <span className="flex items-center gap-2">
               <InstagramIcon />
@@ -633,24 +723,70 @@ export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
           </label>
           <label className="grid gap-2 text-sm font-black text-slate-950">
             <span className="flex items-center gap-2">
-              <TelegramIcon />
-              تلگرام
+              <RubikaIcon />
+              روبیکا
             </span>
             <input
               className={inputClassName}
               dir="ltr"
               inputMode="url"
-              name="telegramUrl"
+              name="rubikaUrl"
               onChange={(event) =>
                 setIdentity((current) => ({
                   ...current,
-                  telegramUrl: event.target.value,
+                  rubikaUrl: event.target.value,
                 }))
               }
-              placeholder="https://t.me/..."
+              placeholder="https://rubika.ir/..."
               type="url"
-              value={identity.telegramUrl}
+              value={identity.rubikaUrl}
             />
+          </label>
+          <label className="grid gap-2 text-sm font-black text-slate-950">
+            <span className="flex items-center gap-2">
+              <EitaaIcon />
+              ایتا
+            </span>
+            <input
+              className={inputClassName}
+              dir="ltr"
+              inputMode="url"
+              name="eitaaUrl"
+              onChange={(event) =>
+                setIdentity((current) => ({
+                  ...current,
+                  eitaaUrl: event.target.value,
+                }))
+              }
+              placeholder="https://eitaa.com/..."
+              type="url"
+              value={identity.eitaaUrl}
+            />
+          </label>
+          <label className="grid gap-2 text-sm font-black text-slate-950 sm:col-span-2">
+            <span className="flex items-center gap-2">
+              <SurveyIcon />
+              لینک فرم نظرسنجی
+            </span>
+            <input
+              className={inputClassName}
+              dir="ltr"
+              inputMode="url"
+              name="surveyFormUrl"
+              onChange={(event) =>
+                setIdentity((current) => ({
+                  ...current,
+                  surveyFormUrl: event.target.value,
+                }))
+              }
+              placeholder="https://survey.example.com/..."
+              type="url"
+              value={identity.surveyFormUrl}
+            />
+            <span className="text-xs font-medium text-slate-500">
+              با ثبت این لینک، دکمهٔ «نظرسنجی» در نوار بالای سایت و فوتر نمایش
+              داده می‌شود.
+            </span>
           </label>
         </div>
 
@@ -839,10 +975,10 @@ export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
         <div className="mt-6 flex justify-end">
           <button
             className="min-h-12 rounded-xl bg-teal-500 px-5 text-sm font-extrabold text-white shadow-[0_10px_20px_rgba(13,148,136,0.23)] transition hover:bg-teal-500 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-teal-500 disabled:opacity-60"
-            disabled={isPending}
+            disabled={isSavingSettings}
             type="submit"
           >
-            {isPending ? "در حال ذخیره…" : "ذخیره اطلاعات سایت"}
+            {isSavingSettings ? "در حال ذخیره…" : "ذخیره اطلاعات سایت"}
           </button>
         </div>
       </form>
@@ -1080,7 +1216,7 @@ export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
             className="mt-5 grid gap-4"
             onSubmit={handleAddWorkingHour}
           >
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
               <WorkingHourFields
                 onChange={(nextValues) =>
                   setNewWorkingHour((current) => ({

@@ -41,6 +41,14 @@ import { useToast } from "@/components/ui/toast-provider";
 
 type BlockType = "paragraph" | "heading" | "list" | "quote" | "table";
 type EditorBlock = { id: string; type: BlockType; content: string };
+type EditorLocale = "fa" | "en" | "ar";
+type ArticleDraft = {
+  blocks: EditorBlock[];
+  excerpt: string;
+  metaDescription: string;
+  tags: string;
+  title: string;
+};
 
 export type ManagedArticle = {
   categories: string[];
@@ -53,6 +61,14 @@ export type ManagedArticle = {
   status: "DRAFT" | "PUBLISHED";
   tags: string[];
   title: string;
+  translations: Array<{
+    content: unknown;
+    excerpt: string | null;
+    locale: "FA" | "EN" | "AR";
+    metaDescription: string | null;
+    tags: string[];
+    title: string;
+  }>;
   updatedAt: string;
 };
 
@@ -77,6 +93,34 @@ function uid() {
 function getEmptyBlocks(): EditorBlock[] {
   return [{ id: uid(), type: "paragraph", content: "" }];
 }
+
+function getEmptyArticleDraft(): ArticleDraft {
+  return {
+    blocks: getEmptyBlocks(),
+    excerpt: "",
+    metaDescription: "",
+    tags: "",
+    title: "",
+  };
+}
+
+function getEmptyArticleDrafts(): Record<EditorLocale, ArticleDraft> {
+  return {
+    ar: getEmptyArticleDraft(),
+    en: getEmptyArticleDraft(),
+    fa: getEmptyArticleDraft(),
+  };
+}
+
+const editorLanguageOptions: Array<{
+  code: EditorLocale;
+  direction: "ltr" | "rtl";
+  label: string;
+}> = [
+  { code: "fa", direction: "rtl", label: "فارسی" },
+  { code: "en", direction: "ltr", label: "English" },
+  { code: "ar", direction: "rtl", label: "العربية" },
+];
 
 function parseEditorBlocks(value: unknown): EditorBlock[] {
   if (!Array.isArray(value)) return getEmptyBlocks();
@@ -632,6 +676,10 @@ export function ArticleEditor({
 }) {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [activeLocale, setActiveLocale] = useState<EditorLocale>("fa");
+  const [translationDrafts, setTranslationDrafts] = useState<
+    Record<EditorLocale, ArticleDraft>
+  >(getEmptyArticleDrafts);
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);
@@ -664,7 +712,40 @@ export function ArticleEditor({
   const shouldReduceMotion = useReducedMotion() ?? false;
   const router = useRouter();
   const { toast } = useToast();
-  const serializedBlocks = useMemo(() => JSON.stringify(blocks), [blocks]);
+  const draftsForSubmission = useMemo<Record<EditorLocale, ArticleDraft>>(
+    () => ({
+      ...translationDrafts,
+      [activeLocale]: { blocks, excerpt, metaDescription, tags, title },
+    }),
+    [activeLocale, blocks, excerpt, metaDescription, tags, title, translationDrafts],
+  );
+  const primaryDraft = draftsForSubmission.fa;
+  const serializedTranslations = useMemo(
+    () =>
+      JSON.stringify({
+        ar: {
+          content: draftsForSubmission.ar.blocks,
+          excerpt: draftsForSubmission.ar.excerpt,
+          metaDescription: draftsForSubmission.ar.metaDescription,
+          tags: draftsForSubmission.ar.tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean),
+          title: draftsForSubmission.ar.title,
+        },
+        en: {
+          content: draftsForSubmission.en.blocks,
+          excerpt: draftsForSubmission.en.excerpt,
+          metaDescription: draftsForSubmission.en.metaDescription,
+          tags: draftsForSubmission.en.tags
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter(Boolean),
+          title: draftsForSubmission.en.title,
+        },
+      }),
+    [draftsForSubmission],
+  );
   const contentLabel = contentType === "NEWS" ? "خبر" : "مقاله";
   const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
   const visiblePage = Math.min(currentPage, pageCount);
@@ -682,6 +763,8 @@ export function ArticleEditor({
 
   const resetEditor = useCallback(() => {
     setEditingId(null);
+    setActiveLocale("fa");
+    setTranslationDrafts(getEmptyArticleDrafts());
     setTitle("");
     setSlug("");
     setSlugTouched(false);
@@ -772,17 +855,39 @@ export function ArticleEditor({
   function openEditEditor(item: ManagedArticle, trigger: HTMLElement) {
     const itemCategories =
       item.categories.length > 0 ? item.categories : [initialCategories[0]];
+    const drafts = getEmptyArticleDrafts();
+    drafts.fa = {
+      blocks: parseEditorBlocks(item.content),
+      excerpt: item.excerpt ?? "",
+      metaDescription: item.metaDescription ?? "",
+      tags: item.tags.join(", "),
+      title: item.title,
+    };
+    item.translations.forEach((translation) => {
+      if (translation.locale === "FA") return;
+      const locale = translation.locale.toLowerCase() as Exclude<EditorLocale, "fa">;
+      drafts[locale] = {
+        blocks: parseEditorBlocks(translation.content),
+        excerpt: translation.excerpt ?? "",
+        metaDescription: translation.metaDescription ?? "",
+        tags: translation.tags.join(", "),
+        title: translation.title,
+      };
+    });
+
     setEditingId(item.id);
-    setTitle(item.title);
+    setActiveLocale("fa");
+    setTranslationDrafts(drafts);
+    setTitle(drafts.fa.title);
     setSlug(item.slug);
     setSlugTouched(true);
-    setBlocks(parseEditorBlocks(item.content));
+    setBlocks(drafts.fa.blocks);
     setCategories((current) =>
       Array.from(new Set([...current, ...itemCategories])),
     );
     setSelectedCategories(itemCategories);
-    setTags(item.tags.join(", "));
-    setExcerpt(item.excerpt ?? "");
+    setTags(drafts.fa.tags);
+    setExcerpt(drafts.fa.excerpt);
     setFeaturedImage(item.featuredImage ?? "");
     if (featuredImagePreviewUrlRef.current)
       URL.revokeObjectURL(featuredImagePreviewUrlRef.current);
@@ -792,7 +897,7 @@ export function ArticleEditor({
     setFeaturedImageError("");
     setIsFeaturedImageDragging(false);
     if (featuredImageInputRef.current) featuredImageInputRef.current.value = "";
-    setMetaDescription(item.metaDescription ?? "");
+    setMetaDescription(drafts.fa.metaDescription);
     setIsInserterOpen(false);
     returnFocusRef.current = trigger;
     setIsEditorOpen(true);
@@ -886,6 +991,23 @@ export function ArticleEditor({
       current.includes(value) ? current : [...current, value],
     );
     setCategoryDraft("");
+  }
+
+  function switchEditorLocale(nextLocale: EditorLocale) {
+    if (nextLocale === activeLocale) return;
+
+    setTranslationDrafts((current) => ({
+      ...current,
+      [activeLocale]: { blocks, excerpt, metaDescription, tags, title },
+    }));
+    const nextDraft = translationDrafts[nextLocale];
+    setActiveLocale(nextLocale);
+    setTitle(nextDraft.title);
+    setBlocks(nextDraft.blocks);
+    setTags(nextDraft.tags);
+    setExcerpt(nextDraft.excerpt);
+    setMetaDescription(nextDraft.metaDescription);
+    setIsInserterOpen(false);
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -1164,7 +1286,29 @@ export function ArticleEditor({
                 <input
                   name="blocksJson"
                   type="hidden"
-                  value={serializedBlocks}
+                  value={JSON.stringify(primaryDraft.blocks)}
+                />
+                <input name="title" type="hidden" value={primaryDraft.title} />
+                <input name="excerpt" type="hidden" value={primaryDraft.excerpt} />
+                <input
+                  name="metaDescription"
+                  type="hidden"
+                  value={primaryDraft.metaDescription}
+                />
+                <input
+                  name="tagsJson"
+                  type="hidden"
+                  value={JSON.stringify(
+                    primaryDraft.tags
+                      .split(",")
+                      .map((tag) => tag.trim())
+                      .filter(Boolean),
+                  )}
+                />
+                <input
+                  name="translationsJson"
+                  type="hidden"
+                  value={serializedTranslations}
                 />
                 <input
                   name="categoriesJson"
@@ -1172,17 +1316,39 @@ export function ArticleEditor({
                   value={JSON.stringify(selectedCategories)}
                 />
                 <input name="id" type="hidden" value={editingId ?? ""} />
-                <input
-                  name="tagsJson"
-                  type="hidden"
-                  value={JSON.stringify(
-                    tags
-                      .split(",")
-                      .map((tag) => tag.trim())
-                      .filter(Boolean),
-                  )}
-                />
                 <input name="type" type="hidden" value={contentType} />
+
+                <div
+                  aria-label="زبان محتوای در حال ویرایش"
+                  className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-5 py-3 sm:px-7"
+                  role="tablist"
+                >
+                  <span className="ml-1 text-xs font-extrabold text-slate-500">
+                    زبان محتوا:
+                  </span>
+                  {editorLanguageOptions.map((option) => {
+                    const isActive = activeLocale === option.code;
+                    return (
+                      <button
+                        aria-selected={isActive}
+                        className={`min-h-10 rounded-xl px-4 text-sm font-extrabold transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 ${
+                          isActive
+                            ? "bg-teal-500 text-white"
+                            : "bg-slate-100 text-slate-600 hover:bg-teal-50 hover:text-teal-500"
+                        }`}
+                        key={option.code}
+                        onClick={() => switchEditorLocale(option.code)}
+                        role="tab"
+                        type="button"
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
+                  <span className="mr-auto text-xs font-medium text-slate-500">
+                    فارسی زبان اصلی است؛ ترجمه‌های خالی نمایش داده نمی‌شوند.
+                  </span>
+                </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-5 py-3 sm:px-7">
                   <div className="relative">
@@ -1251,7 +1417,10 @@ export function ArticleEditor({
 
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-5 sm:p-7">
                   <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
-                    <section className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-[0_14px_34px_rgba(15,23,42,0.05)] sm:p-7">
+                    <section
+                      className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-[0_14px_34px_rgba(15,23,42,0.05)] sm:p-7"
+                      dir={activeLocale === "en" ? "ltr" : "rtl"}
+                    >
                       <label
                         className="sr-only"
                         htmlFor={`${contentType}-title`}
@@ -1261,14 +1430,13 @@ export function ArticleEditor({
                       <input
                         className="w-full border-0 bg-transparent p-0 text-3xl font-black tracking-[-0.05em] text-slate-950 outline-none placeholder:text-slate-300 focus-visible:ring-2 focus-visible:ring-teal-500 sm:text-4xl"
                         id={`${contentType}-title`}
-                        name="title"
                         onChange={(event) => {
                           setTitle(event.target.value);
-                          if (!slugTouched)
+                          if (activeLocale === "fa" && !slugTouched)
                             setSlug(slugify(event.target.value));
                         }}
                         placeholder={`افزودن عنوان ${contentLabel}`}
-                        required
+                        required={activeLocale === "fa"}
                         value={title}
                       />
                       <div className="mt-5 flex items-center gap-2 border-y border-slate-100 py-3 text-xs font-bold text-slate-500">
@@ -1382,7 +1550,6 @@ export function ArticleEditor({
                           خلاصه {contentLabel}
                           <textarea
                             className="min-h-24 resize-y rounded-xl border border-slate-200 p-3 text-sm font-medium leading-6 text-slate-700 outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
-                            name="excerpt"
                             onChange={(event) => setExcerpt(event.target.value)}
                             placeholder="خلاصه‌ای کوتاه برای نمایش در فهرست…"
                             value={excerpt}
@@ -1528,7 +1695,6 @@ export function ArticleEditor({
                           <textarea
                             className="min-h-20 resize-y rounded-xl border border-slate-200 p-3 text-sm font-medium leading-6 text-slate-700 outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
                             maxLength={160}
-                            name="metaDescription"
                             onChange={(event) =>
                               setMetaDescription(event.target.value)
                             }

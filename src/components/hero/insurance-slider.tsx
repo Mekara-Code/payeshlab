@@ -7,6 +7,8 @@ import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { StaggerItem, StaggerScene } from "@/components/motion/stagger-scene";
+import { useTranslations } from "@/components/i18n/dictionary-provider";
 import type { InsurancePartner } from "@/lib/insurance-data";
 import { InsurancePartnersModal } from "./insurance-partners-modal";
 
@@ -82,45 +84,52 @@ function getLoopableInsurances(insurances: InsurancePartner[]) {
 
 export function InsuranceSlider({ insurances, large = false, variant = "light" }: { insurances: InsurancePartner[]; large?: boolean; variant?: "light" | "overlay" }) {
   const shouldReduceMotion = useReducedMotion();
+  const { t } = useTranslations();
   const isOverlay = variant === "overlay";
   const loopableInsurances = getLoopableInsurances(insurances);
 
   return (
-    <section aria-label="بیمه‌های طرف قرارداد" className={`mt-6 overflow-hidden border-t pt-5 ${isOverlay ? "border-white/20" : "border-slate-200/80"}`}>
-      <div className="mb-3 flex items-center justify-between gap-3 px-1">
-        <div>
-          <h2 className={`font-black ${large ? "text-base sm:text-lg" : "text-sm"} ${isOverlay ? "text-white" : "text-slate-900"}`}>بیمه‌های طرف قرارداد</h2>
-          <p className={`mt-0.5 font-bold ${large ? "text-xs sm:text-sm" : "text-[11px]"} ${isOverlay ? "text-white/75" : "text-slate-500"}`}>پذیرش آسان با پوشش بیمه‌ای گسترده</p>
-        </div>
-        <InsurancePartnersModal insurances={insurances} />
-      </div>
+    <section aria-label={t("insurance.title")} className={`mt-6 overflow-hidden border-t pt-5 ${isOverlay ? "border-white/20" : "border-slate-200/80"}`}>
+      <StaggerScene>
+        <StaggerItem className="mb-3">
+          <div className="flex items-center justify-between gap-3 px-1">
+            <div>
+              <h2 className={`font-black ${large ? "text-base sm:text-lg" : "text-sm"} ${isOverlay ? "text-white" : "text-slate-900"}`}>{t("insurance.title")}</h2>
+              <p className={`mt-0.5 font-bold ${large ? "text-xs sm:text-sm" : "text-[11px]"} ${isOverlay ? "text-white/75" : "text-slate-500"}`}>{t("insurance.description")}</p>
+            </div>
+            <InsurancePartnersModal insurances={insurances} />
+          </div>
+        </StaggerItem>
 
-      <Swiper
-        aria-label="فهرست بیمه‌های طرف قرارداد؛ برای دیدن موارد بیشتر به صورت افقی بکشید"
-        allowTouchMove={false}
-        autoplay={shouldReduceMotion ? false : { delay: 0, disableOnInteraction: false, pauseOnMouseEnter: false }}
-        breakpoints={{
-          480: { slidesPerGroup: 1, slidesPerView: 4, spaceBetween: 8 },
-          640: { slidesPerGroup: 1, slidesPerView: 3, spaceBetween: large ? 16 : 20 },
-          1024: { slidesPerGroup: 1, slidesPerView: 8, spaceBetween: 12 },
-        }}
-        className="insurance-marquee overflow-hidden"
-        dir="rtl"
-        modules={[Autoplay]}
-        loop={loopableInsurances.length > 1}
-        slidesPerGroup={1}
-        slidesPerView={4}
-        spaceBetween={8}
-        speed={7000}
-      >
-        {loopableInsurances.map((insurance, index) => (
-          <SwiperSlide key={`${insurance.id}-${index}`}>
-            <article className={`flex min-h-24 items-center justify-center px-1 py-2 ${large ? "sm:min-h-32" : "sm:min-h-28"}`}>
-              <InsuranceLogo key={insurance.logoUrl ?? "empty-logo"} large={large} logoUrl={insurance.logoUrl} name={insurance.name} />
-            </article>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+        <StaggerItem>
+          <Swiper
+            aria-label={t("insurance.list")}
+            allowTouchMove={false}
+            autoplay={shouldReduceMotion ? false : { delay: 0, disableOnInteraction: false, pauseOnMouseEnter: false }}
+            breakpoints={{
+              480: { slidesPerGroup: 1, slidesPerView: 4, spaceBetween: 8 },
+              640: { slidesPerGroup: 1, slidesPerView: 3, spaceBetween: large ? 16 : 20 },
+              1024: { slidesPerGroup: 1, slidesPerView: 8, spaceBetween: 12 },
+            }}
+            className="insurance-marquee overflow-hidden"
+            dir="rtl"
+            modules={[Autoplay]}
+            loop={loopableInsurances.length > 1}
+            slidesPerGroup={1}
+            slidesPerView={4}
+            spaceBetween={8}
+            speed={7000}
+          >
+            {loopableInsurances.map((insurance, index) => (
+              <SwiperSlide key={`${insurance.id}-${index}`}>
+                <article className={`flex min-h-24 items-center justify-center px-1 py-2 ${large ? "sm:min-h-32" : "sm:min-h-28"}`}>
+                  <InsuranceLogo key={insurance.logoUrl ?? "empty-logo"} large={large} logoUrl={insurance.logoUrl} name={insurance.name} />
+                </article>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </StaggerItem>
+      </StaggerScene>
     </section>
   );
 }

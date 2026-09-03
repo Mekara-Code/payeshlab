@@ -48,6 +48,16 @@ type SavedArticleImage = {
   imageUrl: string;
 };
 
+type ArticleTranslationInput = {
+  content: ArticleBlock[];
+  excerpt: string | null;
+  metaDescription: string | null;
+  tags: string[];
+  title: string;
+};
+
+type ArticleTranslationMap = Record<"EN" | "AR", ArticleTranslationInput | null>;
+
 function slugify(value: string) {
   return value
     .trim()
@@ -138,6 +148,88 @@ function parseStringList(raw: string, limit: number, maxLength: number) {
   } catch {
     return [];
   }
+}
+
+function parseArticleTranslations(raw: string): ArticleTranslationMap | "invalid" {
+  const emptyTranslations: ArticleTranslationMap = { AR: null, EN: null };
+  if (!raw) return emptyTranslations;
+
+  try {
+    const value = JSON.parse(raw) as unknown;
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      return "invalid";
+    }
+
+    return (["EN", "AR"] as const).reduce<ArticleTranslationMap>(
+      (translations, locale) => {
+        const entry = (value as Record<string, unknown>)[locale.toLowerCase()];
+        if (entry === undefined || entry === null) return translations;
+        if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+          throw new Error("Invalid translation");
+        }
+
+        const translation = entry as Record<string, unknown>;
+        const title =
+          typeof translation.title === "string" ? translation.title.trim() : "";
+        const content = Array.isArray(translation.content)
+          ? parseBlocks(JSON.stringify(translation.content))
+          : null;
+        const excerpt =
+          typeof translation.excerpt === "string"
+            ? translation.excerpt.trim().slice(0, 2_000) || null
+            : null;
+        const metaDescription =
+          typeof translation.metaDescription === "string"
+            ? translation.metaDescription.trim().slice(0, 160) || null
+            : null;
+        const tags = Array.isArray(translation.tags)
+          ? parseStringList(JSON.stringify(translation.tags), 12, 40)
+          : [];
+        const hasContent = Boolean(
+          title ||
+            excerpt ||
+            metaDescription ||
+            tags.length ||
+            (content && content.some((block) => block.content.trim())),
+        );
+
+        if (!hasContent) return translations;
+        if (!title || title.length > 200 || !content) {
+          throw new Error("Invalid translation");
+        }
+
+        translations[locale] = { content, excerpt, metaDescription, tags, title };
+        return translations;
+      },
+      emptyTranslations,
+    );
+  } catch {
+    return "invalid";
+  }
+}
+
+async function persistArticleTranslations(
+  articleId: string,
+  translations: ArticleTranslationMap,
+) {
+  const prisma = getPrisma();
+  await Promise.all(
+    (["EN", "AR"] as const).map(async (locale) => {
+      const translation = translations[locale];
+      if (!translation) {
+        await prisma.articleTranslation.deleteMany({
+          where: { articleId, locale },
+        });
+        return;
+      }
+
+      await prisma.articleTranslation.upsert({
+        where: { articleId_locale: { articleId, locale } },
+        create: { articleId, locale, ...translation },
+        update: translation,
+      });
+    }),
+  );
 }
 
 function hasValidImageSignature(
@@ -243,6 +335,9 @@ export async function saveArticle(
   const type = parseContentType(getString(formData, "type"));
   const title = getString(formData, "title");
   const blocks = parseBlocks(getString(formData, "blocksJson"));
+  const translations = parseArticleTranslations(
+    getString(formData, "translationsJson"),
+  );
   const submittedSlug = getString(formData, "slug");
   const slug = slugify(submittedSlug || title);
 
@@ -252,6 +347,7 @@ export async function saveArticle(
     title.length > 200 ||
     !slug ||
     !blocks ||
+    translations === "invalid" ||
     (id && !isValidUuid(id))
   ) {
     return { message: "عنوان، نامک و محتوای موردنیاز را بررسی کنید." };
@@ -333,14 +429,17 @@ export async function saveArticle(
         data: { ...data, categories: { set: categories } },
         where: { id },
       });
+      await persistArticleTranslations(id, translations);
     } else {
-      await prisma.article.create({
+      const article = await prisma.article.create({
         data: {
           ...data,
           authorId: session.userId,
           categories: { connect: categories },
         },
+        select: { id: true },
       });
+      await persistArticleTranslations(article.id, translations);
     }
   } catch (error) {
     if (savedImage) await removeStoredArticleImage(savedImage.imageUrl);

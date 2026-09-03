@@ -15,6 +15,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useTranslations } from "@/components/i18n/dictionary-provider";
 
 export type ToastVariant = "success" | "error" | "info";
 
@@ -79,23 +80,26 @@ function ToastIcon({ variant }: { variant: ToastVariant }) {
   );
 }
 
-function getToastPresentation(variant: ToastVariant) {
+function getToastPresentation(
+  variant: ToastVariant,
+  t: (key: string) => string,
+) {
   if (variant === "success")
     return {
       accent: "bg-teal-500",
       icon: "bg-teal-50 text-teal-500",
-      title: "انجام شد",
+      title: t("toast.success"),
     };
   if (variant === "error")
     return {
       accent: "bg-rose-500",
       icon: "bg-rose-50 text-rose-700",
-      title: "نیاز به بررسی دارد",
+      title: t("toast.error"),
     };
   return {
     accent: "bg-slate-500",
     icon: "bg-slate-100 text-slate-700",
-    title: "اطلاع‌رسانی",
+    title: t("toast.info"),
   };
 }
 
@@ -107,7 +111,8 @@ function ToastCard({
   toast: ToastItem;
 }) {
   const shouldReduceMotion = useReducedMotion();
-  const presentation = getToastPresentation(toast.variant);
+  const { t } = useTranslations();
+  const presentation = getToastPresentation(toast.variant, t);
   const transition = {
     duration: shouldReduceMotion ? 0 : 0.24,
     ease: [0.22, 1, 0.36, 1] as const,
@@ -116,7 +121,7 @@ function ToastCard({
   return (
     <motion.button
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      aria-label={`${toast.title}: ${toast.message}. برای بستن کلیک کنید.`}
+      aria-label={`${toast.title}: ${toast.message}. ${t("toast.dismiss")}`}
       className="relative w-full overflow-hidden rounded-2xl border border-slate-200/80 bg-white/95 p-4 text-right shadow-[0_18px_42px_rgba(15,23,42,0.16)] backdrop-blur-xl transition hover:border-teal-200 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-teal-500"
       exit={{ opacity: 0, scale: 0.97, y: -10 }}
       initial={{ opacity: 0, scale: 0.97, y: -14 }}
@@ -141,7 +146,7 @@ function ToastCard({
           </span>
         </span>
         <span aria-hidden="true" className="mt-1 text-xs font-bold text-slate-400">
-          بستن
+          {t("common.close")}
         </span>
       </span>
       <motion.span
@@ -158,6 +163,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const nextId = useRef(0);
   const timers = useRef(new Map<string, number>());
+  const { t } = useTranslations();
 
   useEffect(
     () => () => {
@@ -186,7 +192,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         duration,
         id,
         message: trimmedMessage,
-        title: options.title ?? getToastPresentation(variant).title,
+        title: options.title ?? getToastPresentation(variant, t).title,
         variant,
       };
 
@@ -194,7 +200,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       timers.current.set(id, window.setTimeout(() => dismissToast(id), duration));
       return id;
     },
-    [dismissToast],
+    [dismissToast, t],
   );
 
   const value = useMemo(
