@@ -27,6 +27,12 @@ body {
   text-justify: inter-word;
 }
 
+/* Keep text alignment consistent across every section rendered on the home page. */
+#home,
+#home :where(*) {
+  text-align: justify;
+}
+
 @keyframes insurance-logo-skeleton-shimmer {
   0% {
     background-position: 180% 0;
