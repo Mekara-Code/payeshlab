@@ -177,6 +177,7 @@ export default async function AdminPage() {
         fileName: true,
         fileSize: true,
         id: true,
+        mobile: true,
         nationalCode: true,
         patientName: true,
       },

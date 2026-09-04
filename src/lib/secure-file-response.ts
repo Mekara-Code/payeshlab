@@ -6,10 +6,12 @@ import "server-only";
  */
 export function buildAttachmentHeaders({
   contentType,
+  disposition = "inline",
   fileName,
   size,
 }: {
   contentType: string;
+  disposition?: "attachment" | "inline";
   fileName: string;
   size: number;
 }) {
@@ -17,7 +19,7 @@ export function buildAttachmentHeaders({
 
   return {
     "Cache-Control": "private, no-store",
-    "Content-Disposition": `inline; filename="${asciiFallback || "file"}"; filename*=UTF-8''${encodeURIComponent(fileName)}`,
+    "Content-Disposition": `${disposition}; filename="${asciiFallback || "file"}"; filename*=UTF-8''${encodeURIComponent(fileName)}`,
     "Content-Length": String(size),
     "Content-Type": contentType,
     "X-Content-Type-Options": "nosniff",

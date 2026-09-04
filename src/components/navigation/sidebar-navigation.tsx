@@ -105,7 +105,7 @@ function SidebarContent({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col p-4 sm:p-5">
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto overscroll-contain p-4 sm:p-5">
       <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 pb-4">
         <BrandMark laboratoryName={laboratoryName} />
         {onClose && (
@@ -120,7 +120,7 @@ function SidebarContent({
         )}
       </div>
 
-      <nav aria-label={t("navigation.primary")} className="mt-6 min-h-0 flex-1 overflow-y-auto overscroll-contain pr-1">
+      <nav aria-label={t("navigation.primary")} className="mt-6 shrink-0 pr-1">
         <div className="grid gap-1 pb-4">
         <p className="px-3 pb-2 text-xs font-extrabold tracking-wide text-slate-500">{t("navigation.menu")}</p>
         {navigationItems.map((item) => {
@@ -229,6 +229,9 @@ export function SidebarNavigation({
     activePathname,
     activeSection,
   );
+  const headerNavigationItems = locale === "en"
+    ? navigationItems.filter((item) => item.href !== "/#news-and-announcements")
+    : navigationItems;
 
   const closeMobileSidebar = () => {
     setIsMobileSidebarOpen(false);
@@ -423,7 +426,7 @@ export function SidebarNavigation({
         >
           <BrandMark className="shrink-0" laboratoryName={laboratoryName} />
           <nav aria-label={t("navigation.primary")} className="flex min-w-0 items-center gap-4 2xl:gap-8">
-            {navigationItems.map((item) => {
+            {headerNavigationItems.map((item) => {
               const isActive = item.href === activeNavigationHref;
 
               return (
@@ -475,7 +478,7 @@ export function SidebarNavigation({
                 <motion.section
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   aria-label={t("navigation.onlineAnswersTitle")}
-                  className="absolute left-0 top-full mt-3 w-[min(42rem,calc(100vw-3rem))] origin-top-left rounded-[2rem] border border-white/90 bg-white/95 p-5 text-right shadow-[0_28px_80px_rgba(15,23,42,0.18)] backdrop-blur-xl"
+                  className="absolute end-0 top-full mt-3 max-h-[calc(100dvh-10rem)] w-[min(42rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain origin-top rounded-[2rem] border border-white/90 bg-white/95 p-5 text-right shadow-[0_28px_80px_rgba(15,23,42,0.18)] backdrop-blur-xl"
                   exit={{ opacity: 0, scale: 0.98, y: -8 }}
                   id="desktop-online-answers-menu"
                   initial={{ opacity: 0, scale: 0.98, y: -8 }}
@@ -534,7 +537,7 @@ export function SidebarNavigation({
               animate={{ x: 0 }}
               aria-label={t("navigation.menu")}
               aria-modal="true"
-              className="absolute inset-y-0 left-0 w-[min(21.5rem,calc(100vw-1.25rem))] border-r border-slate-200 bg-white shadow-[20px_0_60px_rgba(15,23,42,0.22)]"
+              className="absolute inset-y-0 left-0 w-[min(21.5rem,calc(100vw-1.25rem))] overflow-hidden border-r border-slate-200 bg-white shadow-[20px_0_60px_rgba(15,23,42,0.22)]"
               exit={{ x: "-100%" }}
               id="mobile-sidebar"
               initial={{ x: "-100%" }}

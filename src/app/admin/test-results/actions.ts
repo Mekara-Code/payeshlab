@@ -2,7 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/admin-session";
-import { isValidNationalCode, toDigitsOnly } from "@/lib/patient-identity";
+import {
+  isValidMobileNumber,
+  isValidNationalCode,
+  toDigitsOnly,
+} from "@/lib/patient-identity";
 import { getPrisma } from "@/lib/prisma";
 import {
   pdfUploadTypes,
@@ -46,9 +50,14 @@ export async function uploadPatientTestResult(
     return { message: "کد ملی بیمار باید ۱۰ رقم و معتبر باشد." };
   }
 
+  const mobile = toDigitsOnly(getString(formData, "mobile"));
+  if (!isValidMobileNumber(mobile)) {
+    return { message: "شماره موبایل بیمار باید ۱۱ رقم و با ۰۹ شروع شود." };
+  }
+
   const patientName = getString(formData, "patientName") || null;
   if (patientName && patientName.length > 160) {
-    return { message: "نام بیمار نباید بیش از ۱۶۰ نویسه باشد." };
+    return { message: "نام بیمار را حداکثر در ۱۶۰ نویسه وارد کنید." };
   }
 
   const resultFile = formData.get("resultFile");
@@ -79,6 +88,7 @@ export async function uploadPatientTestResult(
       data: {
         fileName: sanitizeUploadName(resultFile.name, `${nationalCode}.pdf`),
         fileSize: resultFile.size,
+        mobile,
         nationalCode,
         patientName,
         storedName,

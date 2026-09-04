@@ -35,6 +35,18 @@ export function toDigitsOnly(value: string) {
   return toLatinDigits(value).replace(/[^0-9]/g, "");
 }
 
+/** Normalizes Persian, Arabic and Latin names before an exact identity match. */
+export function normalizePatientName(value: string) {
+  return value
+    .normalize("NFKC")
+    .replace(/[\u064A\u0649]/g, "\u06CC")
+    .replace(/\u0643/g, "\u06A9")
+    .replace(/[\u200C\u200E\u200F]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLocaleLowerCase("fa-IR");
+}
+
 export function isValidNationalCode(value: string) {
   const code = toDigitsOnly(value);
   if (code.length !== 10 || /^(\d)\1{9}$/.test(code)) return false;

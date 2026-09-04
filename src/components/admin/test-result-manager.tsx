@@ -17,6 +17,7 @@ export type ManagedTestResult = {
   fileName: string;
   fileSize: number;
   id: string;
+  mobile: string | null;
   nationalCode: string;
   patientName: string | null;
 };
@@ -99,6 +100,7 @@ export function TestResultManager({ results }: { results: ManagedTestResult[] })
     return results.filter(
       (result) =>
         result.nationalCode.includes(normalizedQuery) ||
+        (result.mobile ?? "").includes(normalizedQuery) ||
         (result.patientName ?? "").includes(normalizedQuery),
     );
   }, [normalizedQuery, results]);
@@ -129,7 +131,7 @@ export function TestResultManager({ results }: { results: ManagedTestResult[] })
                 جواب آزمایش‌ها
               </h2>
               <p className="mt-1.5 text-sm font-medium leading-6 text-slate-600">
-                فایل PDF جواب آزمایش را همراه با کد ملی بیمار ثبت کنید.
+                فایل PDF جواب آزمایش را همراه با کد ملی و شماره موبایل بیمار ثبت کنید.
               </p>
             </div>
           </div>
@@ -169,7 +171,7 @@ export function TestResultManager({ results }: { results: ManagedTestResult[] })
               className="min-h-12 w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-4 pr-11 text-sm font-bold text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
               id="test-result-search"
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="جست‌وجو بر اساس کد ملی یا نام بیمار…"
+              placeholder="جست‌وجو بر اساس کد ملی، موبایل یا نام بیمار…"
               type="search"
               value={searchQuery}
             />
@@ -198,6 +200,11 @@ export function TestResultManager({ results }: { results: ManagedTestResult[] })
                       <span className="rounded-full bg-teal-100 px-2.5 py-1 font-mono text-[11px] font-extrabold text-teal-800" dir="ltr">
                         {result.nationalCode}
                       </span>
+                      {result.mobile ? (
+                        <span className="rounded-full bg-sky-100 px-2.5 py-1 font-mono text-[11px] font-extrabold text-sky-800" dir="ltr">
+                          {result.mobile}
+                        </span>
+                      ) : null}
                       <time className="text-xs font-bold text-slate-500" dateTime={result.createdAt}>
                         {formatPersianDateTime(result.createdAt)}
                       </time>
@@ -241,7 +248,7 @@ export function TestResultManager({ results }: { results: ManagedTestResult[] })
       </section>
 
       <AdminModal
-        description="کد ملی بیمار و فایل PDF جواب آزمایش را وارد کنید."
+        description="کد ملی و شماره موبایل بیمار و فایل PDF جواب آزمایش را وارد کنید."
         eyebrow="ثبت جواب جدید"
         id="test-result-upload-dialog"
         isOpen={isModalOpen}
@@ -263,6 +270,24 @@ export function TestResultManager({ results }: { results: ManagedTestResult[] })
             />
             <span className="text-xs font-medium text-slate-500">
               کد ملی ۱۰ رقمی بدون خط تیره وارد شود.
+            </span>
+          </label>
+
+          <label className="grid gap-2 text-sm font-black text-slate-950">
+            شماره موبایل بیمار
+            <input
+              autoComplete="tel"
+              className="min-h-12 rounded-xl border border-slate-200 px-4 font-mono text-sm font-bold tracking-[0.12em] text-slate-800 outline-none transition focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10"
+              dir="ltr"
+              inputMode="tel"
+              maxLength={11}
+              name="mobile"
+              placeholder="۰۹۱۲۳۴۵۶۷۸۹"
+              required
+              type="tel"
+            />
+            <span className="text-xs font-medium text-slate-500">
+              شماره موبایل ۱۱ رقمی را بدون فاصله وارد کنید.
             </span>
           </label>
 

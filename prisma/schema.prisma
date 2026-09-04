@@ -320,6 +320,7 @@ model SiteWorkingHour {
 model PatientTestResult {
   id           String   @id @default(uuid()) @db.Uuid
   nationalCode String   @db.VarChar(10)
+  mobile       String?  @db.VarChar(11)
   patientName  String?  @db.VarChar(160)
   fileName     String   @db.VarChar(255)
   storedName   String   @unique @db.VarChar(64)
@@ -328,6 +329,7 @@ model PatientTestResult {
   updatedAt    DateTime @updatedAt
 
   @@index([nationalCode, createdAt])
+  @@index([nationalCode, mobile, createdAt])
   @@index([createdAt])
 }
 

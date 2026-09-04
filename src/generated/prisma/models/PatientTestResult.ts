@@ -37,6 +37,7 @@ export type PatientTestResultSumAggregateOutputType = {
 export type PatientTestResultMinAggregateOutputType = {
   id: string | null
   nationalCode: string | null
+  mobile: string | null
   patientName: string | null
   fileName: string | null
   storedName: string | null
@@ -48,6 +49,7 @@ export type PatientTestResultMinAggregateOutputType = {
 export type PatientTestResultMaxAggregateOutputType = {
   id: string | null
   nationalCode: string | null
+  mobile: string | null
   patientName: string | null
   fileName: string | null
   storedName: string | null
@@ -59,6 +61,7 @@ export type PatientTestResultMaxAggregateOutputType = {
 export type PatientTestResultCountAggregateOutputType = {
   id: number
   nationalCode: number
+  mobile: number
   patientName: number
   fileName: number
   storedName: number
@@ -80,6 +83,7 @@ export type PatientTestResultSumAggregateInputType = {
 export type PatientTestResultMinAggregateInputType = {
   id?: true
   nationalCode?: true
+  mobile?: true
   patientName?: true
   fileName?: true
   storedName?: true
@@ -91,6 +95,7 @@ export type PatientTestResultMinAggregateInputType = {
 export type PatientTestResultMaxAggregateInputType = {
   id?: true
   nationalCode?: true
+  mobile?: true
   patientName?: true
   fileName?: true
   storedName?: true
@@ -102,6 +107,7 @@ export type PatientTestResultMaxAggregateInputType = {
 export type PatientTestResultCountAggregateInputType = {
   id?: true
   nationalCode?: true
+  mobile?: true
   patientName?: true
   fileName?: true
   storedName?: true
@@ -200,6 +206,7 @@ export type PatientTestResultGroupByArgs<ExtArgs extends runtime.Types.Extension
 export type PatientTestResultGroupByOutputType = {
   id: string
   nationalCode: string
+  mobile: string | null
   patientName: string | null
   fileName: string
   storedName: string
@@ -234,6 +241,7 @@ export type PatientTestResultWhereInput = {
   NOT?: Prisma.PatientTestResultWhereInput | Prisma.PatientTestResultWhereInput[]
   id?: Prisma.UuidFilter<"PatientTestResult"> | string
   nationalCode?: Prisma.StringFilter<"PatientTestResult"> | string
+  mobile?: Prisma.StringNullableFilter<"PatientTestResult"> | string | null
   patientName?: Prisma.StringNullableFilter<"PatientTestResult"> | string | null
   fileName?: Prisma.StringFilter<"PatientTestResult"> | string
   storedName?: Prisma.StringFilter<"PatientTestResult"> | string
@@ -245,6 +253,7 @@ export type PatientTestResultWhereInput = {
 export type PatientTestResultOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   nationalCode?: Prisma.SortOrder
+  mobile?: Prisma.SortOrderInput | Prisma.SortOrder
   patientName?: Prisma.SortOrderInput | Prisma.SortOrder
   fileName?: Prisma.SortOrder
   storedName?: Prisma.SortOrder
@@ -260,6 +269,7 @@ export type PatientTestResultWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PatientTestResultWhereInput[]
   NOT?: Prisma.PatientTestResultWhereInput | Prisma.PatientTestResultWhereInput[]
   nationalCode?: Prisma.StringFilter<"PatientTestResult"> | string
+  mobile?: Prisma.StringNullableFilter<"PatientTestResult"> | string | null
   patientName?: Prisma.StringNullableFilter<"PatientTestResult"> | string | null
   fileName?: Prisma.StringFilter<"PatientTestResult"> | string
   fileSize?: Prisma.IntFilter<"PatientTestResult"> | number
@@ -270,6 +280,7 @@ export type PatientTestResultWhereUniqueInput = Prisma.AtLeast<{
 export type PatientTestResultOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   nationalCode?: Prisma.SortOrder
+  mobile?: Prisma.SortOrderInput | Prisma.SortOrder
   patientName?: Prisma.SortOrderInput | Prisma.SortOrder
   fileName?: Prisma.SortOrder
   storedName?: Prisma.SortOrder
@@ -289,6 +300,7 @@ export type PatientTestResultScalarWhereWithAggregatesInput = {
   NOT?: Prisma.PatientTestResultScalarWhereWithAggregatesInput | Prisma.PatientTestResultScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"PatientTestResult"> | string
   nationalCode?: Prisma.StringWithAggregatesFilter<"PatientTestResult"> | string
+  mobile?: Prisma.StringNullableWithAggregatesFilter<"PatientTestResult"> | string | null
   patientName?: Prisma.StringNullableWithAggregatesFilter<"PatientTestResult"> | string | null
   fileName?: Prisma.StringWithAggregatesFilter<"PatientTestResult"> | string
   storedName?: Prisma.StringWithAggregatesFilter<"PatientTestResult"> | string
@@ -300,6 +312,7 @@ export type PatientTestResultScalarWhereWithAggregatesInput = {
 export type PatientTestResultCreateInput = {
   id?: string
   nationalCode: string
+  mobile?: string | null
   patientName?: string | null
   fileName: string
   storedName: string
@@ -311,6 +324,7 @@ export type PatientTestResultCreateInput = {
 export type PatientTestResultUncheckedCreateInput = {
   id?: string
   nationalCode: string
+  mobile?: string | null
   patientName?: string | null
   fileName: string
   storedName: string
@@ -322,6 +336,7 @@ export type PatientTestResultUncheckedCreateInput = {
 export type PatientTestResultUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nationalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   storedName?: Prisma.StringFieldUpdateOperationsInput | string
@@ -333,6 +348,7 @@ export type PatientTestResultUpdateInput = {
 export type PatientTestResultUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nationalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   storedName?: Prisma.StringFieldUpdateOperationsInput | string
@@ -344,6 +360,7 @@ export type PatientTestResultUncheckedUpdateInput = {
 export type PatientTestResultCreateManyInput = {
   id?: string
   nationalCode: string
+  mobile?: string | null
   patientName?: string | null
   fileName: string
   storedName: string
@@ -355,6 +372,7 @@ export type PatientTestResultCreateManyInput = {
 export type PatientTestResultUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nationalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   storedName?: Prisma.StringFieldUpdateOperationsInput | string
@@ -366,6 +384,7 @@ export type PatientTestResultUpdateManyMutationInput = {
 export type PatientTestResultUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   nationalCode?: Prisma.StringFieldUpdateOperationsInput | string
+  mobile?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   patientName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fileName?: Prisma.StringFieldUpdateOperationsInput | string
   storedName?: Prisma.StringFieldUpdateOperationsInput | string
@@ -377,6 +396,7 @@ export type PatientTestResultUncheckedUpdateManyInput = {
 export type PatientTestResultCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nationalCode?: Prisma.SortOrder
+  mobile?: Prisma.SortOrder
   patientName?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   storedName?: Prisma.SortOrder
@@ -392,6 +412,7 @@ export type PatientTestResultAvgOrderByAggregateInput = {
 export type PatientTestResultMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nationalCode?: Prisma.SortOrder
+  mobile?: Prisma.SortOrder
   patientName?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   storedName?: Prisma.SortOrder
@@ -403,6 +424,7 @@ export type PatientTestResultMaxOrderByAggregateInput = {
 export type PatientTestResultMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   nationalCode?: Prisma.SortOrder
+  mobile?: Prisma.SortOrder
   patientName?: Prisma.SortOrder
   fileName?: Prisma.SortOrder
   storedName?: Prisma.SortOrder
@@ -420,6 +442,7 @@ export type PatientTestResultSumOrderByAggregateInput = {
 export type PatientTestResultSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   nationalCode?: boolean
+  mobile?: boolean
   patientName?: boolean
   fileName?: boolean
   storedName?: boolean
@@ -431,6 +454,7 @@ export type PatientTestResultSelect<ExtArgs extends runtime.Types.Extensions.Int
 export type PatientTestResultSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   nationalCode?: boolean
+  mobile?: boolean
   patientName?: boolean
   fileName?: boolean
   storedName?: boolean
@@ -442,6 +466,7 @@ export type PatientTestResultSelectCreateManyAndReturn<ExtArgs extends runtime.T
 export type PatientTestResultSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   nationalCode?: boolean
+  mobile?: boolean
   patientName?: boolean
   fileName?: boolean
   storedName?: boolean
@@ -453,6 +478,7 @@ export type PatientTestResultSelectUpdateManyAndReturn<ExtArgs extends runtime.T
 export type PatientTestResultSelectScalar = {
   id?: boolean
   nationalCode?: boolean
+  mobile?: boolean
   patientName?: boolean
   fileName?: boolean
   storedName?: boolean
@@ -461,7 +487,7 @@ export type PatientTestResultSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PatientTestResultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nationalCode" | "patientName" | "fileName" | "storedName" | "fileSize" | "createdAt" | "updatedAt", ExtArgs["result"]["patientTestResult"]>
+export type PatientTestResultOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "nationalCode" | "mobile" | "patientName" | "fileName" | "storedName" | "fileSize" | "createdAt" | "updatedAt", ExtArgs["result"]["patientTestResult"]>
 
 export type $PatientTestResultPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PatientTestResult"
@@ -469,6 +495,7 @@ export type $PatientTestResultPayload<ExtArgs extends runtime.Types.Extensions.I
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     nationalCode: string
+    mobile: string | null
     patientName: string | null
     fileName: string
     storedName: string
@@ -900,6 +927,7 @@ export interface Prisma__PatientTestResultClient<T, Null = never, ExtArgs extend
 export interface PatientTestResultFieldRefs {
   readonly id: Prisma.FieldRef<"PatientTestResult", 'String'>
   readonly nationalCode: Prisma.FieldRef<"PatientTestResult", 'String'>
+  readonly mobile: Prisma.FieldRef<"PatientTestResult", 'String'>
   readonly patientName: Prisma.FieldRef<"PatientTestResult", 'String'>
   readonly fileName: Prisma.FieldRef<"PatientTestResult", 'String'>
   readonly storedName: Prisma.FieldRef<"PatientTestResult", 'String'>

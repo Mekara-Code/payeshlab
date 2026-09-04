@@ -10,7 +10,7 @@ export const navigationItems = [
 ] as const;
 
 export const onlineAnswerItems = [
-  { href: "#online-answers-patients", labelKey: "navigation.onlineAnswersPatients" },
+  { href: "/online-answers/patients", labelKey: "navigation.onlineAnswersPatients" },
   { href: "#online-answers-tests", labelKey: "navigation.onlineAnswersTests" },
   { href: "#online-answers-doctors", labelKey: "navigation.onlineAnswersDoctors" },
   {

@@ -354,6 +354,7 @@ export type SiteWorkingHourScalarFieldEnum = (typeof SiteWorkingHourScalarFieldE
 export const PatientTestResultScalarFieldEnum = {
   id: 'id',
   nationalCode: 'nationalCode',
+  mobile: 'mobile',
   patientName: 'patientName',
   fileName: 'fileName',
   storedName: 'storedName',
