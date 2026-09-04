@@ -16,11 +16,11 @@ export function LanguageSwitcher({ locale }: { locale: ContentLocale }) {
   const { t } = useTranslations();
 
   return (
-    <label className="inline-flex min-h-11 items-center gap-2 text-xs font-extrabold text-white sm:text-sm">
+    <label className="inline-flex h-9 items-center gap-2 rounded-xl border border-white bg-white px-3 text-xs font-extrabold text-teal-500 sm:text-sm">
       <span>{t("language.label")}</span>
       <select
         aria-label={t("language.label")}
-        className="min-h-11 cursor-pointer rounded-xl border border-white/60 bg-teal-500 px-3 font-bold text-white shadow-sm transition hover:bg-teal-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70"
+        className="h-8 min-w-0 cursor-pointer bg-transparent font-bold text-teal-500 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70"
         disabled={isChanging}
         onChange={(event) => {
           const nextLocale = event.target.value;

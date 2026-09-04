@@ -76,7 +76,7 @@ export default async function RootLayout({
   const dictionary = getDictionary(locale);
 
   return (
-    <html className={`${vazirmatn.variable} ${geistMono.variable} h-full antialiased`} dir={localeInfo.direction} lang={localeInfo.languageTag}>
+    <html className={`${vazirmatn.variable} ${geistMono.variable} h-full antialiased`} data-scroll-behavior="smooth" dir={localeInfo.direction} lang={localeInfo.languageTag}>
       <body className="min-h-full flex flex-col">
         <DictionaryProvider dictionary={dictionary} locale={locale}>
           <ToastProvider>{children}</ToastProvider>

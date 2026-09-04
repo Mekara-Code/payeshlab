@@ -61,6 +61,7 @@ export const ModelName = {
   ArticleCategory: 'ArticleCategory',
   Insurance: 'Insurance',
   SlideshowSlide: 'SlideshowSlide',
+  GalleryMedia: 'GalleryMedia',
   LabDepartment: 'LabDepartment',
   LaboratoryTest: 'LaboratoryTest',
   SiteSettings: 'SiteSettings',
@@ -229,6 +230,23 @@ export const SlideshowSlideScalarFieldEnum = {
 } as const
 
 export type SlideshowSlideScalarFieldEnum = (typeof SlideshowSlideScalarFieldEnum)[keyof typeof SlideshowSlideScalarFieldEnum]
+
+
+export const GalleryMediaScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  title: 'title',
+  altText: 'altText',
+  description: 'description',
+  mediaUrl: 'mediaUrl',
+  posterUrl: 'posterUrl',
+  isActive: 'isActive',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GalleryMediaScalarFieldEnum = (typeof GalleryMediaScalarFieldEnum)[keyof typeof GalleryMediaScalarFieldEnum]
 
 
 export const LabDepartmentScalarFieldEnum = {

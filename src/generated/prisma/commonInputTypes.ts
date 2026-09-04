@@ -365,6 +365,23 @@ export type EnumContentLocaleWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumContentLocaleFilter<$PrismaModel>
 }
 
+export type EnumGalleryMediaTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.GalleryMediaType | Prisma.EnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.GalleryMediaType[] | Prisma.ListEnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.GalleryMediaType[] | Prisma.ListEnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumGalleryMediaTypeFilter<$PrismaModel> | $Enums.GalleryMediaType
+}
+
+export type EnumGalleryMediaTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.GalleryMediaType | Prisma.EnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.GalleryMediaType[] | Prisma.ListEnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.GalleryMediaType[] | Prisma.ListEnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumGalleryMediaTypeWithAggregatesFilter<$PrismaModel> | $Enums.GalleryMediaType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumGalleryMediaTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumGalleryMediaTypeFilter<$PrismaModel>
+}
+
 export type DecimalNullableFilter<$PrismaModel = never> = {
   equals?: runtime.Decimal | runtime.DecimalJsLike | number | string | Prisma.DecimalFieldRefInput<$PrismaModel> | null
   in?: runtime.Decimal[] | runtime.DecimalJsLike[] | number[] | string[] | Prisma.ListDecimalFieldRefInput<$PrismaModel> | null
@@ -797,6 +814,23 @@ export type NestedEnumContentLocaleWithAggregatesFilter<$PrismaModel = never> = 
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumContentLocaleFilter<$PrismaModel>
   _max?: Prisma.NestedEnumContentLocaleFilter<$PrismaModel>
+}
+
+export type NestedEnumGalleryMediaTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.GalleryMediaType | Prisma.EnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.GalleryMediaType[] | Prisma.ListEnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.GalleryMediaType[] | Prisma.ListEnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumGalleryMediaTypeFilter<$PrismaModel> | $Enums.GalleryMediaType
+}
+
+export type NestedEnumGalleryMediaTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.GalleryMediaType | Prisma.EnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.GalleryMediaType[] | Prisma.ListEnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.GalleryMediaType[] | Prisma.ListEnumGalleryMediaTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumGalleryMediaTypeWithAggregatesFilter<$PrismaModel> | $Enums.GalleryMediaType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumGalleryMediaTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumGalleryMediaTypeFilter<$PrismaModel>
 }
 
 export type NestedDecimalNullableFilter<$PrismaModel = never> = {

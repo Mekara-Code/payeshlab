@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BrandMark } from "../brand-mark";
@@ -198,11 +199,13 @@ function SidebarContent({
 }
 
 export function SidebarNavigation({
+  hasTestPreparation,
   insuranceOptions,
   laboratoryName,
   locale,
   socialLinks,
 }: {
+  hasTestPreparation: boolean;
   insuranceOptions: string[];
   laboratoryName: string | null;
   locale: ContentLocale;
@@ -342,10 +345,22 @@ export function SidebarNavigation({
             </nav>
           ) : null}
           <div className="flex shrink-0 items-center gap-2">
+            {hasTestPreparation ? (
+              <Link
+                className="inline-flex h-9 items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-white bg-white px-3 text-xs font-extrabold text-teal-500 transition hover:bg-teal-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:text-sm"
+                href="/test-preparation"
+              >
+                <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+                  <path d="M9 3h6M10 3v6.1L5.6 17a2.5 2.5 0 0 0 2.2 3.7h8.4a2.5 2.5 0 0 0 2.2-3.7L14 9.1V3M8.5 15h7" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" />
+                </svg>
+                <span className="sm:hidden">{t("preparation.triggerShort")}</span>
+                <span className="hidden sm:inline">{t("preparation.trigger")}</span>
+              </Link>
+            ) : null}
             <button
               aria-expanded={isJobApplicationOpen}
               aria-haspopup="dialog"
-              className="inline-flex min-h-11 cursor-pointer touch-manipulation items-center justify-center whitespace-nowrap rounded-xl border border-white/60 bg-white/10 px-3 text-xs font-extrabold text-white transition hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:text-sm"
+              className="inline-flex h-9 cursor-pointer touch-manipulation items-center justify-center whitespace-nowrap rounded-xl border border-white bg-white px-3 text-xs font-extrabold text-teal-500 transition hover:bg-teal-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:text-sm"
               onClick={() => setIsJobApplicationOpen(true)}
               type="button"
             >

@@ -68,6 +68,11 @@ export type Insurance = Prisma.InsuranceModel
  */
 export type SlideshowSlide = Prisma.SlideshowSlideModel
 /**
+ * Model GalleryMedia
+ * 
+ */
+export type GalleryMedia = Prisma.GalleryMediaModel
+/**
  * Model LabDepartment
  * 
  */

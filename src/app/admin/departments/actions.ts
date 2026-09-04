@@ -1,10 +1,10 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
-import { mkdir, unlink, writeFile } from "node:fs/promises";
+import { unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/admin-session";
+import { isValidAdminImageUpload, saveAdminImageAsWebp } from "@/lib/admin-image-uploads";
 import { getPrisma } from "@/lib/prisma";
 
 export type LabDepartmentActionState = {
@@ -13,11 +13,6 @@ export type LabDepartmentActionState = {
 };
 
 const MAX_DEPARTMENT_IMAGE_SIZE = 6 * 1024 * 1024;
-const departmentImageTypes = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-} as const;
 const departmentImageDirectory = join(process.cwd(), "public", "uploads", "lab-departments");
 
 type SavedDepartmentImage = {
@@ -47,39 +42,24 @@ function isValidDepartment(title: string, description: string, titleAr: string, 
   return title.length > 0 && title.length <= 100 && description.length > 0 && description.length <= 1_500 && isValidTranslation(titleAr, descriptionAr) && isValidTranslation(titleEn, descriptionEn);
 }
 
-function hasValidImageSignature(bytes: Uint8Array, type: keyof typeof departmentImageTypes) {
-  if (type === "image/png") {
-    return bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a;
-  }
-
-  if (type === "image/jpeg") {
-    return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-  }
-
-  return bytes.length >= 12 && bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
-}
-
 async function saveDepartmentImage(file: FormDataEntryValue | null): Promise<{ error?: string; savedImage?: SavedDepartmentImage }> {
   if (!file || typeof file === "string" || file.size === 0) {
     return {};
   }
 
-  if (!(file.type in departmentImageTypes) || file.size > MAX_DEPARTMENT_IMAGE_SIZE) {
+  if (!isValidAdminImageUpload(file, MAX_DEPARTMENT_IMAGE_SIZE)) {
     return { error: "تصویر خدمت باید PNG، JPG یا WebP و حداکثر ۶ مگابایت باشد." };
   }
 
-  const imageType = file.type as keyof typeof departmentImageTypes;
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  if (!hasValidImageSignature(bytes, imageType)) {
-    return { error: "فایل انتخاب‌شده یک تصویر معتبر نیست." };
-  }
-
-  const fileName = `${randomUUID()}.${departmentImageTypes[imageType]}`;
-  const filePath = join(departmentImageDirectory, fileName);
-  await mkdir(departmentImageDirectory, { recursive: true });
-  await writeFile(filePath, bytes, { flag: "wx" });
-
-  return { savedImage: { filePath, imageUrl: `/uploads/lab-departments/${fileName}` } };
+  return {
+    savedImage: await saveAdminImageAsWebp(file, {
+      directory: departmentImageDirectory,
+      maxHeight: 1200,
+      maxInputBytes: MAX_DEPARTMENT_IMAGE_SIZE,
+      maxWidth: 1200,
+      urlPrefix: "/uploads/lab-departments",
+    }),
+  };
 }
 
 async function removeStoredDepartmentImage(imageUrl: string | null) {

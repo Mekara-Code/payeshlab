@@ -1,10 +1,10 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
-import { mkdir, unlink, writeFile } from "node:fs/promises";
+import { unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/admin-session";
+import { isValidAdminImageUpload, saveAdminImageAsWebp } from "@/lib/admin-image-uploads";
 import { getPrisma } from "@/lib/prisma";
 
 export type InsuranceActionState = {
@@ -28,51 +28,32 @@ function slugify(value: string) {
 }
 
 const MAX_LOGO_SIZE = 2 * 1024 * 1024;
-const logoFileTypes = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-} as const;
+const insuranceLogoDirectory = join(process.cwd(), "public", "uploads", "insurance-logos");
 
 type SavedLogo = {
   filePath: string;
   logoUrl: string;
 };
 
-function hasValidImageSignature(bytes: Uint8Array, type: keyof typeof logoFileTypes) {
-  if (type === "image/png") {
-    return bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47 && bytes[4] === 0x0d && bytes[5] === 0x0a && bytes[6] === 0x1a && bytes[7] === 0x0a;
-  }
-
-  if (type === "image/jpeg") {
-    return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-  }
-
-  return bytes.length >= 12 && bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50;
-}
-
 async function saveLogo(file: FormDataEntryValue | null): Promise<{ error?: string; savedLogo?: SavedLogo }> {
   if (!file || typeof file === "string" || file.size === 0) {
     return {};
   }
 
-  if (!(file.type in logoFileTypes) || file.size > MAX_LOGO_SIZE) {
+  if (!isValidAdminImageUpload(file, MAX_LOGO_SIZE)) {
     return { error: "لوگو باید PNG، JPG یا WebP و حداکثر ۲ مگابایت باشد." };
   }
 
-  const imageType = file.type as keyof typeof logoFileTypes;
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  if (!hasValidImageSignature(bytes, imageType)) {
-    return { error: "فایل انتخاب‌شده یک تصویر معتبر نیست." };
-  }
+  const savedImage = await saveAdminImageAsWebp(file, {
+    directory: insuranceLogoDirectory,
+    maxHeight: 800,
+    maxInputBytes: MAX_LOGO_SIZE,
+    maxWidth: 800,
+    quality: 85,
+    urlPrefix: "/uploads/insurance-logos",
+  });
 
-  const fileName = `${randomUUID()}.${logoFileTypes[imageType]}`;
-  const storageDirectory = join(process.cwd(), "public", "uploads", "insurance-logos");
-  const filePath = join(storageDirectory, fileName);
-  await mkdir(storageDirectory, { recursive: true });
-  await writeFile(filePath, bytes, { flag: "wx" });
-
-  return { savedLogo: { filePath, logoUrl: `/uploads/insurance-logos/${fileName}` } };
+  return { savedLogo: { filePath: savedImage.filePath, logoUrl: savedImage.imageUrl } };
 }
 
 async function removeStoredLogo(logoUrl: string | null) {

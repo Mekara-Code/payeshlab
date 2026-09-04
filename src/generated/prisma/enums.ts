@@ -36,7 +36,8 @@ export type ArticleStatus = (typeof ArticleStatus)[keyof typeof ArticleStatus]
 
 export const ArticleType = {
   ARTICLE: 'ARTICLE',
-  NEWS: 'NEWS'
+  NEWS: 'NEWS',
+  PREPARATION: 'PREPARATION'
 } as const
 
 export type ArticleType = (typeof ArticleType)[keyof typeof ArticleType]
@@ -67,3 +68,11 @@ export const ContentLocale = {
 } as const
 
 export type ContentLocale = (typeof ContentLocale)[keyof typeof ContentLocale]
+
+
+export const GalleryMediaType = {
+  IMAGE: 'IMAGE',
+  VIDEO: 'VIDEO'
+} as const
+
+export type GalleryMediaType = (typeof GalleryMediaType)[keyof typeof GalleryMediaType]

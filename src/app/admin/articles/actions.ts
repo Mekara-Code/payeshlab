@@ -1,11 +1,11 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
-import { mkdir, unlink, writeFile } from "node:fs/promises";
+import { unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { revalidatePath } from "next/cache";
 import { ArticleStatus } from "@/generated/prisma/client";
 import { getAdminSession } from "@/lib/admin-session";
+import { isValidAdminImageUpload, saveAdminImageAsWebp } from "@/lib/admin-image-uploads";
 import { getPrisma } from "@/lib/prisma";
 
 const MAX_BLOCKS = 100;
@@ -17,12 +17,7 @@ const VALID_BLOCK_TYPES = new Set([
   "quote",
   "table",
 ]);
-const CONTENT_TYPES = new Set(["ARTICLE", "NEWS"]);
-const articleImageTypes = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-} as const;
+const CONTENT_TYPES = new Set(["ARTICLE", "NEWS", "PREPARATION"]);
 const articleImageDirectory = join(
   process.cwd(),
   "public",
@@ -30,7 +25,7 @@ const articleImageDirectory = join(
   "article-images",
 );
 
-export type ManagedContentType = "ARTICLE" | "NEWS";
+export type ManagedContentType = "ARTICLE" | "NEWS" | "PREPARATION";
 
 export type ArticleActionState = {
   message?: string;
@@ -133,6 +128,15 @@ function parseBlocks(raw: string): ArticleBlock[] | null {
   }
 }
 
+function hasReadableBlockContent(blocks: ArticleBlock[]) {
+  return blocks.some((block) =>
+    block.content
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .trim(),
+  );
+}
+
 function parseStringList(raw: string, limit: number, maxLength: number) {
   try {
     const values = JSON.parse(raw) as unknown;
@@ -232,70 +236,25 @@ async function persistArticleTranslations(
   );
 }
 
-function hasValidImageSignature(
-  bytes: Uint8Array,
-  type: keyof typeof articleImageTypes,
-) {
-  if (type === "image/png") {
-    return (
-      bytes.length >= 8 &&
-      bytes[0] === 0x89 &&
-      bytes[1] === 0x50 &&
-      bytes[2] === 0x4e &&
-      bytes[3] === 0x47 &&
-      bytes[4] === 0x0d &&
-      bytes[5] === 0x0a &&
-      bytes[6] === 0x1a &&
-      bytes[7] === 0x0a
-    );
-  }
-
-  if (type === "image/jpeg") {
-    return (
-      bytes.length >= 3 &&
-      bytes[0] === 0xff &&
-      bytes[1] === 0xd8 &&
-      bytes[2] === 0xff
-    );
-  }
-
-  return (
-    bytes.length >= 12 &&
-    bytes[0] === 0x52 &&
-    bytes[1] === 0x49 &&
-    bytes[2] === 0x46 &&
-    bytes[3] === 0x46 &&
-    bytes[8] === 0x57 &&
-    bytes[9] === 0x45 &&
-    bytes[10] === 0x42 &&
-    bytes[11] === 0x50
-  );
-}
-
 async function saveArticleImage(
   file: FormDataEntryValue | null,
 ): Promise<{ error?: string; savedImage?: SavedArticleImage }> {
   if (!file || typeof file === "string" || file.size === 0) return {};
 
-  if (!(file.type in articleImageTypes) || file.size > MAX_ARTICLE_IMAGE_SIZE) {
+  if (!isValidAdminImageUpload(file, MAX_ARTICLE_IMAGE_SIZE)) {
     return {
       error: "تصویر شاخص باید PNG، JPG یا WebP و حداکثر ۵ مگابایت باشد.",
     };
   }
 
-  const imageType = file.type as keyof typeof articleImageTypes;
-  const bytes = new Uint8Array(await file.arrayBuffer());
-  if (!hasValidImageSignature(bytes, imageType)) {
-    return { error: "فایل انتخاب‌شده یک تصویر معتبر نیست." };
-  }
-
-  const fileName = `${randomUUID()}.${articleImageTypes[imageType]}`;
-  const filePath = join(articleImageDirectory, fileName);
-  await mkdir(articleImageDirectory, { recursive: true });
-  await writeFile(filePath, bytes, { flag: "wx" });
-
   return {
-    savedImage: { filePath, imageUrl: `/uploads/article-images/${fileName}` },
+    savedImage: await saveAdminImageAsWebp(file, {
+      directory: articleImageDirectory,
+      maxHeight: 1920,
+      maxInputBytes: MAX_ARTICLE_IMAGE_SIZE,
+      maxWidth: 1920,
+      urlPrefix: "/uploads/article-images",
+    }),
   };
 }
 
@@ -316,9 +275,12 @@ async function requireAdmin() {
 function revalidateContentPaths(...slugs: Array<string | null | undefined>) {
   revalidatePath("/");
   revalidatePath("/articles");
+  revalidatePath("/test-preparation");
   revalidatePath("/admin");
   slugs.forEach((slug) => {
-    if (slug) revalidatePath(`/articles/${slug}`);
+    if (slug && slug !== "test-preparation") {
+      revalidatePath(`/articles/${slug}`);
+    }
   });
 }
 
@@ -339,7 +301,11 @@ export async function saveArticle(
     getString(formData, "translationsJson"),
   );
   const submittedSlug = getString(formData, "slug");
-  const slug = slugify(submittedSlug || title);
+  const slug = type === "PREPARATION" ? "test-preparation" : slugify(submittedSlug || title);
+  const status: ArticleStatus =
+    formData.get("status") === "published"
+      ? ArticleStatus.PUBLISHED
+      : ArticleStatus.DRAFT;
 
   if (
     !type ||
@@ -347,6 +313,9 @@ export async function saveArticle(
     title.length > 200 ||
     !slug ||
     !blocks ||
+    (type === "PREPARATION" &&
+      status === ArticleStatus.PUBLISHED &&
+      !hasReadableBlockContent(blocks)) ||
     translations === "invalid" ||
     (id && !isValidUuid(id))
   ) {
@@ -362,13 +331,19 @@ export async function saveArticle(
   const excerpt = getString(formData, "excerpt").slice(0, 2_000) || null;
   const metaDescription =
     getString(formData, "metaDescription").slice(0, 160) || null;
-  const status: ArticleStatus =
-    formData.get("status") === "published"
-      ? ArticleStatus.PUBLISHED
-      : ArticleStatus.DRAFT;
   const prisma = getPrisma();
   let savedImage: SavedArticleImage | undefined;
   let previousSlug: string | null = null;
+
+  if (!id && type === "PREPARATION") {
+    const existingPreparation = await prisma.article.findFirst({
+      select: { id: true },
+      where: { type: "PREPARATION" },
+    });
+    if (existingPreparation) {
+      return { message: "فقط یک راهنمای آمادگی‌های قبل آزمایش می‌تواند ایجاد شود." };
+    }
+  }
 
   try {
     const upload = await saveArticleImage(formData.get("featuredImageFile"));
@@ -459,7 +434,12 @@ export async function saveArticle(
   }
 
   revalidateContentPaths(slug, previousSlug);
-  const contentLabel = type === "NEWS" ? "خبر" : "مقاله";
+  const contentLabel =
+    type === "PREPARATION"
+      ? "راهنمای آمادگی‌های قبل آزمایش"
+      : type === "NEWS"
+        ? "خبر"
+        : "مقاله";
   return {
     message:
       status === "PUBLISHED"

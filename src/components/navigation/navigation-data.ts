@@ -4,6 +4,7 @@ export const navigationItems = [
   { href: "/#news-and-announcements", labelKey: "navigation.news" },
   { href: "/#articles", labelKey: "navigation.journal" },
   { href: "/tests", labelKey: "navigation.tests" },
+  { href: "/gallery", labelKey: "navigation.gallery" },
   { href: "/about", labelKey: "navigation.about" },
   { href: "/contact", labelKey: "navigation.contact" },
 ] as const;

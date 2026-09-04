@@ -407,6 +407,7 @@ export const ModelName = {
   ArticleCategory: 'ArticleCategory',
   Insurance: 'Insurance',
   SlideshowSlide: 'SlideshowSlide',
+  GalleryMedia: 'GalleryMedia',
   LabDepartment: 'LabDepartment',
   LaboratoryTest: 'LaboratoryTest',
   SiteSettings: 'SiteSettings',
@@ -431,7 +432,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "adminUser" | "adminSession" | "adminAuthAudit" | "article" | "announcement" | "articleTranslation" | "announcementTranslation" | "articleCategory" | "insurance" | "slideshowSlide" | "labDepartment" | "laboratoryTest" | "siteSettings" | "sitePhone" | "siteAddress" | "siteWorkingHour" | "patientTestResult" | "homeSamplingRequest" | "jobApplication"
+    modelProps: "adminUser" | "adminSession" | "adminAuthAudit" | "article" | "announcement" | "articleTranslation" | "announcementTranslation" | "articleCategory" | "insurance" | "slideshowSlide" | "galleryMedia" | "labDepartment" | "laboratoryTest" | "siteSettings" | "sitePhone" | "siteAddress" | "siteWorkingHour" | "patientTestResult" | "homeSamplingRequest" | "jobApplication"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1172,6 +1173,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SlideshowSlideCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SlideshowSlideCountAggregateOutputType> | number
+        }
+      }
+    }
+    GalleryMedia: {
+      payload: Prisma.$GalleryMediaPayload<ExtArgs>
+      fields: Prisma.GalleryMediaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GalleryMediaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GalleryMediaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GalleryMediaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GalleryMediaPayload>
+        }
+        findFirst: {
+          args: Prisma.GalleryMediaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GalleryMediaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GalleryMediaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GalleryMediaPayload>
+        }
+        findMany: {
+          args: Prisma.GalleryMediaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GalleryMediaPayload>[]
+        }
+        create: {
+          args: Prisma.GalleryMediaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GalleryMediaPayload>
+        }
+        createMany: {
+          args: Prisma.GalleryMediaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GalleryMediaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GalleryMediaPayload>[]
+        }
+        delete: {
+          args: Prisma.GalleryMediaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GalleryMediaPayload>
+        }
+        update: {
+          args: Prisma.GalleryMediaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GalleryMediaPayload>
+        }
+        deleteMany: {
+          args: Prisma.GalleryMediaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GalleryMediaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GalleryMediaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GalleryMediaPayload>[]
+        }
+        upsert: {
+          args: Prisma.GalleryMediaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GalleryMediaPayload>
+        }
+        aggregate: {
+          args: Prisma.GalleryMediaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGalleryMedia>
+        }
+        groupBy: {
+          args: Prisma.GalleryMediaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GalleryMediaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GalleryMediaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GalleryMediaCountAggregateOutputType> | number
         }
       }
     }
@@ -2023,6 +2098,23 @@ export const SlideshowSlideScalarFieldEnum = {
 export type SlideshowSlideScalarFieldEnum = (typeof SlideshowSlideScalarFieldEnum)[keyof typeof SlideshowSlideScalarFieldEnum]
 
 
+export const GalleryMediaScalarFieldEnum = {
+  id: 'id',
+  type: 'type',
+  title: 'title',
+  altText: 'altText',
+  description: 'description',
+  mediaUrl: 'mediaUrl',
+  posterUrl: 'posterUrl',
+  isActive: 'isActive',
+  sortOrder: 'sortOrder',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type GalleryMediaScalarFieldEnum = (typeof GalleryMediaScalarFieldEnum)[keyof typeof GalleryMediaScalarFieldEnum]
+
+
 export const LabDepartmentScalarFieldEnum = {
   id: 'id',
   title: 'title',
@@ -2419,6 +2511,20 @@ export type ListEnumContentLocaleFieldRefInput<$PrismaModel> = FieldRefInputType
 
 
 /**
+ * Reference to a field of type 'GalleryMediaType'
+ */
+export type EnumGalleryMediaTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GalleryMediaType'>
+    
+
+
+/**
+ * Reference to a field of type 'GalleryMediaType[]'
+ */
+export type ListEnumGalleryMediaTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GalleryMediaType[]'>
+    
+
+
+/**
  * Reference to a field of type 'Decimal'
  */
 export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -2634,6 +2740,7 @@ export type GlobalOmitConfig = {
   articleCategory?: Prisma.ArticleCategoryOmit
   insurance?: Prisma.InsuranceOmit
   slideshowSlide?: Prisma.SlideshowSlideOmit
+  galleryMedia?: Prisma.GalleryMediaOmit
   labDepartment?: Prisma.LabDepartmentOmit
   laboratoryTest?: Prisma.LaboratoryTestOmit
   siteSettings?: Prisma.SiteSettingsOmit

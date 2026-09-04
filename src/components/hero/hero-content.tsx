@@ -265,7 +265,7 @@ export function HeroContent({ contactDetails }: { contactDetails: HeroContactDet
         </StaggerItem>
 
         <StaggerItem className="mt-7">
-          <h1 className="text-[clamp(2.25rem,9vw,4.9rem)] font-black leading-[1.1] tracking-[-0.06em] text-slate-950 sm:text-[clamp(2.8rem,4.8vw,4.9rem)]">
+          <h1 className="!text-right text-[clamp(2.25rem,9vw,4.9rem)] font-black leading-[1.1] tracking-[-0.06em] text-slate-950 sm:text-[clamp(2.8rem,4.8vw,4.9rem)]">
             {t("hero.title")}
           </h1>
         </StaggerItem>

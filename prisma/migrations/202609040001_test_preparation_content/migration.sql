@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "ArticleType" ADD VALUE IF NOT EXISTS 'PREPARATION';

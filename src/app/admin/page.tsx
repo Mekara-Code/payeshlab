@@ -6,6 +6,7 @@ import type { ManagedArticle } from "@/components/admin/article-editor";
 import type { ManagedHomeSamplingRequest } from "@/components/admin/home-sampling-manager";
 import type { ManagedJobApplication } from "@/components/admin/job-application-manager";
 import type { ManagedTestResult } from "@/components/admin/test-result-manager";
+import type { ManagedGalleryMedia } from "@/components/admin/gallery-manager";
 import { getAdminSession } from "@/lib/admin-session";
 import type { InsurancePartner } from "@/lib/insurance-data";
 import type { LabDepartmentData } from "@/lib/lab-department-data";
@@ -38,7 +39,10 @@ export default async function AdminPage() {
   let slides: Array<
     SlideshowSlideData & { isActive: boolean; updatedAt: string }
   > = [];
-  let articles: Array<ManagedArticle & { type: "ARTICLE" | "NEWS" }> = [];
+  let galleryMedia: ManagedGalleryMedia[] = [];
+  let articles: Array<
+    ManagedArticle & { type: "ARTICLE" | "NEWS" | "PREPARATION" }
+  > = [];
   let announcements: ManagedAnnouncement[] = [];
   let tests: ManagedLaboratoryTest[] = [];
   let testResults: ManagedTestResult[] = [];
@@ -109,6 +113,32 @@ export default async function AdminPage() {
     slides = managedSlides.map((slide) => ({
       ...slide,
       updatedAt: slide.updatedAt.toISOString(),
+    }));
+  } catch {
+    // The admin can still access the panel while a new database migration is being applied.
+  }
+
+  try {
+    const managedGalleryMedia = await getPrisma().galleryMedia.findMany({
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+      select: {
+        altText: true,
+        createdAt: true,
+        description: true,
+        id: true,
+        isActive: true,
+        mediaUrl: true,
+        posterUrl: true,
+        sortOrder: true,
+        title: true,
+        type: true,
+        updatedAt: true,
+      },
+    });
+    galleryMedia = managedGalleryMedia.map((media) => ({
+      ...media,
+      createdAt: media.createdAt.toISOString(),
+      updatedAt: media.updatedAt.toISOString(),
     }));
   } catch {
     // The admin can still access the panel while a new database migration is being applied.
@@ -351,6 +381,7 @@ export default async function AdminPage() {
       articles={articles}
       departments={departments}
       email={session.email}
+      galleryMedia={galleryMedia}
       insurances={insurances}
       jobApplications={jobApplications}
       samplingRequests={samplingRequests}

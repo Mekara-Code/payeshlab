@@ -26,6 +26,10 @@ import {
   TestResultManager,
   type ManagedTestResult,
 } from "@/components/admin/test-result-manager";
+import {
+  GalleryManager,
+  type ManagedGalleryMedia,
+} from "@/components/admin/gallery-manager";
 import { SlideshowManager } from "@/components/admin/slideshow-manager";
 import { SettingsManager } from "@/components/admin/settings-manager";
 import { BrandMark } from "@/components/brand-mark";
@@ -41,12 +45,14 @@ const navigationItems = [
   { id: "news", label: "مدیریت اخبار" },
   { id: "services", label: "مدیریت خدمات" },
   { id: "tests", label: "مدیریت آزمایش‌ها" },
+  { id: "preparations", label: "آمادگی‌های قبل آزمایش" },
   { id: "results", label: "جواب آزمایش‌ها" },
   { id: "sampling", label: "نمونه‌گیری در منزل" },
   { id: "careers", label: "درخواست‌های استخدام" },
   { id: "announcements", label: "مدیریت اطلاعیه‌ها" },
   { id: "insurances", label: "مدیریت بیمه‌ها" },
   { id: "slideshow", label: "مدیریت اسلایدشو" },
+  { id: "gallery", label: "مدیریت گالری" },
   { id: "settings", label: "تنظیمات سایت" },
 ] as const;
 
@@ -182,6 +188,14 @@ function NavigationIcon({ id }: { id: NavigationId }) {
       </svg>
     );
   }
+  if (id === "preparations") {
+    return (
+      <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 24 24">
+        <path {...common} d="M9 3h6M10 3v6.1L5.6 17a2.5 2.5 0 0 0 2.2 3.7h8.4a2.5 2.5 0 0 0 2.2-3.7L14 9.1V3" />
+        <path {...common} d="M8.5 15h7M9.5 12h5" />
+      </svg>
+    );
+  }
   if (id === "results") {
     return (
       <svg aria-hidden="true" className="size-5" viewBox="0 0 24 24">
@@ -221,6 +235,15 @@ function NavigationIcon({ id }: { id: NavigationId }) {
       <svg aria-hidden="true" className="size-5" viewBox="0 0 24 24">
         <rect {...common} height="14" rx="2" width="18" x="3" y="5" />
         <path {...common} d="m7 15 3-3 2.5 2.5 2-2L18 16M8 9h.01" />
+      </svg>
+    );
+  }
+  if (id === "gallery") {
+    return (
+      <svg aria-hidden="true" className="size-5" viewBox="0 0 24 24">
+        <rect {...common} height="14" rx="2" width="18" x="3" y="5" />
+        <path {...common} d="m7 15 3-3 2.5 2.5 2-2L18 16M8 9h.01" />
+        <path {...common} d="M16 7v4m-2-2h4" />
       </svg>
     );
   }
@@ -277,7 +300,10 @@ function SidebarContent({
         )}
       </div>
 
-      <nav aria-label="ناوبری مدیریت" className="mt-6 grid gap-1">
+      <nav
+        aria-label="ناوبری مدیریت"
+        className="mt-6 grid min-h-0 flex-1 content-start gap-1 overflow-y-auto overscroll-contain pl-1"
+      >
         <p className="px-3 pb-2 text-xs font-extrabold tracking-wide text-slate-500">
           مدیریت محتوا
         </p>
@@ -302,7 +328,7 @@ function SidebarContent({
         })}
       </nav>
 
-      <div className="mt-auto border-t border-slate-200 pt-5">
+      <div className="mt-auto shrink-0 border-t border-slate-200 pt-5">
         <p className="truncate px-2 text-xs font-bold text-slate-500" dir="ltr">
           {email}
         </p>
@@ -324,6 +350,7 @@ export function AdminDashboard({
   articles,
   departments,
   email,
+  galleryMedia,
   insurances,
   jobApplications,
   samplingRequests,
@@ -333,9 +360,10 @@ export function AdminDashboard({
   tests,
 }: {
   announcements: ManagedAnnouncement[];
-  articles: Array<ManagedArticle & { type: "ARTICLE" | "NEWS" }>;
+  articles: Array<ManagedArticle & { type: "ARTICLE" | "NEWS" | "PREPARATION" }>;
   departments: DashboardDepartment[];
   email: string;
+  galleryMedia: ManagedGalleryMedia[];
   insurances: DashboardInsurance[];
   jobApplications: ManagedJobApplication[];
   samplingRequests: ManagedHomeSamplingRequest[];
@@ -361,10 +389,16 @@ export function AdminDashboard({
 
   const articleItems = articles.filter((article) => article.type === "ARTICLE");
   const newsItems = articles.filter((article) => article.type === "NEWS");
+  const preparationItems = articles.filter(
+    (article) => article.type === "PREPARATION",
+  );
   const publishedArticles = articleItems.filter(
     (article) => article.status === "PUBLISHED",
   ).length;
   const publishedNews = newsItems.filter(
+    (article) => article.status === "PUBLISHED",
+  ).length;
+  const publishedPreparations = preparationItems.filter(
     (article) => article.status === "PUBLISHED",
   ).length;
   const activeDepartments = departments.filter(
@@ -377,6 +411,7 @@ export function AdminDashboard({
     (insurance) => insurance.isActive,
   ).length;
   const activeSlides = slides.filter((slide) => slide.isActive).length;
+  const activeGalleryMedia = galleryMedia.filter((item) => item.isActive).length;
   const activeTests = tests.filter((test) => test.isActive).length;
   const pendingSamplingRequests = samplingRequests.filter(
     (request) => request.status === "PENDING",
@@ -404,6 +439,13 @@ export function AdminDashboard({
       target: "news",
       tone: "bg-teal-50 text-teal-500",
       value: newsItems.length,
+    },
+    {
+      detail: publishedPreparations > 0 ? "منتشرشده" : "پیش‌نویس یا خالی",
+      label: "آمادگی‌ها",
+      target: "preparations",
+      tone: "bg-cyan-50 text-cyan-800",
+      value: preparationItems.length,
     },
     {
       detail: `${formatNumber(activeDepartments)} فعال`,
@@ -439,6 +481,13 @@ export function AdminDashboard({
       target: "slideshow",
       tone: "bg-teal-50 text-teal-500",
       value: slides.length,
+    },
+    {
+      detail: `${formatNumber(activeGalleryMedia)} فعال`,
+      label: "گالری",
+      target: "gallery",
+      tone: "bg-cyan-50 text-cyan-800",
+      value: galleryMedia.length,
     },
     {
       detail: `${formatNumber(testResults.length)} فایل بارگذاری‌شده`,
@@ -486,8 +535,18 @@ export function AdminDashboard({
   const recentActivity: DashboardActivity[] = [
     ...articles.map((article) => ({
       id: `article-${article.id}`,
-      label: article.type === "NEWS" ? "خبر به‌روزرسانی شد" : "مقاله به‌روزرسانی شد",
-      target: (article.type === "NEWS" ? "news" : "articles") as NavigationId,
+      label:
+        article.type === "PREPARATION"
+          ? "راهنمای آمادگی به‌روزرسانی شد"
+          : article.type === "NEWS"
+            ? "خبر به‌روزرسانی شد"
+            : "مقاله به‌روزرسانی شد",
+      target:
+        (article.type === "PREPARATION"
+          ? "preparations"
+          : article.type === "NEWS"
+            ? "news"
+            : "articles") as NavigationId,
       title: article.title,
       updatedAt: article.updatedAt,
     })),
@@ -607,6 +666,12 @@ export function AdminDashboard({
             contentType="NEWS"
             items={articles.filter((article) => article.type === "NEWS")}
           />
+        ) : activeItem === "preparations" ? (
+          <ArticleEditor
+            contentType="PREPARATION"
+            items={preparationItems}
+            singleItem
+          />
         ) : activeItem === "announcements" ? (
           <AnnouncementManager announcements={announcements} />
         ) : activeItem === "services" ? (
@@ -623,6 +688,8 @@ export function AdminDashboard({
           <InsuranceManager insurances={insurances} />
         ) : activeItem === "slideshow" ? (
           <SlideshowManager slides={slides} />
+        ) : activeItem === "gallery" ? (
+          <GalleryManager media={galleryMedia} />
         ) : activeItem === "settings" ? (
           <SettingsManager settings={settings} />
         ) : (
@@ -645,6 +712,7 @@ export function AdminDashboard({
                         departments.length +
                         insurances.length +
                         slides.length +
+                        galleryMedia.length +
                         tests.length +
                         testResults.length +
                         samplingRequests.length +

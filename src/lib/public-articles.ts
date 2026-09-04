@@ -122,6 +122,28 @@ function getArticleBlocks(value: unknown): PublicArticleBlock[] {
   });
 }
 
+function hasReadableBlockContent(blocks: PublicArticleBlock[]) {
+  return blocks.some((block) => {
+    if (block.type === "table") {
+      try {
+        const rows = JSON.parse(block.content) as unknown;
+        return Array.isArray(rows) && rows.some(
+          (row) => Array.isArray(row) && row.some(
+            (cell) => typeof cell === "string" && cell.trim().length > 0,
+          ),
+        );
+      } catch {
+        return false;
+      }
+    }
+
+    return block.content
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/gi, " ")
+      .trim().length > 0;
+  });
+}
+
 function getFallbackArticleDetail(article: PublicArticle, locale: ContentLocale): PublicArticleDetail {
   const dictionary = getDictionary(locale);
 
@@ -225,5 +247,63 @@ export async function getPublishedArticleBySlug(
   } catch {
     const fallbackArticle = getDefaultPublicArticles(locale).find((item) => item.slug === slug);
     return fallbackArticle ? getFallbackArticleDetail(fallbackArticle, locale) : null;
+  }
+}
+
+export async function getPublishedTestPreparation(
+  locale: ContentLocale = "fa",
+): Promise<PublicArticleDetail | null> {
+  try {
+    const article = await getPrisma().article.findFirst({
+      select: {
+        content: true,
+        createdAt: true,
+        excerpt: true,
+        featuredImage: true,
+        id: true,
+        metaDescription: true,
+        publishedAt: true,
+        slug: true,
+        tags: true,
+        title: true,
+        translations: {
+          select: {
+            content: true,
+            excerpt: true,
+            metaDescription: true,
+            tags: true,
+            title: true,
+          },
+          where: { locale: toDatabaseContentLocale(locale) },
+        },
+      },
+      where: { status: "PUBLISHED", type: "PREPARATION" },
+    });
+
+    if (!article) return null;
+
+    const translation = article.translations?.[0];
+    const translatedContent = getArticleBlocks(translation?.content);
+    const primaryContent = getArticleBlocks(article.content);
+    const content = hasReadableBlockContent(translatedContent)
+      ? translatedContent
+      : primaryContent;
+
+    if (!hasReadableBlockContent(content)) return null;
+
+    return {
+      categories: [],
+      content,
+      excerpt: translation?.excerpt ?? article.excerpt ?? "",
+      id: article.id,
+      imageUrl: article.featuredImage,
+      metaDescription: translation?.metaDescription ?? article.metaDescription,
+      publishedAt: (article.publishedAt ?? article.createdAt).toISOString(),
+      slug: article.slug,
+      tags: translation?.tags ?? article.tags,
+      title: translation?.title ?? article.title,
+    };
+  } catch {
+    return null;
   }
 }
