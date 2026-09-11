@@ -470,7 +470,7 @@ function RichTextComposer({
         ) : null}
         <div
           aria-label={ariaLabel}
-          className={`min-h-32 p-3 text-base leading-8 text-slate-700 outline-none ${className ?? ""}`}
+          className={`min-h-32 overflow-x-auto break-words p-3 text-base leading-8 text-slate-700 outline-none [overflow-wrap:anywhere] ${className ?? ""}`}
           contentEditable
           dir="auto"
           onInput={updateValue}
@@ -1434,9 +1434,9 @@ export function ArticleEditor({
                 </div>
 
                 <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-5 sm:p-7">
-                  <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
+                  <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start">
                     <section
-                      className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-[0_14px_34px_rgba(15,23,42,0.05)] sm:p-7"
+                      className="min-w-0 rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-[0_14px_34px_rgba(15,23,42,0.05)] sm:p-7"
                       dir={activeLocale === "en" ? "ltr" : "rtl"}
                     >
                       <label
@@ -1488,7 +1488,7 @@ export function ArticleEditor({
                         >
                           <div
                             aria-describedby="block-order-help"
-                            className="mt-3 grid gap-4"
+                            className="mt-3 grid grid-cols-1 gap-4 [&>*]:min-w-0"
                           >
                             {blocks.map((block, index) => (
                               <SortableEditorBlock
