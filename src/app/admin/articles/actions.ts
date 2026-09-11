@@ -277,6 +277,7 @@ function revalidateContentPaths(...slugs: Array<string | null | undefined>) {
   revalidatePath("/articles");
   revalidatePath("/test-preparation");
   revalidatePath("/admin");
+  revalidatePath("/sitemap.xml");
   slugs.forEach((slug) => {
     if (slug && slug !== "test-preparation") {
       revalidatePath(`/articles/${slug}`);

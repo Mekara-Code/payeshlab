@@ -19,6 +19,23 @@ export function getSiteUrl() {
   return toValidUrl(configuredUrl);
 }
 
+export function isProductionDeployment() {
+  if (process.env.VERCEL_ENV) {
+    return process.env.VERCEL_ENV === "production";
+  }
+
+  return process.env.NODE_ENV === "production";
+}
+
+/**
+ * Only the production deployment may be indexed. Vercel preview/development
+ * builds and local dev servers would otherwise compete with the real site as
+ * duplicate content.
+ */
+export function isSearchIndexingAllowed() {
+  return isProductionDeployment();
+}
+
 export function toAbsoluteUrl(path: string) {
   if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;

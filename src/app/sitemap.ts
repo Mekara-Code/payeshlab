@@ -1,51 +1,164 @@
 import type { MetadataRoute } from "next";
+import { getSiteUrl, isSearchIndexingAllowed } from "@/lib/seo";
 import {
-  getPublishedArticles,
-  getPublishedTestPreparation,
-} from "@/lib/public-articles";
-import { getPublishedLaboratoryTests } from "@/lib/laboratory-test-data";
-import { getSiteUrl } from "@/lib/seo";
+  getSitemapContent,
+  latestDate,
+  type SitemapGalleryMedia,
+} from "@/lib/sitemap-data";
 
+// Refreshed hourly; admin actions also revalidate it the moment content is published.
 export const revalidate = 3600;
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = getSiteUrl();
-  const [articles, tests, testPreparation] = await Promise.all([
-    getPublishedArticles(100, "fa"),
-    getPublishedLaboratoryTests(),
-    getPublishedTestPreparation("fa"),
-  ]);
-  const staticPages: MetadataRoute.Sitemap = [
-    { changeFrequency: "weekly", priority: 1, url: new URL("/", siteUrl).toString() },
-    { changeFrequency: "monthly", priority: 0.8, url: new URL("/about", siteUrl).toString() },
-    { changeFrequency: "monthly", priority: 0.9, url: new URL("/contact", siteUrl).toString() },
-    { changeFrequency: "weekly", priority: 0.8, url: new URL("/articles", siteUrl).toString() },
-    { changeFrequency: "weekly", priority: 0.8, url: new URL("/tests", siteUrl).toString() },
-    { changeFrequency: "weekly", priority: 0.7, url: new URL("/gallery", siteUrl).toString() },
-    ...(testPreparation
-      ? [
-          {
-            changeFrequency: "monthly" as const,
-            lastModified: testPreparation.publishedAt,
-            priority: 0.8,
-            url: new URL("/test-preparation", siteUrl).toString(),
-          },
-        ]
-      : []),
-  ];
+type SitemapEntry = MetadataRoute.Sitemap[number];
+type SitemapVideo = NonNullable<SitemapEntry["videos"]>[number];
+
+// Google's documented limits for video sitemap fields.
+const videoTitleMaxLength = 100;
+const videoDescriptionMaxLength = 2048;
+
+const xmlEntities: Record<string, string> = {
+  '"': "&quot;",
+  "&": "&amp;",
+  "'": "&apos;",
+  "<": "&lt;",
+  ">": "&gt;",
+};
+
+// Next.js writes sitemap values into the XML verbatim, so anything that can
+// contain admin-entered text or query strings is escaped here.
+function escapeXml(value: string) {
+  return value.replace(/["&'<>]/g, (character) => xmlEntities[character]);
+}
+
+function truncate(value: string, maxLength: number) {
+  const text = value.replace(/\s+/g, " ").trim();
+  return text.length > maxLength ? `${text.slice(0, maxLength - 1).trimEnd()}…` : text;
+}
+
+/** Resolves relative paths against the canonical origin and percent-encodes non-ASCII characters. */
+function toSitemapUrl(path: string) {
+  try {
+    const url = new URL(path, getSiteUrl());
+    return url.protocol === "http:" || url.protocol === "https:" ? escapeXml(url.toString()) : null;
+  } catch {
+    return null;
+  }
+}
+
+function toSitemapUrls(paths: Array<string | null | undefined>) {
+  const urls = paths.flatMap((path) => {
+    const url = path ? toSitemapUrl(path) : null;
+    return url ? [url] : [];
+  });
+
+  return [...new Set(urls)];
+}
+
+function page(
+  path: string,
+  options: Omit<SitemapEntry, "images" | "url"> & { images?: Array<string | null | undefined> },
+): SitemapEntry {
+  const { images, ...entry } = options;
+  const imageUrls = toSitemapUrls(images ?? []);
+
+  return {
+    ...entry,
+    ...(imageUrls.length > 0 ? { images: imageUrls } : {}),
+    url: toSitemapUrl(path) ?? path,
+  };
+}
+
+function toSitemapVideo(item: SitemapGalleryMedia): SitemapVideo[] {
+  const contentUrl = toSitemapUrl(item.mediaUrl);
+  const thumbnailUrl = item.posterUrl ? toSitemapUrl(item.posterUrl) : null;
+
+  // Google rejects video entries without a thumbnail.
+  if (!contentUrl || !thumbnailUrl) return [];
 
   return [
-    ...staticPages,
-    ...articles.map((article) => ({
-      changeFrequency: "monthly" as const,
-      lastModified: article.publishedAt,
+    {
+      content_loc: contentUrl,
+      description: escapeXml(truncate(item.description || item.altText || item.title, videoDescriptionMaxLength)),
+      family_friendly: "yes",
+      publication_date: item.createdAt.toISOString(),
+      thumbnail_loc: thumbnailUrl,
+      title: escapeXml(truncate(item.title, videoTitleMaxLength)),
+    },
+  ];
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Staging and preview deployments are disallowed in robots.txt; an empty sitemap keeps them consistent.
+  if (!isSearchIndexingAllowed()) return [];
+
+  const content = await getSitemapContent();
+  const galleryImages = content.gallery.filter((item) => item.type === "IMAGE");
+  const galleryVideos = content.gallery.filter((item) => item.type === "VIDEO").flatMap(toSitemapVideo);
+
+  return [
+    page("/", {
+      changeFrequency: "daily",
+      images: content.homeImages,
+      lastModified: content.homeLastModified,
+      priority: 1,
+    }),
+
+    // Test catalogue: the pages with the strongest search intent ("<test name> آزمایش").
+    page("/tests", {
+      changeFrequency: "weekly",
+      lastModified: latestDate(content.tests.map((test) => test.lastModified)),
+      priority: 0.9,
+    }),
+    ...content.tests.map((test) =>
+      page(`/tests/${encodeURIComponent(test.slug)}`, {
+        changeFrequency: "monthly",
+        lastModified: test.lastModified,
+        priority: 0.8,
+      }),
+    ),
+
+    ...(content.testPreparationLastModified
+      ? [
+          page("/test-preparation", {
+            changeFrequency: "monthly",
+            lastModified: content.testPreparationLastModified,
+            priority: 0.8,
+          }),
+        ]
+      : []),
+
+    page("/contact", {
+      changeFrequency: "monthly",
+      lastModified: content.settingsLastModified,
+      priority: 0.8,
+    }),
+
+    page("/articles", {
+      changeFrequency: "weekly",
+      lastModified: latestDate(content.articles.map((article) => article.lastModified)),
       priority: 0.7,
-      url: new URL(`/articles/${encodeURIComponent(article.slug)}`, siteUrl).toString(),
-    })),
-    ...tests.map((test) => ({
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-      url: new URL(`/tests/${encodeURIComponent(test.slug)}`, siteUrl).toString(),
-    })),
+    }),
+    ...content.articles.map((article) =>
+      page(`/articles/${encodeURIComponent(article.slug)}`, {
+        changeFrequency: "monthly",
+        images: [article.imageUrl],
+        lastModified: article.lastModified,
+        priority: 0.7,
+      }),
+    ),
+
+    page("/about", {
+      changeFrequency: "monthly",
+      lastModified: content.settingsLastModified,
+      priority: 0.6,
+    }),
+
+    page("/gallery", {
+      changeFrequency: "monthly",
+      images: galleryImages.map((item) => item.mediaUrl),
+      lastModified: latestDate(content.gallery.map((item) => item.lastModified)),
+      priority: 0.5,
+      ...(galleryVideos.length > 0 ? { videos: galleryVideos } : {}),
+    }),
   ];
 }

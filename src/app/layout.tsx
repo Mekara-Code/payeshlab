@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Vazirmatn } from "next/font/google";
+import { SiteAnalytics } from "@/components/analytics/site-analytics";
 import { DictionaryProvider } from "@/components/i18n/dictionary-provider";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { getContentLocaleInfo } from "@/lib/content-locale";
 import { getSelectedContentLocale } from "@/lib/content-locale-server";
 import { getDictionary } from "@/lib/dictionaries";
-import { getOpenGraphLocale, getSiteUrl, toAbsoluteUrl } from "@/lib/seo";
+import {
+  getOpenGraphLocale,
+  getSiteUrl,
+  isProductionDeployment,
+  isSearchIndexingAllowed,
+  toAbsoluteUrl,
+} from "@/lib/seo";
 import "./globals.css";
 
 const vazirmatn = Vazirmatn({
@@ -44,17 +51,19 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       url: toAbsoluteUrl("/"),
     },
-    robots: {
-      follow: true,
-      googleBot: {
-        follow: true,
-        index: true,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-        "max-video-preview": -1,
-      },
-      index: true,
-    },
+    robots: isSearchIndexingAllowed()
+      ? {
+          follow: true,
+          googleBot: {
+            follow: true,
+            index: true,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+            "max-video-preview": -1,
+          },
+          index: true,
+        }
+      : { follow: false, index: false },
     title,
     twitter: {
       card: "summary_large_image",
@@ -82,6 +91,8 @@ export default async function RootLayout({
           <ToastProvider>{children}</ToastProvider>
         </DictionaryProvider>
       </body>
+      {/* Page views on client-side navigation are tracked by GA4 enhanced measurement (history events). */}
+      {isProductionDeployment() ? <SiteAnalytics /> : null}
     </html>
   );
 }
