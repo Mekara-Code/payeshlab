@@ -9,12 +9,5 @@ export const navigationItems = [
   { href: "/contact", labelKey: "navigation.contact" },
 ] as const;
 
-export const onlineAnswerItems = [
-  { href: "/online-answers/patients", labelKey: "navigation.onlineAnswersPatients" },
-  { href: "#online-answers-tests", labelKey: "navigation.onlineAnswersTests" },
-  { href: "#online-answers-doctors", labelKey: "navigation.onlineAnswersDoctors" },
-  {
-    href: "#online-answers-partners",
-    labelKey: "navigation.onlineAnswersPartners",
-  },
-] as const;
+/** Patient results are the only online results service for now, so the header links straight to it. */
+export const onlineAnswersHref = "/online-answers/patients";

@@ -5,8 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BrandMark } from "../brand-mark";
-import { ChevronDownIcon, CloseIcon, MenuIcon } from "./navigation-icons";
-import { navigationItems, onlineAnswerItems } from "./navigation-data";
+import { CloseIcon, MenuIcon } from "./navigation-icons";
+import { navigationItems, onlineAnswersHref } from "./navigation-data";
 import { LanguageSwitcher } from "./language-switcher";
 import { JobApplicationModal } from "@/components/careers/job-application-modal";
 import { EitaaIcon } from "@/components/icons/eitaa-icon";
@@ -78,31 +78,20 @@ function getActiveNavigationHref(
 
 type SidebarContentProps = {
   activeHref: string | null;
-  isOnlineAnswersOpen: boolean;
   laboratoryName: string | null;
   onClose?: () => void;
   onNavigate: () => void;
   onRequestSampling: () => void;
-  onToggleOnlineAnswers: () => void;
-  reduceMotion: boolean | null;
 };
 
 function SidebarContent({
   activeHref,
-  isOnlineAnswersOpen,
   laboratoryName,
   onClose,
   onNavigate,
   onRequestSampling,
-  onToggleOnlineAnswers,
-  reduceMotion,
 }: SidebarContentProps) {
   const { t } = useTranslations();
-  const onlineAnswersId = "mobile-online-answers";
-  const transition = {
-    duration: reduceMotion ? 0 : 0.18,
-    ease: [0.22, 1, 0.36, 1] as const,
-  };
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-y-auto overscroll-contain p-4 sm:p-5">
@@ -155,40 +144,13 @@ function SidebarContent({
           {t("homeSampling.trigger")}
         </button>
 
-        <button
-          aria-controls={onlineAnswersId}
-          aria-expanded={isOnlineAnswersOpen}
-          className="mt-2 flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl bg-teal-500 px-4 text-right text-sm font-extrabold text-white transition duration-200 hover:bg-teal-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
-          onClick={onToggleOnlineAnswers}
-          type="button"
+        <a
+          className="mt-2 flex min-h-12 w-full items-center justify-center rounded-2xl bg-teal-500 px-4 text-center text-sm font-extrabold text-white transition duration-200 hover:bg-teal-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
+          href={onlineAnswersHref}
+          onClick={onNavigate}
         >
-          <span>{t("navigation.onlineAnswers")}</span>
-          <ChevronDownIcon className={`size-5 transition-transform duration-200 ${isOnlineAnswersOpen ? "rotate-180" : ""}`} />
-        </button>
-
-        <AnimatePresence initial={false}>
-          {isOnlineAnswersOpen && (
-            <motion.div
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-2 grid gap-1"
-              exit={{ opacity: 0, y: -6 }}
-              id={onlineAnswersId}
-              initial={{ opacity: 0, y: -6 }}
-              transition={transition}
-            >
-              {onlineAnswerItems.map((item) => (
-                <a
-                  className="flex min-h-12 items-center rounded-2xl px-3 text-sm font-bold text-slate-700 transition duration-200 hover:bg-teal-50 hover:text-teal-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
-                  href={item.href}
-                  key={item.href}
-                  onClick={onNavigate}
-                >
-                  {t(item.labelKey)}
-                </a>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+          {t("navigation.onlineAnswers")}
+        </a>
       </div>
 
       <div className="mt-auto shrink-0 pt-6 text-xs font-medium leading-5 text-slate-500">
@@ -214,7 +176,6 @@ export function SidebarNavigation({
   const { t } = useTranslations();
   const activePathname = usePathname();
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
-  const [isOnlineAnswersOpen, setIsOnlineAnswersOpen] = useState(false);
   const [isSamplingFormOpen, setIsSamplingFormOpen] = useState(false);
   const [isJobApplicationOpen, setIsJobApplicationOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -239,7 +200,6 @@ export function SidebarNavigation({
 
   const openSamplingForm = () => {
     setIsMobileSidebarOpen(false);
-    setIsOnlineAnswersOpen(false);
     setIsSamplingFormOpen(true);
   };
 
@@ -461,49 +421,12 @@ export function SidebarNavigation({
               {t("homeSampling.trigger")}
             </button>
 
-            <div className="relative">
-            <button
-              aria-controls="desktop-online-answers-menu"
-              aria-expanded={isOnlineAnswersOpen}
-              className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-teal-500 px-4 py-3 text-[13px] font-extrabold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-teal-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500 2xl:px-5 2xl:text-sm"
-              onClick={() => setIsOnlineAnswersOpen((current) => !current)}
-              type="button"
+            <a
+              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-full bg-teal-500 px-4 py-3 text-[13px] font-extrabold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-teal-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500 2xl:px-5 2xl:text-sm"
+              href={onlineAnswersHref}
             >
               {t("navigation.onlineAnswers")}
-              <ChevronDownIcon className={`size-4 transition-transform duration-200 ${isOnlineAnswersOpen ? "rotate-180" : ""}`} />
-            </button>
-
-            <AnimatePresence>
-              {isOnlineAnswersOpen && (
-                <motion.section
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  aria-label={t("navigation.onlineAnswersTitle")}
-                  className="absolute end-0 top-full mt-3 max-h-[calc(100dvh-10rem)] w-[min(42rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain origin-top rounded-[2rem] border border-white/90 bg-white/95 p-5 text-right shadow-[0_28px_80px_rgba(15,23,42,0.18)] backdrop-blur-xl"
-                  exit={{ opacity: 0, scale: 0.98, y: -8 }}
-                  id="desktop-online-answers-menu"
-                  initial={{ opacity: 0, scale: 0.98, y: -8 }}
-                  transition={drawerTransition}
-                >
-                  <div className="mb-4 border-b border-slate-200 pb-4">
-                    <p className="text-base font-black text-slate-950">{t("navigation.onlineAnswersTitle")}</p>
-                    <p className="mt-1 text-sm font-medium text-slate-600">{t("navigation.onlineAnswersDescription")}</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    {onlineAnswerItems.map((item) => (
-                      <a
-                        className="flex min-h-20 items-center rounded-2xl border border-slate-200 bg-slate-50/70 px-4 text-sm font-extrabold text-slate-800 transition duration-200 hover:-translate-y-0.5 hover:border-teal-200 hover:bg-teal-50 hover:text-teal-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
-                        href={item.href}
-                        key={item.href}
-                        onClick={() => setIsOnlineAnswersOpen(false)}
-                      >
-                        {t(item.labelKey)}
-                      </a>
-                    ))}
-                  </div>
-                </motion.section>
-              )}
-            </AnimatePresence>
-            </div>
+            </a>
           </div>
         </div>
       </header>
@@ -546,13 +469,10 @@ export function SidebarNavigation({
             >
               <SidebarContent
                 activeHref={activeNavigationHref}
-                isOnlineAnswersOpen={isOnlineAnswersOpen}
                 laboratoryName={laboratoryName}
                 onClose={closeMobileSidebar}
                 onNavigate={closeMobileSidebar}
                 onRequestSampling={openSamplingForm}
-                onToggleOnlineAnswers={() => setIsOnlineAnswersOpen((current) => !current)}
-                reduceMotion={shouldReduceMotion}
               />
             </motion.aside>
           </motion.div>
