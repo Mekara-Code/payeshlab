@@ -33,6 +33,14 @@ body {
   text-align: justify;
 }
 
+/* Justified text breaks badly in the narrow columns of a phone layout; opt specific blocks out. */
+@media (max-width: 639px) {
+  #home .no-justify-mobile,
+  #home .no-justify-mobile * {
+    text-align: center;
+  }
+}
+
 @keyframes insurance-logo-skeleton-shimmer {
   0% {
     background-position: 180% 0;

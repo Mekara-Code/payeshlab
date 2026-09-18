@@ -11,7 +11,7 @@ import { SiteNavigation } from "@/components/navigation/site-navigation";
 import { ScrollScene } from "@/components/motion/scroll-scene";
 import { StaggerItem, StaggerScene } from "@/components/motion/stagger-scene";
 import { defaultInsurances, type InsurancePartner } from "@/lib/insurance-data";
-import { getDefaultLabDepartments, type LabDepartmentData } from "@/lib/lab-department-data";
+import { getDefaultLabDepartments, localizeLabDepartment, type LabDepartmentData } from "@/lib/lab-department-data";
 import {
   getDefaultAnnouncements,
   getDefaultNews,
@@ -79,15 +79,21 @@ async function getHomepageDepartments(locale: ContentLocale): Promise<LabDepartm
       orderBy: [{ sortOrder: "asc" }, { title: "asc" }],
       select: {
         description: true,
+        descriptionAr: true,
+        descriptionEn: true,
         id: true,
         imageUrl: true,
         sortOrder: true,
         title: true,
+        titleAr: true,
+        titleEn: true,
       },
       where: { isActive: true },
     });
 
-    return departments.length > 0 ? departments : getDefaultLabDepartments(locale);
+    return departments.length > 0
+      ? departments.map((department) => localizeLabDepartment(department, locale))
+      : getDefaultLabDepartments(locale);
   } catch {
     return getDefaultLabDepartments(locale);
   }
@@ -240,7 +246,7 @@ export default async function Home() {
           </ScrollScene>
 
           <section className="mx-auto mt-14 max-w-4xl rounded-[2rem] border border-teal-100 bg-[#f7fbfb] px-6 py-8 text-center sm:mt-16 sm:px-10 sm:py-10">
-            <h2 className="text-2xl font-black leading-9 tracking-[-0.05em] text-slate-950 sm:text-3xl">
+            <h2 className="no-justify-mobile text-2xl font-black leading-9 tracking-[-0.05em] text-slate-950 sm:text-3xl">
               {t("seo.homeContentTitle")}
             </h2>
             <p className="mx-auto mt-4 max-w-3xl text-sm font-medium leading-8 text-slate-600 sm:text-base">

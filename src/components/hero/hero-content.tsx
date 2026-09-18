@@ -236,14 +236,14 @@ function MetricPie({
           />
         </svg>
 
-        <div className="relative z-10 flex max-w-[82%] flex-col items-center text-center">
+        <div className="relative z-10 flex max-w-[74%] flex-col items-center text-center sm:max-w-[82%]">
           <span
             aria-label={`${t(metric.labelKey)}: ${displayValue}`}
             className="whitespace-nowrap text-base font-black tracking-[-0.05em] text-teal-500 sm:text-2xl"
           >
             <bdi dir="ltr">{displayValue}</bdi>
           </span>
-          <span className="mt-1 text-[9px] font-bold leading-3.5 text-slate-700 sm:text-xs sm:leading-5">
+          <span className="mt-0.5 text-[8px] font-bold leading-3 text-slate-700 sm:mt-1 sm:text-xs sm:leading-5">
             {t(metric.labelKey)}
           </span>
         </div>
@@ -259,7 +259,7 @@ export function HeroContent({ contactDetails }: { contactDetails: HeroContactDet
     <ScrollScene className="max-w-xl text-right" distance={30}>
       <StaggerScene>
         <StaggerItem>
-          <span className="inline-flex rounded-full bg-white/75 px-4 py-2 text-sm font-bold text-slate-600 backdrop-blur-md">
+          <span className="inline-flex rounded-full bg-white/75 px-3 py-1.5 text-xs font-bold text-slate-600 backdrop-blur-md sm:px-4 sm:py-2 sm:text-sm">
             {t("hero.badge")}
           </span>
         </StaggerItem>
@@ -271,7 +271,7 @@ export function HeroContent({ contactDetails }: { contactDetails: HeroContactDet
         </StaggerItem>
 
         <StaggerItem className="mt-7">
-          <p className="max-w-lg text-base font-medium leading-9 text-slate-800 sm:text-lg sm:leading-9">
+          <p className="max-w-lg text-sm font-medium leading-7 text-slate-800 sm:text-lg sm:leading-9">
             {t("hero.description")}
           </p>
         </StaggerItem>

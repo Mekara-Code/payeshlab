@@ -191,7 +191,7 @@ export const fa: Dictionary = {
   "insurance.description": "پذیرش آسان با پوشش بیمه‌ای گسترده",
   "insurance.list": "فهرست بیمه‌های طرف قرارداد؛ برای دیدن موارد بیشتر به صورت افقی بکشید",
   "insurance.logoAlt": "لوگوی {{name}}",
-  "insurance.viewList": "مشاهده فهرست بیمه‌ها",
+  "insurance.viewList": "مشاهده بیمه‌ها",
   "insurance.closeList": "بستن فهرست بیمه‌های طرف قرارداد",
   "insurance.coverage": "پوشش درمان",
   "insurance.modalTitle": "فهرست بیمه‌های طرف قرارداد",

@@ -208,7 +208,7 @@ export function InsurancePartnersModal({ insurances }: InsurancePartnersModalPro
         aria-controls="insurance-partners-dialog"
         aria-expanded={isOpen}
         aria-haspopup="dialog"
-        className="inline-flex min-h-11 items-center gap-2 px-1 py-2 text-sm font-extrabold text-teal-500 underline-offset-4 transition-[color,text-decoration-color,transform] duration-200 hover:text-teal-500 hover:underline focus-visible:rounded-sm focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-teal-500 active:scale-[0.98]"
+        className="no-justify-mobile inline-flex min-h-11 items-center gap-2 whitespace-nowrap px-1 py-2 text-sm font-extrabold text-teal-500 underline-offset-4 transition-[color,text-decoration-color,transform] duration-200 hover:text-teal-500 hover:underline focus-visible:rounded-sm focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-teal-500 active:scale-[0.98]"
         onClick={openModal}
         type="button"
       >

@@ -49,3 +49,28 @@ export function getDefaultLabDepartments(locale: ContentLocale): LabDepartmentDa
 import type { ContentLocale } from "@/lib/content-locale";
 import { getDictionary } from "@/lib/dictionaries";
 import { translate } from "@/lib/dictionaries/types";
+
+/**
+ * Departments store their Arabic/English copy in sibling columns rather than a
+ * translation table, so public pages have to pick the right column themselves.
+ * Empty translations fall back to the Persian original.
+ */
+export function localizeLabDepartment(
+  department: LabDepartmentData,
+  locale: ContentLocale,
+): LabDepartmentData {
+  const translated =
+    locale === "en"
+      ? { description: department.descriptionEn, title: department.titleEn }
+      : locale === "ar"
+        ? { description: department.descriptionAr, title: department.titleAr }
+        : { description: null, title: null };
+
+  return {
+    description: translated.description?.trim() || department.description,
+    id: department.id,
+    imageUrl: department.imageUrl,
+    sortOrder: department.sortOrder,
+    title: translated.title?.trim() || department.title,
+  };
+}
