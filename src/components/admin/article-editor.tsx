@@ -692,11 +692,9 @@ function SortableEditorBlock({
 export function ArticleEditor({
   contentType = "ARTICLE",
   items = [],
-  singleItem = false,
 }: {
   contentType?: ManagedContentType;
   items?: ManagedArticle[];
-  singleItem?: boolean;
 }) {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -777,12 +775,11 @@ export function ArticleEditor({
       ? "خبر"
       : "مقاله";
   const contentHeading = isPreparation
-    ? "آمادگی‌های قبل آزمایش"
+    ? "مدیریت آمادگی‌ها"
     : `${contentLabel}‌ها`;
   const contentDescription = isPreparation
-    ? "راهنمای چندزبانهٔ قبل از آزمایش را با بلوک‌های متنوع ایجاد و منتشر کنید."
+    ? "راهنماهای چندزبانهٔ آمادگی قبل از آزمایش را با عنوان، متن و تصویر ایجاد، ویرایش، منتشر یا حذف کنید."
     : `${contentLabel}‌های خود را ایجاد، ویرایش، منتشر یا حذف کنید.`;
-  const canCreate = !singleItem || items.length === 0;
   const pageCount = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
   const visiblePage = Math.min(currentPage, pageCount);
   const pageItems = items.slice(
@@ -1095,16 +1092,14 @@ export function ArticleEditor({
               {contentDescription}
             </p>
           </div>
-          {canCreate ? (
-            <button
-              className="inline-flex min-h-12 w-fit items-center gap-2 rounded-2xl bg-teal-500 px-5 text-sm font-extrabold text-white transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-teal-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500 active:translate-y-0"
-              onClick={(event) => openNewEditor(event.currentTarget)}
-              type="button"
-            >
-              <PlusIcon />
-              {isPreparation ? "افزودن راهنمای آمادگی" : `${contentLabel} جدید`}
-            </button>
-          ) : null}
+          <button
+            className="inline-flex min-h-12 w-fit items-center gap-2 rounded-2xl bg-teal-500 px-5 text-sm font-extrabold text-white transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-teal-500 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-teal-500 active:translate-y-0"
+            onClick={(event) => openNewEditor(event.currentTarget)}
+            type="button"
+          >
+            <PlusIcon />
+            {isPreparation ? "افزودن راهنمای آمادگی" : `${contentLabel} جدید`}
+          </button>
         </div>
 
         {items.length > 0 ? (

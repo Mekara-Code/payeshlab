@@ -45,7 +45,7 @@ const navigationItems = [
   { id: "news", label: "مدیریت اخبار" },
   { id: "services", label: "مدیریت خدمات" },
   { id: "tests", label: "مدیریت آزمایش‌ها" },
-  { id: "preparations", label: "آمادگی‌های قبل آزمایش" },
+  { id: "preparations", label: "مدیریت آمادگی‌ها" },
   { id: "results", label: "جواب آزمایش‌ها" },
   { id: "sampling", label: "نمونه‌گیری در منزل" },
   { id: "careers", label: "درخواست‌های استخدام" },
@@ -441,7 +441,7 @@ export function AdminDashboard({
       value: newsItems.length,
     },
     {
-      detail: publishedPreparations > 0 ? "منتشرشده" : "پیش‌نویس یا خالی",
+      detail: `${formatNumber(publishedPreparations)} منتشرشده`,
       label: "آمادگی‌ها",
       target: "preparations",
       tone: "bg-cyan-50 text-cyan-800",
@@ -667,11 +667,7 @@ export function AdminDashboard({
             items={articles.filter((article) => article.type === "NEWS")}
           />
         ) : activeItem === "preparations" ? (
-          <ArticleEditor
-            contentType="PREPARATION"
-            items={preparationItems}
-            singleItem
-          />
+          <ArticleEditor contentType="PREPARATION" items={preparationItems} />
         ) : activeItem === "announcements" ? (
           <AnnouncementManager announcements={announcements} />
         ) : activeItem === "services" ? (

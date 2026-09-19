@@ -272,16 +272,27 @@ async function requireAdmin() {
   return session?.role === "ADMIN" ? session : null;
 }
 
-function revalidateContentPaths(...slugs: Array<string | null | undefined>) {
+function revalidateContentPaths(
+  type: ManagedContentType,
+  ...slugs: Array<string | null | undefined>
+) {
   revalidatePath("/");
-  revalidatePath("/articles");
-  revalidatePath("/test-preparation");
   revalidatePath("/admin");
   revalidatePath("/sitemap.xml");
+
+  if (type === "PREPARATION") {
+    revalidatePath("/test-preparation");
+    // Publishing or deleting a guide reshuffles every page of the archive.
+    revalidatePath("/test-preparation/page/[page]", "page");
+    slugs.forEach((slug) => {
+      if (slug) revalidatePath(`/test-preparation/${slug}`);
+    });
+    return;
+  }
+
+  revalidatePath("/articles");
   slugs.forEach((slug) => {
-    if (slug && slug !== "test-preparation") {
-      revalidatePath(`/articles/${slug}`);
-    }
+    if (slug) revalidatePath(`/articles/${slug}`);
   });
 }
 
@@ -302,7 +313,7 @@ export async function saveArticle(
     getString(formData, "translationsJson"),
   );
   const submittedSlug = getString(formData, "slug");
-  const slug = type === "PREPARATION" ? "test-preparation" : slugify(submittedSlug || title);
+  const slug = slugify(submittedSlug || title);
   const status: ArticleStatus =
     formData.get("status") === "published"
       ? ArticleStatus.PUBLISHED
@@ -335,16 +346,6 @@ export async function saveArticle(
   const prisma = getPrisma();
   let savedImage: SavedArticleImage | undefined;
   let previousSlug: string | null = null;
-
-  if (!id && type === "PREPARATION") {
-    const existingPreparation = await prisma.article.findFirst({
-      select: { id: true },
-      where: { type: "PREPARATION" },
-    });
-    if (existingPreparation) {
-      return { message: "فقط یک راهنمای آمادگی‌های قبل آزمایش می‌تواند ایجاد شود." };
-    }
-  }
 
   try {
     const upload = await saveArticleImage(formData.get("featuredImageFile"));
@@ -434,7 +435,7 @@ export async function saveArticle(
     await removeStoredArticleImage(previousFeaturedImage);
   }
 
-  revalidateContentPaths(slug, previousSlug);
+  revalidateContentPaths(type, slug, previousSlug);
   const contentLabel =
     type === "PREPARATION"
       ? "راهنمای آمادگی‌های قبل آزمایش"
@@ -480,7 +481,7 @@ export async function toggleArticleStatus(
     return { message: "تغییر وضعیت انجام نشد. دوباره تلاش کنید." };
   }
 
-  revalidateContentPaths(existing.slug);
+  revalidateContentPaths(type, existing.slug);
   return {
     message: isPublished ? "محتوا به پیش‌نویس منتقل شد." : "محتوا منتشر شد.",
     success: true,
@@ -511,6 +512,6 @@ export async function deleteArticle(
     return { message: "حذف محتوا انجام نشد. دوباره تلاش کنید." };
   }
 
-  revalidateContentPaths(existing.slug);
+  revalidateContentPaths(type, existing.slug);
   return { message: "محتوا حذف شد.", success: true };
 }

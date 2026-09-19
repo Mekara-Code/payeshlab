@@ -3,7 +3,7 @@ import "server-only";
 import { getPrisma } from "@/lib/prisma";
 import {
   getDefaultPublicArticles,
-  getPublishedTestPreparation,
+  PREPARATIONS_PER_PAGE,
 } from "@/lib/public-articles";
 import { SITE_SETTINGS_ID } from "@/lib/site-settings";
 import { getDefaultSlideshowSlides } from "@/lib/slideshow-data";
@@ -30,14 +30,20 @@ export type SitemapGalleryMedia = {
   type: "IMAGE" | "VIDEO";
 };
 
+export type SitemapPreparations = {
+  items: SitemapArticle[];
+  /** Number of archive pages, mirroring the page size used by the public route. */
+  pageCount: number;
+};
+
 export type SitemapContent = {
   articles: SitemapArticle[];
   gallery: SitemapGalleryMedia[];
   homeImages: string[];
   homeLastModified: Date | undefined;
+  /** Empty when no guide is published, so the archive stays out of the sitemap. */
+  preparations: SitemapPreparations;
   settingsLastModified: Date | undefined;
-  /** `null` means the page currently responds with 404 and must stay out of the sitemap. */
-  testPreparationLastModified: Date | null;
   tests: SitemapLaboratoryTest[];
 };
 
@@ -95,23 +101,39 @@ async function getSitemapArticles(): Promise<SitemapArticle[]> {
   }));
 }
 
-async function getTestPreparationLastModified() {
-  const preparation = await getPublishedTestPreparation("fa");
-  if (!preparation) return null;
-
-  const record = await safely(
+async function getSitemapPreparations(): Promise<SitemapPreparations> {
+  const preparations = await safely(
     () =>
-      getPrisma().article.findUnique({
-        select: { translations: translationTimestamps, updatedAt: true },
-        where: { id: preparation.id },
+      getPrisma().article.findMany({
+        orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+        select: {
+          featuredImage: true,
+          slug: true,
+          translations: translationTimestamps,
+          updatedAt: true,
+        },
+        where: { status: "PUBLISHED", type: "PREPARATION" },
       }),
     null,
   );
 
-  return (
-    latestDate([record?.updatedAt, ...(record?.translations.map((translation) => translation.updatedAt) ?? [])]) ??
-    new Date(preparation.publishedAt)
-  );
+  // A failed query must not advertise URLs the site may not actually serve.
+  if (!preparations || preparations.length === 0) {
+    return { items: [], pageCount: 0 };
+  }
+
+  return {
+    items: preparations.map((preparation) => ({
+      imageUrl: preparation.featuredImage,
+      lastModified:
+        latestDate([
+          preparation.updatedAt,
+          ...preparation.translations.map((translation) => translation.updatedAt),
+        ]) ?? preparation.updatedAt,
+      slug: preparation.slug,
+    })),
+    pageCount: Math.ceil(preparations.length / PREPARATIONS_PER_PAGE),
+  };
 }
 
 async function getSitemapLaboratoryTests(): Promise<SitemapLaboratoryTest[]> {
@@ -219,12 +241,12 @@ async function getHomeSections() {
 }
 
 export async function getSitemapContent(): Promise<SitemapContent> {
-  const [articles, tests, gallery, testPreparationLastModified, settingsLastModified, home] =
+  const [articles, tests, gallery, preparations, settingsLastModified, home] =
     await Promise.all([
       getSitemapArticles(),
       getSitemapLaboratoryTests(),
       getSitemapGalleryMedia(),
-      getTestPreparationLastModified(),
+      getSitemapPreparations(),
       getSettingsLastModified(),
       getHomeSections(),
     ]);
@@ -239,8 +261,8 @@ export async function getSitemapContent(): Promise<SitemapContent> {
       settingsLastModified,
       ...articles.map((article) => article.lastModified),
     ]),
+    preparations,
     settingsLastModified,
-    testPreparationLastModified,
     tests,
   };
 }

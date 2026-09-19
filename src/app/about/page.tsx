@@ -283,7 +283,7 @@ export default async function AboutPage() {
                     <span className="text-teal-600">
                       <BadgeIcon />
                     </span>
-                    <span className="text-xs font-extrabold text-slate-600">
+                    <span className="text-sm font-extrabold text-slate-700">
                       {t("about.technicalManagerLicense")}
                     </span>
                     <bdi

@@ -3,7 +3,7 @@ import { getDictionary } from "@/lib/dictionaries";
 import { translate } from "@/lib/dictionaries/types";
 import { defaultInsurances } from "@/lib/insurance-data";
 import { getPrisma } from "@/lib/prisma";
-import { getPublishedTestPreparation } from "@/lib/public-articles";
+import { countPublishedPreparations } from "@/lib/public-articles";
 import { getSiteSettings } from "@/lib/site-settings";
 import { SidebarNavigation, type SocialLink } from "./sidebar-navigation";
 
@@ -27,10 +27,10 @@ async function getInsuranceOptions() {
 
 export async function SiteNavigation() {
   const locale = await getSelectedContentLocale();
-  const [settings, insuranceOptions, testPreparation] = await Promise.all([
+  const [settings, insuranceOptions, preparationCount] = await Promise.all([
     getSiteSettings(),
     getInsuranceOptions(),
-    getPublishedTestPreparation(locale),
+    countPublishedPreparations(),
   ]);
   const dictionary = getDictionary(locale);
   const t = (key: string) => translate(dictionary, key);
@@ -67,7 +67,7 @@ export async function SiteNavigation() {
 
   return (
     <SidebarNavigation
-      hasTestPreparation={Boolean(testPreparation)}
+      hasTestPreparation={preparationCount > 0}
       insuranceOptions={insuranceOptions}
       laboratoryName={settings.laboratoryName}
       locale={locale}

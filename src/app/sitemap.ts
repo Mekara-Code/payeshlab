@@ -92,6 +92,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (!isSearchIndexingAllowed()) return [];
 
   const content = await getSitemapContent();
+  const preparationLastModified = latestDate(
+    content.preparations.items.map((preparation) => preparation.lastModified),
+  );
   const galleryImages = content.gallery.filter((item) => item.type === "IMAGE");
   const galleryVideos = content.gallery.filter((item) => item.type === "VIDEO").flatMap(toSitemapVideo);
 
@@ -117,13 +120,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     ),
 
-    ...(content.testPreparationLastModified
+    // Preparation guides: high search intent ("<test name> آمادگی"), one URL per guide
+    // plus every page of the archive so deep pages are still discoverable.
+    ...(preparationLastModified
       ? [
           page("/test-preparation", {
-            changeFrequency: "monthly",
-            lastModified: content.testPreparationLastModified,
-            priority: 0.8,
+            changeFrequency: "weekly",
+            lastModified: preparationLastModified,
+            priority: 0.9,
           }),
+          ...Array.from({ length: Math.max(0, content.preparations.pageCount - 1) }, (_, index) =>
+            page(`/test-preparation/page/${index + 2}`, {
+              changeFrequency: "weekly",
+              lastModified: preparationLastModified,
+              priority: 0.5,
+            }),
+          ),
+          ...content.preparations.items.map((preparation) =>
+            page(`/test-preparation/${encodeURIComponent(preparation.slug)}`, {
+              changeFrequency: "monthly",
+              images: [preparation.imageUrl],
+              lastModified: preparation.lastModified,
+              priority: 0.8,
+            }),
+          ),
         ]
       : []),
 

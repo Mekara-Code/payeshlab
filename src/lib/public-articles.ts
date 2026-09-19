@@ -250,11 +250,104 @@ export async function getPublishedArticleBySlug(
   }
 }
 
-export async function getPublishedTestPreparation(
+/** Preparation guides are paginated on their own archive, nine cards per page. */
+export const PREPARATIONS_PER_PAGE = 9;
+
+export type PublicPreparationPage = {
+  items: PublicArticle[];
+  page: number;
+  pageCount: number;
+  total: number;
+};
+
+const preparationWhere = { status: "PUBLISHED", type: "PREPARATION" } as const;
+
+export async function countPublishedPreparations(): Promise<number> {
+  try {
+    return await getPrisma().article.count({ where: preparationWhere });
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * One page of the preparation archive. `page` is 1-based; `pageCount` is at
+ * least 1 so an empty archive still renders its own first page.
+ */
+export async function getPublishedPreparations(
+  page = 1,
+  locale: ContentLocale = "fa",
+  pageSize = PREPARATIONS_PER_PAGE,
+): Promise<PublicPreparationPage> {
+  const requestedPage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+
+  try {
+    const prisma = getPrisma();
+    const total = await prisma.article.count({ where: preparationWhere });
+    const pageCount = Math.max(1, Math.ceil(total / pageSize));
+    const currentPage = Math.min(requestedPage, pageCount);
+    const preparations = await prisma.article.findMany({
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+      select: {
+        createdAt: true,
+        excerpt: true,
+        featuredImage: true,
+        id: true,
+        publishedAt: true,
+        slug: true,
+        title: true,
+        translations: {
+          select: { excerpt: true, title: true },
+          where: { locale: toDatabaseContentLocale(locale) },
+        },
+      },
+      skip: (currentPage - 1) * pageSize,
+      take: pageSize,
+      where: preparationWhere,
+    });
+
+    return {
+      items: preparations.map((preparation) => {
+        const translation = preparation.translations?.[0];
+        return {
+          excerpt: translation?.excerpt ?? preparation.excerpt ?? "",
+          id: preparation.id,
+          imageUrl: preparation.featuredImage,
+          publishedAt: (preparation.publishedAt ?? preparation.createdAt).toISOString(),
+          slug: preparation.slug,
+          title: translation?.title ?? preparation.title,
+        };
+      }),
+      page: currentPage,
+      pageCount,
+      total,
+    };
+  } catch {
+    return { items: [], page: 1, pageCount: 1, total: 0 };
+  }
+}
+
+/** Slugs of every published guide, for `generateStaticParams` and the sitemap. */
+export async function getPublishedPreparationSlugs(): Promise<string[]> {
+  try {
+    const preparations = await getPrisma().article.findMany({
+      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+      select: { slug: true },
+      where: preparationWhere,
+    });
+
+    return preparations.map((preparation) => preparation.slug);
+  } catch {
+    return [];
+  }
+}
+
+export async function getPublishedPreparationBySlug(
+  slug: string,
   locale: ContentLocale = "fa",
 ): Promise<PublicArticleDetail | null> {
   try {
-    const article = await getPrisma().article.findFirst({
+    const preparation = await getPrisma().article.findFirst({
       select: {
         content: true,
         createdAt: true,
@@ -277,14 +370,15 @@ export async function getPublishedTestPreparation(
           where: { locale: toDatabaseContentLocale(locale) },
         },
       },
-      where: { status: "PUBLISHED", type: "PREPARATION" },
+      where: { slug, ...preparationWhere },
     });
 
-    if (!article) return null;
+    if (!preparation) return null;
 
-    const translation = article.translations?.[0];
+    const translation = preparation.translations?.[0];
     const translatedContent = getArticleBlocks(translation?.content);
-    const primaryContent = getArticleBlocks(article.content);
+    const primaryContent = getArticleBlocks(preparation.content);
+    // A translation that was left empty falls back to the Persian body.
     const content = hasReadableBlockContent(translatedContent)
       ? translatedContent
       : primaryContent;
@@ -294,14 +388,14 @@ export async function getPublishedTestPreparation(
     return {
       categories: [],
       content,
-      excerpt: translation?.excerpt ?? article.excerpt ?? "",
-      id: article.id,
-      imageUrl: article.featuredImage,
-      metaDescription: translation?.metaDescription ?? article.metaDescription,
-      publishedAt: (article.publishedAt ?? article.createdAt).toISOString(),
-      slug: article.slug,
-      tags: translation?.tags ?? article.tags,
-      title: translation?.title ?? article.title,
+      excerpt: translation?.excerpt ?? preparation.excerpt ?? "",
+      id: preparation.id,
+      imageUrl: preparation.featuredImage,
+      metaDescription: translation?.metaDescription ?? preparation.metaDescription,
+      publishedAt: (preparation.publishedAt ?? preparation.createdAt).toISOString(),
+      slug: preparation.slug,
+      tags: translation?.tags ?? preparation.tags,
+      title: translation?.title ?? preparation.title,
     };
   } catch {
     return null;

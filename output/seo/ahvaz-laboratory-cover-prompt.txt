@@ -1,0 +1,10 @@
+Use case: illustration-story.
+Asset type: premium landscape editorial cover image for a Persian medical laboratory article titled "آزمایشگاه اهواز", for payeshlab.com.
+Primary request: create one refined, beautiful, high quality 16:9 landscape cover illustration linking laboratory diagnostics with the city of Ahvaz in Iran.
+Scene: an elegant contemporary microscope and a small neatly arranged rack of capped specimen tubes in the foreground, on a clean ivory surface. A stylized recognizable twin-arched white bridge over the Karun River in Ahvaz appears in the middle distance with a few restrained palm silhouettes and low city shapes. Visually coherent scene with graceful depth and ample breathing room.
+Style: sophisticated 3D editorial illustration with subtly matte materials, realistic clean optics on the microscope, restrained premium healthcare art direction. Clearly an illustrative conceptual scene, NOT a documentary photograph of a real laboratory building, and no fake clinic signage.
+Composition: balanced wide composition, microscope as a strong main focal point, bridge forms a gentle secondary arc, cropped safely for a blog card. No busy detail, no floating icons, no charts, no decorative DNA spirals.
+Lighting: soft luminous daylight with a hint of warm Ahvaz sun, light airy atmosphere, gentle shadows, inviting and professional.
+Palette: teal, muted turquoise, off-white, deep navy accents, restrained sandy gold; cohesive with a teal-and-white healthcare website.
+Constraints: no text, no lettering, no logos, no watermarks, no people, no needles, no exposed blood, no false certificates or claims. Anatomically and mechanically plausible laboratory objects. Flat complete landscape image with no website mockup frame.
+Output: one polished high-resolution landscape image.
