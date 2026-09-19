@@ -2,8 +2,8 @@
 
 import { grantPatientResultDownloadAccess } from "@/lib/patient-result-access";
 import {
-  isValidMobileNumber,
   isValidNationalCode,
+  isValidReceptionNumber,
   toDigitsOnly,
 } from "@/lib/patient-identity";
 import { getPrisma } from "@/lib/prisma";
@@ -28,9 +28,9 @@ export async function findPatientTestResult(
   formData: FormData,
 ): Promise<PatientResultLookupState> {
   const nationalCode = toDigitsOnly(getString(formData, "nationalCode"));
-  const mobile = toDigitsOnly(getString(formData, "mobile"));
+  const receptionNumber = toDigitsOnly(getString(formData, "receptionNumber"));
 
-  if (!isValidNationalCode(nationalCode) || !isValidMobileNumber(mobile)) {
+  if (!isValidNationalCode(nationalCode) || !isValidReceptionNumber(receptionNumber)) {
     return { error: "invalidIdentity" };
   }
 
@@ -43,7 +43,7 @@ export async function findPatientTestResult(
         fileSize: true,
         id: true,
       },
-      where: { mobile, nationalCode },
+      where: { nationalCode, receptionNumber },
     });
 
     if (results.length === 0) return { error: "notFound" };

@@ -414,6 +414,7 @@ export const ModelName = {
   SitePhone: 'SitePhone',
   SiteAddress: 'SiteAddress',
   SiteWorkingHour: 'SiteWorkingHour',
+  SiteHoliday: 'SiteHoliday',
   PatientTestResult: 'PatientTestResult',
   HomeSamplingRequest: 'HomeSamplingRequest',
   JobApplication: 'JobApplication'
@@ -432,7 +433,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "adminUser" | "adminSession" | "adminAuthAudit" | "article" | "announcement" | "articleTranslation" | "announcementTranslation" | "articleCategory" | "insurance" | "slideshowSlide" | "galleryMedia" | "labDepartment" | "laboratoryTest" | "siteSettings" | "sitePhone" | "siteAddress" | "siteWorkingHour" | "patientTestResult" | "homeSamplingRequest" | "jobApplication"
+    modelProps: "adminUser" | "adminSession" | "adminAuthAudit" | "article" | "announcement" | "articleTranslation" | "announcementTranslation" | "articleCategory" | "insurance" | "slideshowSlide" | "galleryMedia" | "labDepartment" | "laboratoryTest" | "siteSettings" | "sitePhone" | "siteAddress" | "siteWorkingHour" | "siteHoliday" | "patientTestResult" | "homeSamplingRequest" | "jobApplication"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1694,6 +1695,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SiteHoliday: {
+      payload: Prisma.$SiteHolidayPayload<ExtArgs>
+      fields: Prisma.SiteHolidayFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SiteHolidayFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteHolidayPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SiteHolidayFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteHolidayPayload>
+        }
+        findFirst: {
+          args: Prisma.SiteHolidayFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteHolidayPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SiteHolidayFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteHolidayPayload>
+        }
+        findMany: {
+          args: Prisma.SiteHolidayFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteHolidayPayload>[]
+        }
+        create: {
+          args: Prisma.SiteHolidayCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteHolidayPayload>
+        }
+        createMany: {
+          args: Prisma.SiteHolidayCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SiteHolidayCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteHolidayPayload>[]
+        }
+        delete: {
+          args: Prisma.SiteHolidayDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteHolidayPayload>
+        }
+        update: {
+          args: Prisma.SiteHolidayUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteHolidayPayload>
+        }
+        deleteMany: {
+          args: Prisma.SiteHolidayDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SiteHolidayUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SiteHolidayUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteHolidayPayload>[]
+        }
+        upsert: {
+          args: Prisma.SiteHolidayUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SiteHolidayPayload>
+        }
+        aggregate: {
+          args: Prisma.SiteHolidayAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSiteHoliday>
+        }
+        groupBy: {
+          args: Prisma.SiteHolidayGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SiteHolidayGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SiteHolidayCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SiteHolidayCountAggregateOutputType> | number
+        }
+      }
+    }
     PatientTestResult: {
       payload: Prisma.$PatientTestResultPayload<ExtArgs>
       fields: Prisma.PatientTestResultFieldRefs
@@ -2221,10 +2296,22 @@ export const SiteWorkingHourScalarFieldEnum = {
 export type SiteWorkingHourScalarFieldEnum = (typeof SiteWorkingHourScalarFieldEnum)[keyof typeof SiteWorkingHourScalarFieldEnum]
 
 
+export const SiteHolidayScalarFieldEnum = {
+  id: 'id',
+  settingsId: 'settingsId',
+  date: 'date',
+  title: 'title',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SiteHolidayScalarFieldEnum = (typeof SiteHolidayScalarFieldEnum)[keyof typeof SiteHolidayScalarFieldEnum]
+
+
 export const PatientTestResultScalarFieldEnum = {
   id: 'id',
   nationalCode: 'nationalCode',
-  mobile: 'mobile',
+  receptionNumber: 'receptionNumber',
   patientName: 'patientName',
   fileName: 'fileName',
   storedName: 'storedName',
@@ -2752,6 +2839,7 @@ export type GlobalOmitConfig = {
   sitePhone?: Prisma.SitePhoneOmit
   siteAddress?: Prisma.SiteAddressOmit
   siteWorkingHour?: Prisma.SiteWorkingHourOmit
+  siteHoliday?: Prisma.SiteHolidayOmit
   patientTestResult?: Prisma.PatientTestResultOmit
   homeSamplingRequest?: Prisma.HomeSamplingRequestOmit
   jobApplication?: Prisma.JobApplicationOmit

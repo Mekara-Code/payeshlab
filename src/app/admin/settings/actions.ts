@@ -8,6 +8,13 @@ import {
   isValidAdminImageUpload,
   saveAdminImageAsWebp,
 } from "@/lib/admin-image-uploads";
+import {
+  getJalaliWeekDayId,
+  isValidJalaliParts,
+  parseJalaliKey,
+  toJalaliKey,
+} from "@/lib/jalali";
+import { alwaysClosedWeekDays } from "@/lib/lab-availability";
 import { getPrisma } from "@/lib/prisma";
 import { SITE_SETTINGS_ID } from "@/lib/site-settings";
 import {
@@ -764,6 +771,108 @@ export async function deleteSiteWorkingHour(
 
   revalidateSettingsPaths();
   return { message: "بازهٔ کاری حذف شد.", success: true };
+}
+
+const MAX_HOLIDAYS_PER_MONTH = 31;
+
+/**
+ * Replaces the stored closure days of a single Jalali month with the picked
+ * ones, so the calendar can add and remove days in a single confirmation.
+ */
+export async function saveSiteHolidayMonth(
+  year: number,
+  month: number,
+  days: number[],
+): Promise<SettingsActionState> {
+  if (!(await isAuthorizedAdmin()))
+    return { message: "دسترسی شما برای ثبت ایام تعطیل معتبر نیست." };
+
+  if (!isValidJalaliParts(year, month, 1))
+    return { message: "سال یا ماه انتخاب‌شده معتبر نیست." };
+  if (!Array.isArray(days) || days.length > MAX_HOLIDAYS_PER_MONTH)
+    return { message: "فهرست روزهای انتخاب‌شده معتبر نیست." };
+
+  const uniqueDays = Array.from(new Set(days));
+  if (uniqueDays.some((day) => !isValidJalaliParts(year, month, day)))
+    return { message: "یکی از روزهای انتخاب‌شده در این ماه وجود ندارد." };
+
+  // Fridays are always closed, so they are never stored as explicit holidays.
+  const dates = uniqueDays
+    .filter((day) => !alwaysClosedWeekDays.includes(getJalaliWeekDayId(year, month, day)))
+    .map((day) => toJalaliKey(year, month, day));
+  const monthPrefix = `${year}/${String(month).padStart(2, "0")}/`;
+
+  try {
+    await ensureSettings();
+    await getPrisma().$transaction([
+      getPrisma().siteHoliday.deleteMany({
+        where: {
+          date:
+            dates.length > 0
+              ? { notIn: dates, startsWith: monthPrefix }
+              : { startsWith: monthPrefix },
+          settingsId: SITE_SETTINGS_ID,
+        },
+      }),
+      getPrisma().siteHoliday.createMany({
+        data: dates.map((date) => ({ date, settingsId: SITE_SETTINGS_ID })),
+        skipDuplicates: true,
+      }),
+    ]);
+  } catch {
+    return { message: "ثبت ایام تعطیل انجام نشد. دوباره تلاش کنید." };
+  }
+
+  revalidateSettingsPaths();
+  return {
+    message: dates.length > 0 ? "ایام تعطیل ذخیره شد." : "ایام تعطیل این ماه پاک شد.",
+    success: true,
+  };
+}
+
+export async function deleteSiteHoliday(
+  id: string,
+): Promise<SettingsActionState> {
+  if (!(await isAuthorizedAdmin()) || !isValidUuid(id))
+    return { message: "درخواست حذف روز تعطیل معتبر نیست." };
+
+  try {
+    const existing = await getPrisma().siteHoliday.findFirst({
+      select: { id: true },
+      where: { id, settingsId: SITE_SETTINGS_ID },
+    });
+    if (!existing) return { message: "روز تعطیل پیدا نشد." };
+
+    await getPrisma().siteHoliday.delete({ where: { id } });
+  } catch {
+    return { message: "حذف روز تعطیل انجام نشد." };
+  }
+
+  revalidateSettingsPaths();
+  return { message: "روز موردنظر از ایام تعطیل خارج شد.", success: true };
+}
+
+export async function createSiteHoliday(
+  date: string,
+): Promise<SettingsActionState> {
+  if (!(await isAuthorizedAdmin()))
+    return { message: "دسترسی شما برای ثبت ایام تعطیل معتبر نیست." };
+
+  const parsed = typeof date === "string" ? parseJalaliKey(date) : null;
+  if (!parsed) return { message: "تاریخ انتخاب‌شده معتبر نیست." };
+
+  try {
+    await ensureSettings();
+    await getPrisma().siteHoliday.createMany({
+      data: [{ date: toJalaliKey(parsed.year, parsed.month, parsed.day), settingsId: SITE_SETTINGS_ID }],
+      skipDuplicates: true,
+    });
+  } catch {
+    return { message: "ثبت روز تعطیل انجام نشد. دوباره تلاش کنید." };
+  }
+
+  revalidateSettingsPaths();
+  return { message: "روز تعطیل ثبت شد.", success: true };
 }
 
 export async function deleteSiteAddress(

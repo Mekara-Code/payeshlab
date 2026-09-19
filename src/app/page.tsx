@@ -3,6 +3,8 @@ import { HomeSlideshow } from "@/components/hero/home-slideshow";
 import { InsuranceSlider } from "@/components/hero/insurance-slider";
 import { LabDepartments } from "@/components/home/lab-departments";
 import { HomeSampleCollection } from "@/components/home/home-sample-collection";
+import { LabStatusNotice } from "@/components/home/lab-status-notice";
+import { LabStatusProvider } from "@/components/home/lab-status-provider";
 import { NewsAndAnnouncements } from "@/components/home/news-and-announcements";
 import { PayeshArticles } from "@/components/home/payesh-articles";
 import { SiteFooter } from "@/components/site-footer";
@@ -29,6 +31,7 @@ import {
   type ContentLocale,
 } from "@/lib/content-locale";
 import { getDefaultSlideshowSlides, type SlideshowSlideData } from "@/lib/slideshow-data";
+import { getCurrentLabStatus } from "@/lib/lab-availability";
 import { getSiteSettings } from "@/lib/site-settings";
 import { formatWorkingHourRange } from "@/lib/working-hours";
 
@@ -220,64 +223,72 @@ export default async function Home() {
       label: formatWorkingHourRange(workingHour, locale),
     })),
   };
+  // Computed from the server clock so the badge never depends on the visitor's device.
+  const labStatus = getCurrentLabStatus({
+    holidays: settings.holidays.map((holiday) => holiday.date),
+    workingHours: settings.workingHours,
+  });
 
   return (
-    <main className="relative bg-[#f7fbfb]" id="home">
-      <LocalBusinessJsonLd settings={settings} />
-      <a
-        className="sr-only fixed left-4 top-4 z-[60] rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white focus:not-sr-only focus:outline-2 focus:outline-offset-4 focus:outline-teal-400"
-        href="#main-content"
-      >
-        {t("skipNavigation")}
-      </a>
-      <SiteNavigation />
-      <HomeSlideshow contactDetails={heroContactDetails} slides={slides} />
+    <LabStatusProvider initialStatus={labStatus}>
+      <main className="relative bg-[#f7fbfb]" id="home">
+        <LocalBusinessJsonLd settings={settings} />
+        <a
+          className="sr-only fixed left-4 top-4 z-[60] rounded-xl bg-slate-950 px-4 py-3 text-sm font-bold text-white focus:not-sr-only focus:outline-2 focus:outline-offset-4 focus:outline-teal-400"
+          href="#main-content"
+        >
+          {t("skipNavigation")}
+        </a>
+        <SiteNavigation />
+        <HomeSlideshow contactDetails={heroContactDetails} slides={slides} />
 
-      <section
-        className="bg-white px-5 py-16 sm:px-10 sm:py-20 lg:px-20 lg:py-28"
-        id="lab-intro"
-      >
-        <div className="mx-auto max-w-5xl">
-          <ScrollScene distance={24}>
-            <InsuranceSlider insurances={insurances} />
-          </ScrollScene>
-          <ScrollScene distance={42}>
-            <LabDepartments departments={departments} />
-          </ScrollScene>
+        <section
+          className="bg-white px-5 py-16 sm:px-10 sm:py-20 lg:px-20 lg:py-28"
+          id="lab-intro"
+        >
+          <div className="mx-auto max-w-5xl">
+            <ScrollScene distance={24}>
+              <InsuranceSlider insurances={insurances} />
+            </ScrollScene>
+            <ScrollScene distance={42}>
+              <LabDepartments departments={departments} />
+            </ScrollScene>
 
-          <section className="mx-auto mt-14 max-w-4xl rounded-[2rem] border border-teal-100 bg-[#f7fbfb] px-6 py-8 text-center sm:mt-16 sm:px-10 sm:py-10">
-            <h2 className="no-justify-mobile text-2xl font-black leading-9 tracking-[-0.05em] text-slate-950 sm:text-3xl">
-              {t("seo.homeContentTitle")}
-            </h2>
-            <p className="mx-auto mt-4 max-w-3xl text-sm font-medium leading-8 text-slate-600 sm:text-base">
-              {t("seo.homeContentDescription")}
-            </p>
-          </section>
+            <section className="mx-auto mt-14 max-w-4xl rounded-[2rem] border border-teal-100 bg-[#f7fbfb] px-6 py-8 text-center sm:mt-16 sm:px-10 sm:py-10">
+              <h2 className="no-justify-mobile text-2xl font-black leading-9 tracking-[-0.05em] text-slate-950 sm:text-3xl">
+                {t("seo.homeContentTitle")}
+              </h2>
+              <p className="mx-auto mt-4 max-w-3xl text-sm font-medium leading-8 text-slate-600 sm:text-base">
+                {t("seo.homeContentDescription")}
+              </p>
+            </section>
 
-          <StaggerScene className="mt-14 border-t border-teal-100 pt-12 sm:mt-16 sm:pt-14">
-            <StaggerItem className="mb-7 text-center sm:mb-9">
-              <span className="inline-flex rounded-full bg-teal-500/10 px-4 py-2 text-sm font-extrabold text-teal-500">
-                {t("stats.badge")}
-              </span>
-              <h3 className="mt-4 text-2xl font-black tracking-[-0.05em] text-slate-950 sm:text-3xl">
-                {t("stats.label")}
-              </h3>
-            </StaggerItem>
-            <StaggerItem>
-              <HeroStatistics />
-            </StaggerItem>
-          </StaggerScene>
-          <HomeSampleCollection />
-        </div>
-      </section>
-      <ScrollScene direction="down" distance={42}>
-        <NewsAndAnnouncements announcements={announcements} news={news} />
-      </ScrollScene>
-      <ScrollScene distance={42}>
-        <PayeshArticles articleTitleOrbs articles={articles} />
-      </ScrollScene>
-      <SiteFooter settings={settings} />
-    </main>
+            <StaggerScene className="mt-14 border-t border-teal-100 pt-12 sm:mt-16 sm:pt-14">
+              <StaggerItem className="mb-7 text-center sm:mb-9">
+                <span className="inline-flex rounded-full bg-teal-500/10 px-4 py-2 text-sm font-extrabold text-teal-500">
+                  {t("stats.badge")}
+                </span>
+                <h3 className="mt-4 text-2xl font-black tracking-[-0.05em] text-slate-950 sm:text-3xl">
+                  {t("stats.label")}
+                </h3>
+              </StaggerItem>
+              <StaggerItem>
+                <HeroStatistics />
+              </StaggerItem>
+            </StaggerScene>
+            <HomeSampleCollection />
+          </div>
+        </section>
+        <ScrollScene direction="down" distance={42}>
+          <NewsAndAnnouncements announcements={announcements} news={news} />
+        </ScrollScene>
+        <ScrollScene distance={42}>
+          <PayeshArticles articleTitleOrbs articles={articles} />
+        </ScrollScene>
+        <SiteFooter settings={settings} />
+        <LabStatusNotice />
+      </main>
+    </LabStatusProvider>
   );
 }
 import type { Metadata } from "next";

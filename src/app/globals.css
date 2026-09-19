@@ -33,6 +33,12 @@ body {
   text-align: justify;
 }
 
+/* The floating status notice is a narrow card, so it keeps normal alignment. */
+#home .lab-status-notice,
+#home .lab-status-notice :where(*) {
+  text-align: start;
+}
+
 /* Justified text breaks badly in the narrow columns of a phone layout; opt specific blocks out. */
 @media (max-width: 639px) {
   #home .no-justify-mobile,

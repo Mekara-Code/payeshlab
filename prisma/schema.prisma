@@ -274,6 +274,7 @@ model SiteSettings {
   phoneNumbers     SitePhone[]
   addresses        SiteAddress[]
   workingHours     SiteWorkingHour[]
+  holidays         SiteHoliday[]
 }
 
 model SitePhone {
@@ -321,19 +322,35 @@ model SiteWorkingHour {
   @@index([settingsId, sortOrder])
 }
 
+/// Laboratory closure days, stored as a Jalali `YYYY/MM/DD` date so the admin
+/// calendar and the public status badge share one representation.
+model SiteHoliday {
+  id         String       @id @default(uuid()) @db.Uuid
+  settingsId String       @db.VarChar(32)
+  date       String       @db.VarChar(10)
+  title      String?      @db.VarChar(120)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  settings   SiteSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+
+  @@unique([settingsId, date])
+  @@index([settingsId, date])
+}
+
 model PatientTestResult {
-  id           String   @id @default(uuid()) @db.Uuid
-  nationalCode String   @db.VarChar(10)
-  mobile       String?  @db.VarChar(11)
-  patientName  String?  @db.VarChar(160)
-  fileName     String   @db.VarChar(255)
-  storedName   String   @unique @db.VarChar(64)
-  fileSize     Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String   @id @default(uuid()) @db.Uuid
+  nationalCode    String   @db.VarChar(10)
+  /// Reception number the laboratory issues when the sample is taken.
+  receptionNumber String?  @db.VarChar(20)
+  patientName     String?  @db.VarChar(160)
+  fileName        String   @db.VarChar(255)
+  storedName      String   @unique @db.VarChar(64)
+  fileSize        Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([nationalCode, createdAt])
-  @@index([nationalCode, mobile, createdAt])
+  @@index([nationalCode, receptionNumber, createdAt])
   @@index([createdAt])
 }
 

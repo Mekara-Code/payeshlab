@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/admin-session";
 import {
-  isValidMobileNumber,
   isValidNationalCode,
+  isValidReceptionNumber,
   toDigitsOnly,
 } from "@/lib/patient-identity";
 import { getPrisma } from "@/lib/prisma";
@@ -50,9 +50,9 @@ export async function uploadPatientTestResult(
     return { message: "کد ملی بیمار باید ۱۰ رقم و معتبر باشد." };
   }
 
-  const mobile = toDigitsOnly(getString(formData, "mobile"));
-  if (!isValidMobileNumber(mobile)) {
-    return { message: "شماره موبایل بیمار باید ۱۱ رقم و با ۰۹ شروع شود." };
+  const receptionNumber = toDigitsOnly(getString(formData, "receptionNumber"));
+  if (!isValidReceptionNumber(receptionNumber)) {
+    return { message: "شماره پذیرش آزمایشگاه باید بین ۳ تا ۲۰ رقم باشد." };
   }
 
   const patientName = getString(formData, "patientName") || null;
@@ -88,9 +88,9 @@ export async function uploadPatientTestResult(
       data: {
         fileName: sanitizeUploadName(resultFile.name, `${nationalCode}.pdf`),
         fileSize: resultFile.size,
-        mobile,
         nationalCode,
         patientName,
+        receptionNumber,
         storedName,
       },
     });

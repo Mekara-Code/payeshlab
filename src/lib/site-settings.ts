@@ -35,11 +35,19 @@ export type SiteWorkingHourData = {
   startTime: string;
 };
 
+export type SiteHolidayData = {
+  /** Jalali date in the `YYYY/MM/DD` form. */
+  date: string;
+  id: string;
+  title: string | null;
+};
+
 export type SiteSettingsData = {
   addresses: SiteAddressData[];
   ceoMessage: string | null;
   city: string | null;
   eitaaUrl: string | null;
+  holidays: SiteHolidayData[];
   instagramUrl: string | null;
   laboratoryName: string | null;
   latitude: number | null;
@@ -62,6 +70,7 @@ export const emptySiteSettings: SiteSettingsData = {
   ceoMessage: null,
   city: null,
   eitaaUrl: null,
+  holidays: [],
   instagramUrl: null,
   laboratoryName: null,
   latitude: null,
@@ -84,6 +93,7 @@ export async function getSiteSettings(): Promise<SiteSettingsData> {
     const settings = await getPrisma().siteSettings.findUnique({
       include: {
         addresses: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
+        holidays: { orderBy: { date: "asc" } },
         phoneNumbers: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
         workingHours: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
       },
@@ -102,6 +112,11 @@ export async function getSiteSettings(): Promise<SiteSettingsData> {
       ceoMessage: settings.ceoMessage,
       city: settings.city,
       eitaaUrl: settings.eitaaUrl,
+      holidays: settings.holidays.map((holiday) => ({
+        date: holiday.date,
+        id: holiday.id,
+        title: holiday.title,
+      })),
       instagramUrl: settings.instagramUrl,
       laboratoryName: settings.laboratoryName,
       latitude: settings.latitude === null ? null : Number(settings.latitude),

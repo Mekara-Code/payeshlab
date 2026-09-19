@@ -123,20 +123,19 @@ export function PatientResultsLookup() {
                 </label>
 
                 <label className="grid gap-2 text-sm font-black text-slate-950">
-                  {t("patientResults.mobile")}
+                  {t("patientResults.receptionNumber")}
                   <input
-                    autoComplete="tel"
+                    autoComplete="off"
                     className="min-h-13 rounded-2xl border border-slate-200 bg-white px-4 font-mono text-base font-bold tracking-[0.12em] text-slate-900 outline-none transition placeholder:font-sans placeholder:tracking-normal placeholder:text-slate-400 focus:border-teal-500 focus:ring-4 focus:ring-teal-500/10 disabled:cursor-wait disabled:bg-slate-50"
                     dir="ltr"
                     disabled={isPending}
-                    inputMode="tel"
-                    maxLength={11}
-                    name="mobile"
-                    placeholder="09123456789"
+                    inputMode="numeric"
+                    maxLength={20}
+                    name="receptionNumber"
+                    placeholder="123456"
                     required
-                    type="tel"
                   />
-                  <span className="text-xs font-medium tracking-normal text-slate-500">{t("patientResults.mobileHint")}</span>
+                  <span className="text-xs font-medium tracking-normal text-slate-500">{t("patientResults.receptionNumberHint")}</span>
                 </label>
               </div>
 

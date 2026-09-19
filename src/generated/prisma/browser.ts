@@ -103,6 +103,12 @@ export type SiteAddress = Prisma.SiteAddressModel
  */
 export type SiteWorkingHour = Prisma.SiteWorkingHourModel
 /**
+ * Model SiteHoliday
+ * Laboratory closure days, stored as a Jalali `YYYY/MM/DD` date so the admin
+ * calendar and the public status badge share one representation.
+ */
+export type SiteHoliday = Prisma.SiteHolidayModel
+/**
  * Model PatientTestResult
  * 
  */

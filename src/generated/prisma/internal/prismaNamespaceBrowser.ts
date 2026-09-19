@@ -68,6 +68,7 @@ export const ModelName = {
   SitePhone: 'SitePhone',
   SiteAddress: 'SiteAddress',
   SiteWorkingHour: 'SiteWorkingHour',
+  SiteHoliday: 'SiteHoliday',
   PatientTestResult: 'PatientTestResult',
   HomeSamplingRequest: 'HomeSamplingRequest',
   JobApplication: 'JobApplication'
@@ -355,10 +356,22 @@ export const SiteWorkingHourScalarFieldEnum = {
 export type SiteWorkingHourScalarFieldEnum = (typeof SiteWorkingHourScalarFieldEnum)[keyof typeof SiteWorkingHourScalarFieldEnum]
 
 
+export const SiteHolidayScalarFieldEnum = {
+  id: 'id',
+  settingsId: 'settingsId',
+  date: 'date',
+  title: 'title',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SiteHolidayScalarFieldEnum = (typeof SiteHolidayScalarFieldEnum)[keyof typeof SiteHolidayScalarFieldEnum]
+
+
 export const PatientTestResultScalarFieldEnum = {
   id: 'id',
   nationalCode: 'nationalCode',
-  mobile: 'mobile',
+  receptionNumber: 'receptionNumber',
   patientName: 'patientName',
   fileName: 'fileName',
   storedName: 'storedName',

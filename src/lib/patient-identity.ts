@@ -65,6 +65,11 @@ export function isValidMobileNumber(value: string) {
   return /^09\d{9}$/.test(toDigitsOnly(value));
 }
 
+/** Reception numbers are issued by the laboratory, so only their length is fixed. */
+export function isValidReceptionNumber(value: string) {
+  return /^\d{3,20}$/.test(toDigitsOnly(value));
+}
+
 export function isValidLandlineNumber(value: string) {
   const phone = toDigitsOnly(value);
   return phone.length >= 8 && phone.length <= 11;

@@ -2,6 +2,7 @@
 
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { LabStatusBadge } from "@/components/home/lab-status-badge";
 import { ScrollScene } from "@/components/motion/scroll-scene";
 import { StaggerItem, StaggerScene } from "@/components/motion/stagger-scene";
 import { useTranslations } from "@/components/i18n/dictionary-provider";
@@ -102,11 +103,12 @@ function HeroContactDetails({ contactDetails }: { contactDetails: HeroContactDet
 
       {hasWorkingHours ? (
         <div className="min-w-0 rounded-2xl border border-white/80 bg-white/90 p-4 shadow-[0_12px_28px_rgba(15,23,42,0.08)]">
-          <h2 className="flex items-center gap-2 text-xs font-extrabold text-slate-950">
+          <h2 className="flex flex-wrap items-center gap-2 text-xs font-extrabold text-slate-950">
             <span className="grid size-7 shrink-0 place-items-center rounded-full bg-teal-100 text-teal-600">
               <HeroClockIcon />
             </span>
             {t("hero.workingHours")}
+            <LabStatusBadge className="ms-auto" />
           </h2>
           <ul className="mt-3 grid gap-2.5">
             {contactDetails.workingHours.map((workingHour) => (

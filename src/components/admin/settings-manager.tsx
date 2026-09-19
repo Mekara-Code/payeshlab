@@ -5,6 +5,7 @@ import {
   type ReactNode,
   useActionState,
   useEffect,
+  useMemo,
   useRef,
   useState,
   useTransition,
@@ -16,11 +17,13 @@ import {
   createSitePhone,
   createSiteWorkingHour,
   deleteSiteAddress,
+  deleteSiteHoliday,
   deleteSitePhone,
   deleteSiteWorkingHour,
   clearTechnicalManagerImage,
   searchIranLocations,
   saveLaboratoryIdentity,
+  saveSiteHolidayMonth,
   saveSiteLinks,
   saveSiteLocation,
   saveTechnicalManager,
@@ -31,6 +34,8 @@ import {
   type SettingsActionState,
 } from "@/app/admin/settings/actions";
 import { ClockTimePickerModal } from "@/components/admin/clock-time-picker-modal";
+import { HolidayCalendarModal } from "@/components/admin/holiday-calendar-modal";
+import { HolidayListModal } from "@/components/admin/holiday-list-modal";
 import { LocationPicker } from "@/components/admin/location-picker";
 import { useConfirm } from "@/components/ui/confirm-provider";
 import { EitaaIcon } from "@/components/icons/eitaa-icon";
@@ -39,6 +44,7 @@ import { useActionToast } from "@/components/ui/use-action-toast";
 import { useToast } from "@/components/ui/toast-provider";
 import { defaultCeoMessage } from "@/lib/site-settings-content";
 import type {
+  SiteHolidayData,
   SiteSettingsData,
   SiteWorkingHourData,
 } from "@/lib/site-settings";
@@ -87,6 +93,41 @@ function ClockIcon() {
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 24 24">
+      <rect
+        height="16"
+        rx="3"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        width="18"
+        x="3"
+        y="5"
+      />
+      <path
+        d="M3 10h18M8 3v4M16 3v4"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
+function ListIcon() {
+  return (
+    <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"
+        stroke="currentColor"
+        strokeLinecap="round"
         strokeWidth="1.8"
       />
     </svg>
@@ -625,6 +666,12 @@ export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
     useState<WorkingHourValues>(defaultWorkingHourValues);
   const [newWorkingHourPicker, setNewWorkingHourPicker] =
     useState<WorkingHourTimeField | null>(null);
+  const [isHolidayCalendarOpen, setIsHolidayCalendarOpen] = useState(false);
+  const [isHolidayListOpen, setIsHolidayListOpen] = useState(false);
+  const holidayDates = useMemo(
+    () => settings.holidays.map((holiday) => holiday.date),
+    [settings.holidays],
+  );
   const { toast } = useToast();
   const { confirm } = useConfirm();
   useActionToast(identityState, {
@@ -794,6 +841,22 @@ export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
       title: "حذف بازهٔ کاری؟",
     });
     if (isConfirmed) runAction(() => deleteSiteWorkingHour(id));
+  }
+
+  function saveHolidayMonth(year: number, month: number, days: number[]) {
+    runAction(
+      () => saveSiteHolidayMonth(year, month, days),
+      () => setIsHolidayCalendarOpen(false),
+    );
+  }
+
+  async function removeHoliday(holiday: SiteHolidayData, label: string) {
+    const isConfirmed = await confirm({
+      confirmLabel: "خارج کردن از تعطیلات",
+      description: `«${label}» از ایام تعطیل خارج می‌شود و آزمایشگاه در آن روز طبق ساعات کاری باز خواهد بود.`,
+      title: "حذف روز تعطیل؟",
+    });
+    if (isConfirmed) runAction(() => deleteSiteHoliday(holiday.id));
   }
 
   async function removePhone(id: string, phone: string) {
@@ -1690,6 +1753,51 @@ export function SettingsManager({ settings }: { settings: SiteSettingsData }) {
               eyebrow="ساعات کاری"
               icon={<ClockIcon />}
               title="افزودن و مدیریت زمان پاسخ‌گویی"
+            />
+
+            <div className="mt-5 rounded-2xl border border-teal-100 bg-teal-50/50 p-4">
+              <p className="text-xs font-bold leading-6 text-slate-600">
+                ایام تعطیل آزمایشگاه روی وضعیت «باز/بسته» در صفحهٔ نخست اثر
+                می‌گذارد. جمعه‌ها همیشه تعطیل هستند.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-teal-500 px-4 text-sm font-extrabold text-white shadow-[0_10px_20px_rgba(13,148,136,0.23)] transition hover:bg-teal-600 focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-teal-500"
+                  onClick={() => setIsHolidayCalendarOpen(true)}
+                  type="button"
+                >
+                  <CalendarIcon />
+                  تنظیم ایام تعطیل
+                </button>
+                <button
+                  className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-teal-200 bg-white px-4 text-sm font-extrabold text-teal-600 transition hover:bg-teal-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500"
+                  onClick={() => setIsHolidayListOpen(true)}
+                  type="button"
+                >
+                  <ListIcon />
+                  لیست ایام تعطیل
+                  {settings.holidays.length > 0 ? (
+                    <span className="grid size-6 place-items-center rounded-full bg-teal-500 text-[0.65rem] font-black text-white">
+                      {settings.holidays.length.toLocaleString("fa-IR")}
+                    </span>
+                  ) : null}
+                </button>
+              </div>
+            </div>
+
+            <HolidayCalendarModal
+              holidays={holidayDates}
+              isOpen={isHolidayCalendarOpen}
+              isSaving={isPending}
+              onClose={() => setIsHolidayCalendarOpen(false)}
+              onSave={saveHolidayMonth}
+            />
+            <HolidayListModal
+              holidays={settings.holidays}
+              isOpen={isHolidayListOpen}
+              isPending={isPending}
+              onClose={() => setIsHolidayListOpen(false)}
+              onDelete={(holiday, label) => void removeHoliday(holiday, label)}
             />
 
             <form className="mt-5 grid gap-4" onSubmit={handleAddWorkingHour}>

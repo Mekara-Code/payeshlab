@@ -335,6 +335,7 @@ export type SiteSettingsWhereInput = {
   phoneNumbers?: Prisma.SitePhoneListRelationFilter
   addresses?: Prisma.SiteAddressListRelationFilter
   workingHours?: Prisma.SiteWorkingHourListRelationFilter
+  holidays?: Prisma.SiteHolidayListRelationFilter
 }
 
 export type SiteSettingsOrderByWithRelationInput = {
@@ -360,6 +361,7 @@ export type SiteSettingsOrderByWithRelationInput = {
   phoneNumbers?: Prisma.SitePhoneOrderByRelationAggregateInput
   addresses?: Prisma.SiteAddressOrderByRelationAggregateInput
   workingHours?: Prisma.SiteWorkingHourOrderByRelationAggregateInput
+  holidays?: Prisma.SiteHolidayOrderByRelationAggregateInput
 }
 
 export type SiteSettingsWhereUniqueInput = Prisma.AtLeast<{
@@ -388,6 +390,7 @@ export type SiteSettingsWhereUniqueInput = Prisma.AtLeast<{
   phoneNumbers?: Prisma.SitePhoneListRelationFilter
   addresses?: Prisma.SiteAddressListRelationFilter
   workingHours?: Prisma.SiteWorkingHourListRelationFilter
+  holidays?: Prisma.SiteHolidayListRelationFilter
 }, "id">
 
 export type SiteSettingsOrderByWithAggregationInput = {
@@ -465,6 +468,7 @@ export type SiteSettingsCreateInput = {
   phoneNumbers?: Prisma.SitePhoneCreateNestedManyWithoutSettingsInput
   addresses?: Prisma.SiteAddressCreateNestedManyWithoutSettingsInput
   workingHours?: Prisma.SiteWorkingHourCreateNestedManyWithoutSettingsInput
+  holidays?: Prisma.SiteHolidayCreateNestedManyWithoutSettingsInput
 }
 
 export type SiteSettingsUncheckedCreateInput = {
@@ -490,6 +494,7 @@ export type SiteSettingsUncheckedCreateInput = {
   phoneNumbers?: Prisma.SitePhoneUncheckedCreateNestedManyWithoutSettingsInput
   addresses?: Prisma.SiteAddressUncheckedCreateNestedManyWithoutSettingsInput
   workingHours?: Prisma.SiteWorkingHourUncheckedCreateNestedManyWithoutSettingsInput
+  holidays?: Prisma.SiteHolidayUncheckedCreateNestedManyWithoutSettingsInput
 }
 
 export type SiteSettingsUpdateInput = {
@@ -515,6 +520,7 @@ export type SiteSettingsUpdateInput = {
   phoneNumbers?: Prisma.SitePhoneUpdateManyWithoutSettingsNestedInput
   addresses?: Prisma.SiteAddressUpdateManyWithoutSettingsNestedInput
   workingHours?: Prisma.SiteWorkingHourUpdateManyWithoutSettingsNestedInput
+  holidays?: Prisma.SiteHolidayUpdateManyWithoutSettingsNestedInput
 }
 
 export type SiteSettingsUncheckedUpdateInput = {
@@ -540,6 +546,7 @@ export type SiteSettingsUncheckedUpdateInput = {
   phoneNumbers?: Prisma.SitePhoneUncheckedUpdateManyWithoutSettingsNestedInput
   addresses?: Prisma.SiteAddressUncheckedUpdateManyWithoutSettingsNestedInput
   workingHours?: Prisma.SiteWorkingHourUncheckedUpdateManyWithoutSettingsNestedInput
+  holidays?: Prisma.SiteHolidayUncheckedUpdateManyWithoutSettingsNestedInput
 }
 
 export type SiteSettingsCreateManyInput = {
@@ -739,6 +746,20 @@ export type SiteSettingsUpdateOneRequiredWithoutWorkingHoursNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SiteSettingsUpdateToOneWithWhereWithoutWorkingHoursInput, Prisma.SiteSettingsUpdateWithoutWorkingHoursInput>, Prisma.SiteSettingsUncheckedUpdateWithoutWorkingHoursInput>
 }
 
+export type SiteSettingsCreateNestedOneWithoutHolidaysInput = {
+  create?: Prisma.XOR<Prisma.SiteSettingsCreateWithoutHolidaysInput, Prisma.SiteSettingsUncheckedCreateWithoutHolidaysInput>
+  connectOrCreate?: Prisma.SiteSettingsCreateOrConnectWithoutHolidaysInput
+  connect?: Prisma.SiteSettingsWhereUniqueInput
+}
+
+export type SiteSettingsUpdateOneRequiredWithoutHolidaysNestedInput = {
+  create?: Prisma.XOR<Prisma.SiteSettingsCreateWithoutHolidaysInput, Prisma.SiteSettingsUncheckedCreateWithoutHolidaysInput>
+  connectOrCreate?: Prisma.SiteSettingsCreateOrConnectWithoutHolidaysInput
+  upsert?: Prisma.SiteSettingsUpsertWithoutHolidaysInput
+  connect?: Prisma.SiteSettingsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SiteSettingsUpdateToOneWithWhereWithoutHolidaysInput, Prisma.SiteSettingsUpdateWithoutHolidaysInput>, Prisma.SiteSettingsUncheckedUpdateWithoutHolidaysInput>
+}
+
 export type SiteSettingsCreateWithoutPhoneNumbersInput = {
   id: string
   laboratoryName?: string | null
@@ -761,6 +782,7 @@ export type SiteSettingsCreateWithoutPhoneNumbersInput = {
   updatedAt?: Date | string
   addresses?: Prisma.SiteAddressCreateNestedManyWithoutSettingsInput
   workingHours?: Prisma.SiteWorkingHourCreateNestedManyWithoutSettingsInput
+  holidays?: Prisma.SiteHolidayCreateNestedManyWithoutSettingsInput
 }
 
 export type SiteSettingsUncheckedCreateWithoutPhoneNumbersInput = {
@@ -785,6 +807,7 @@ export type SiteSettingsUncheckedCreateWithoutPhoneNumbersInput = {
   updatedAt?: Date | string
   addresses?: Prisma.SiteAddressUncheckedCreateNestedManyWithoutSettingsInput
   workingHours?: Prisma.SiteWorkingHourUncheckedCreateNestedManyWithoutSettingsInput
+  holidays?: Prisma.SiteHolidayUncheckedCreateNestedManyWithoutSettingsInput
 }
 
 export type SiteSettingsCreateOrConnectWithoutPhoneNumbersInput = {
@@ -825,6 +848,7 @@ export type SiteSettingsUpdateWithoutPhoneNumbersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   addresses?: Prisma.SiteAddressUpdateManyWithoutSettingsNestedInput
   workingHours?: Prisma.SiteWorkingHourUpdateManyWithoutSettingsNestedInput
+  holidays?: Prisma.SiteHolidayUpdateManyWithoutSettingsNestedInput
 }
 
 export type SiteSettingsUncheckedUpdateWithoutPhoneNumbersInput = {
@@ -849,6 +873,7 @@ export type SiteSettingsUncheckedUpdateWithoutPhoneNumbersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   addresses?: Prisma.SiteAddressUncheckedUpdateManyWithoutSettingsNestedInput
   workingHours?: Prisma.SiteWorkingHourUncheckedUpdateManyWithoutSettingsNestedInput
+  holidays?: Prisma.SiteHolidayUncheckedUpdateManyWithoutSettingsNestedInput
 }
 
 export type SiteSettingsCreateWithoutAddressesInput = {
@@ -873,6 +898,7 @@ export type SiteSettingsCreateWithoutAddressesInput = {
   updatedAt?: Date | string
   phoneNumbers?: Prisma.SitePhoneCreateNestedManyWithoutSettingsInput
   workingHours?: Prisma.SiteWorkingHourCreateNestedManyWithoutSettingsInput
+  holidays?: Prisma.SiteHolidayCreateNestedManyWithoutSettingsInput
 }
 
 export type SiteSettingsUncheckedCreateWithoutAddressesInput = {
@@ -897,6 +923,7 @@ export type SiteSettingsUncheckedCreateWithoutAddressesInput = {
   updatedAt?: Date | string
   phoneNumbers?: Prisma.SitePhoneUncheckedCreateNestedManyWithoutSettingsInput
   workingHours?: Prisma.SiteWorkingHourUncheckedCreateNestedManyWithoutSettingsInput
+  holidays?: Prisma.SiteHolidayUncheckedCreateNestedManyWithoutSettingsInput
 }
 
 export type SiteSettingsCreateOrConnectWithoutAddressesInput = {
@@ -937,6 +964,7 @@ export type SiteSettingsUpdateWithoutAddressesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   phoneNumbers?: Prisma.SitePhoneUpdateManyWithoutSettingsNestedInput
   workingHours?: Prisma.SiteWorkingHourUpdateManyWithoutSettingsNestedInput
+  holidays?: Prisma.SiteHolidayUpdateManyWithoutSettingsNestedInput
 }
 
 export type SiteSettingsUncheckedUpdateWithoutAddressesInput = {
@@ -961,6 +989,7 @@ export type SiteSettingsUncheckedUpdateWithoutAddressesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   phoneNumbers?: Prisma.SitePhoneUncheckedUpdateManyWithoutSettingsNestedInput
   workingHours?: Prisma.SiteWorkingHourUncheckedUpdateManyWithoutSettingsNestedInput
+  holidays?: Prisma.SiteHolidayUncheckedUpdateManyWithoutSettingsNestedInput
 }
 
 export type SiteSettingsCreateWithoutWorkingHoursInput = {
@@ -985,6 +1014,7 @@ export type SiteSettingsCreateWithoutWorkingHoursInput = {
   updatedAt?: Date | string
   phoneNumbers?: Prisma.SitePhoneCreateNestedManyWithoutSettingsInput
   addresses?: Prisma.SiteAddressCreateNestedManyWithoutSettingsInput
+  holidays?: Prisma.SiteHolidayCreateNestedManyWithoutSettingsInput
 }
 
 export type SiteSettingsUncheckedCreateWithoutWorkingHoursInput = {
@@ -1009,6 +1039,7 @@ export type SiteSettingsUncheckedCreateWithoutWorkingHoursInput = {
   updatedAt?: Date | string
   phoneNumbers?: Prisma.SitePhoneUncheckedCreateNestedManyWithoutSettingsInput
   addresses?: Prisma.SiteAddressUncheckedCreateNestedManyWithoutSettingsInput
+  holidays?: Prisma.SiteHolidayUncheckedCreateNestedManyWithoutSettingsInput
 }
 
 export type SiteSettingsCreateOrConnectWithoutWorkingHoursInput = {
@@ -1049,6 +1080,7 @@ export type SiteSettingsUpdateWithoutWorkingHoursInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   phoneNumbers?: Prisma.SitePhoneUpdateManyWithoutSettingsNestedInput
   addresses?: Prisma.SiteAddressUpdateManyWithoutSettingsNestedInput
+  holidays?: Prisma.SiteHolidayUpdateManyWithoutSettingsNestedInput
 }
 
 export type SiteSettingsUncheckedUpdateWithoutWorkingHoursInput = {
@@ -1073,6 +1105,123 @@ export type SiteSettingsUncheckedUpdateWithoutWorkingHoursInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   phoneNumbers?: Prisma.SitePhoneUncheckedUpdateManyWithoutSettingsNestedInput
   addresses?: Prisma.SiteAddressUncheckedUpdateManyWithoutSettingsNestedInput
+  holidays?: Prisma.SiteHolidayUncheckedUpdateManyWithoutSettingsNestedInput
+}
+
+export type SiteSettingsCreateWithoutHolidaysInput = {
+  id: string
+  laboratoryName?: string | null
+  shortDescription?: string | null
+  ceoMessage?: string | null
+  province?: string | null
+  city?: string | null
+  instagramUrl?: string | null
+  whatsappUrl?: string | null
+  rubikaUrl?: string | null
+  eitaaUrl?: string | null
+  surveyFormUrl?: string | null
+  technicalManagerName?: string | null
+  technicalManagerLicenseCode?: string | null
+  technicalManagerBio?: string | null
+  technicalManagerImageUrl?: string | null
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumbers?: Prisma.SitePhoneCreateNestedManyWithoutSettingsInput
+  addresses?: Prisma.SiteAddressCreateNestedManyWithoutSettingsInput
+  workingHours?: Prisma.SiteWorkingHourCreateNestedManyWithoutSettingsInput
+}
+
+export type SiteSettingsUncheckedCreateWithoutHolidaysInput = {
+  id: string
+  laboratoryName?: string | null
+  shortDescription?: string | null
+  ceoMessage?: string | null
+  province?: string | null
+  city?: string | null
+  instagramUrl?: string | null
+  whatsappUrl?: string | null
+  rubikaUrl?: string | null
+  eitaaUrl?: string | null
+  surveyFormUrl?: string | null
+  technicalManagerName?: string | null
+  technicalManagerLicenseCode?: string | null
+  technicalManagerBio?: string | null
+  technicalManagerImageUrl?: string | null
+  latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumbers?: Prisma.SitePhoneUncheckedCreateNestedManyWithoutSettingsInput
+  addresses?: Prisma.SiteAddressUncheckedCreateNestedManyWithoutSettingsInput
+  workingHours?: Prisma.SiteWorkingHourUncheckedCreateNestedManyWithoutSettingsInput
+}
+
+export type SiteSettingsCreateOrConnectWithoutHolidaysInput = {
+  where: Prisma.SiteSettingsWhereUniqueInput
+  create: Prisma.XOR<Prisma.SiteSettingsCreateWithoutHolidaysInput, Prisma.SiteSettingsUncheckedCreateWithoutHolidaysInput>
+}
+
+export type SiteSettingsUpsertWithoutHolidaysInput = {
+  update: Prisma.XOR<Prisma.SiteSettingsUpdateWithoutHolidaysInput, Prisma.SiteSettingsUncheckedUpdateWithoutHolidaysInput>
+  create: Prisma.XOR<Prisma.SiteSettingsCreateWithoutHolidaysInput, Prisma.SiteSettingsUncheckedCreateWithoutHolidaysInput>
+  where?: Prisma.SiteSettingsWhereInput
+}
+
+export type SiteSettingsUpdateToOneWithWhereWithoutHolidaysInput = {
+  where?: Prisma.SiteSettingsWhereInput
+  data: Prisma.XOR<Prisma.SiteSettingsUpdateWithoutHolidaysInput, Prisma.SiteSettingsUncheckedUpdateWithoutHolidaysInput>
+}
+
+export type SiteSettingsUpdateWithoutHolidaysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumbers?: Prisma.SitePhoneUpdateManyWithoutSettingsNestedInput
+  addresses?: Prisma.SiteAddressUpdateManyWithoutSettingsNestedInput
+  workingHours?: Prisma.SiteWorkingHourUpdateManyWithoutSettingsNestedInput
+}
+
+export type SiteSettingsUncheckedUpdateWithoutHolidaysInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  laboratoryName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  shortDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ceoMessage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  province?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagramUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  whatsappUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumbers?: Prisma.SitePhoneUncheckedUpdateManyWithoutSettingsNestedInput
+  addresses?: Prisma.SiteAddressUncheckedUpdateManyWithoutSettingsNestedInput
+  workingHours?: Prisma.SiteWorkingHourUncheckedUpdateManyWithoutSettingsNestedInput
 }
 
 
@@ -1084,12 +1233,14 @@ export type SiteSettingsCountOutputType = {
   phoneNumbers: number
   addresses: number
   workingHours: number
+  holidays: number
 }
 
 export type SiteSettingsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   phoneNumbers?: boolean | SiteSettingsCountOutputTypeCountPhoneNumbersArgs
   addresses?: boolean | SiteSettingsCountOutputTypeCountAddressesArgs
   workingHours?: boolean | SiteSettingsCountOutputTypeCountWorkingHoursArgs
+  holidays?: boolean | SiteSettingsCountOutputTypeCountHolidaysArgs
 }
 
 /**
@@ -1123,6 +1274,13 @@ export type SiteSettingsCountOutputTypeCountWorkingHoursArgs<ExtArgs extends run
   where?: Prisma.SiteWorkingHourWhereInput
 }
 
+/**
+ * SiteSettingsCountOutputType without action
+ */
+export type SiteSettingsCountOutputTypeCountHolidaysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SiteHolidayWhereInput
+}
+
 
 export type SiteSettingsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1147,6 +1305,7 @@ export type SiteSettingsSelect<ExtArgs extends runtime.Types.Extensions.Internal
   phoneNumbers?: boolean | Prisma.SiteSettings$phoneNumbersArgs<ExtArgs>
   addresses?: boolean | Prisma.SiteSettings$addressesArgs<ExtArgs>
   workingHours?: boolean | Prisma.SiteSettings$workingHoursArgs<ExtArgs>
+  holidays?: boolean | Prisma.SiteSettings$holidaysArgs<ExtArgs>
   _count?: boolean | Prisma.SiteSettingsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["siteSettings"]>
 
@@ -1221,6 +1380,7 @@ export type SiteSettingsInclude<ExtArgs extends runtime.Types.Extensions.Interna
   phoneNumbers?: boolean | Prisma.SiteSettings$phoneNumbersArgs<ExtArgs>
   addresses?: boolean | Prisma.SiteSettings$addressesArgs<ExtArgs>
   workingHours?: boolean | Prisma.SiteSettings$workingHoursArgs<ExtArgs>
+  holidays?: boolean | Prisma.SiteSettings$holidaysArgs<ExtArgs>
   _count?: boolean | Prisma.SiteSettingsCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SiteSettingsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1232,6 +1392,7 @@ export type $SiteSettingsPayload<ExtArgs extends runtime.Types.Extensions.Intern
     phoneNumbers: Prisma.$SitePhonePayload<ExtArgs>[]
     addresses: Prisma.$SiteAddressPayload<ExtArgs>[]
     workingHours: Prisma.$SiteWorkingHourPayload<ExtArgs>[]
+    holidays: Prisma.$SiteHolidayPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1650,6 +1811,7 @@ export interface Prisma__SiteSettingsClient<T, Null = never, ExtArgs extends run
   phoneNumbers<T extends Prisma.SiteSettings$phoneNumbersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SiteSettings$phoneNumbersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SitePhonePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   addresses<T extends Prisma.SiteSettings$addressesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SiteSettings$addressesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SiteAddressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   workingHours<T extends Prisma.SiteSettings$workingHoursArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SiteSettings$workingHoursArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SiteWorkingHourPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  holidays<T extends Prisma.SiteSettings$holidaysArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SiteSettings$holidaysArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SiteHolidayPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2160,6 +2322,30 @@ export type SiteSettings$workingHoursArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.SiteWorkingHourScalarFieldEnum | Prisma.SiteWorkingHourScalarFieldEnum[]
+}
+
+/**
+ * SiteSettings.holidays
+ */
+export type SiteSettings$holidaysArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SiteHoliday
+   */
+  select?: Prisma.SiteHolidaySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SiteHoliday
+   */
+  omit?: Prisma.SiteHolidayOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SiteHolidayInclude<ExtArgs> | null
+  where?: Prisma.SiteHolidayWhereInput
+  orderBy?: Prisma.SiteHolidayOrderByWithRelationInput | Prisma.SiteHolidayOrderByWithRelationInput[]
+  cursor?: Prisma.SiteHolidayWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SiteHolidayScalarFieldEnum | Prisma.SiteHolidayScalarFieldEnum[]
 }
 
 /**
