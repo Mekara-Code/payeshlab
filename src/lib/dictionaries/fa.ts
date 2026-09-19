@@ -371,6 +371,8 @@ export const fa: Dictionary = {
   "labStatus.closed": "بسته است",
   "labStatus.openTitle": "آزمایشگاه باز است",
   "labStatus.closedTitle": "آزمایشگاه بسته است",
+  "labStatus.holidayTitle": "آزمایشگاه به دلیل روز تعطیل بسته است",
+  "labStatus.weeklyClosureTitle": "آزمایشگاه به دلیل تعطیلی جمعه بسته است",
   "labStatus.openDescription": "هم‌اکنون پذیرش فعال است و همکاران ما آمادهٔ خدمت‌رسانی به شما هستند.",
   "labStatus.closedDescription": "پذیرش در حال حاضر انجام نمی‌شود؛ در ساعت کاری بعدی در خدمت شما هستیم.",
   "labStatus.holidayDescription": "امروز از ایام تعطیل آزمایشگاه است و پذیرش انجام نمی‌شود.",

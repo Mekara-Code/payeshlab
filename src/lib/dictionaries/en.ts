@@ -371,6 +371,8 @@ export const en: Dictionary = {
   "labStatus.closed": "Closed",
   "labStatus.openTitle": "The laboratory is open",
   "labStatus.closedTitle": "The laboratory is closed",
+  "labStatus.holidayTitle": "The laboratory is closed for a holiday",
+  "labStatus.weeklyClosureTitle": "The laboratory is closed for the Friday holiday",
   "labStatus.openDescription": "Admissions are running and our team is ready to serve you.",
   "labStatus.closedDescription": "Admissions are paused right now; we will be back during the next working hours.",
   "labStatus.holidayDescription": "Today is a laboratory holiday, so no samples are taken.",

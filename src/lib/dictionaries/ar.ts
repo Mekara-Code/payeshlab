@@ -371,6 +371,8 @@ export const ar: Dictionary = {
   "labStatus.closed": "مغلق",
   "labStatus.openTitle": "المختبر مفتوح",
   "labStatus.closedTitle": "المختبر مغلق",
+  "labStatus.holidayTitle": "المختبر مغلق بسبب يوم العطلة",
+  "labStatus.weeklyClosureTitle": "المختبر مغلق بسبب عطلة الجمعة",
   "labStatus.openDescription": "الاستقبال جارٍ الآن وفريقنا جاهز لخدمتكم.",
   "labStatus.closedDescription": "الاستقبال متوقف حاليًا؛ نعود إليكم في ساعات العمل القادمة.",
   "labStatus.holidayDescription": "اليوم من أيام عطلة المختبر ولا يتم الاستقبال فيه.",
