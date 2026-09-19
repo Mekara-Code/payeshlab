@@ -74,6 +74,21 @@ function PortraitIcon() {
   );
 }
 
+function BadgeIcon() {
+  return (
+    <svg aria-hidden="true" className="size-5" fill="none" viewBox="0 0 24 24">
+      <circle cx="12" cy="9" r="5" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="m8.5 14.5-1 7 4.5-2.2 4.5 2.2-1-7"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+    </svg>
+  );
+}
+
 function StethoscopeIcon() {
   return (
     <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
@@ -216,69 +231,77 @@ export default async function AboutPage() {
 
       {technicalManagerName ? (
         <section
-          className="scroll-mt-24 bg-white px-5 py-16 sm:px-10 sm:py-24 lg:px-20"
+          aria-label={t("about.technicalManagerTitle")}
+          className="scroll-mt-24 bg-[#f7fbfb] px-5 pb-16 sm:px-10 sm:pb-24 lg:px-20"
           id="technical-manager"
         >
-          <div className="mx-auto max-w-6xl">
-            <div className="relative overflow-hidden rounded-[2.25rem] border border-teal-100 bg-[linear-gradient(130deg,#ffffff,rgba(240,253,250,0.92))] p-6 shadow-[0_26px_60px_rgba(15,23,42,0.09)] sm:p-10">
-              <div
-                aria-hidden="true"
-                className="absolute -left-24 -top-24 size-72 rounded-full bg-teal-100/60 blur-3xl"
-              />
-              <div className="relative grid gap-8 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:items-center lg:gap-12">
-                <div className="mx-auto w-full max-w-[17rem] lg:mx-0">
-                  <div className="relative aspect-[4/5] overflow-hidden rounded-[1.9rem] border-8 border-white bg-slate-100 shadow-[0_22px_48px_rgba(15,23,42,0.16)]">
-                    {settings.technicalManagerImageUrl ? (
-                      <Image
-                        alt={t("about.technicalManagerImageAlt", {
-                          name: technicalManagerName,
-                        })}
-                        className="object-cover object-center"
-                        fill
-                        sizes="(min-width: 1024px) 17rem, (min-width: 640px) 17rem, calc(100vw - 4.5rem)"
-                        src={settings.technicalManagerImageUrl}
-                      />
-                    ) : (
-                      <span className="grid size-full place-items-center bg-teal-50 text-teal-500">
-                        <PortraitIcon />
-                      </span>
-                    )}
-                  </div>
-                  {technicalManagerLicenseCode ? (
-                    <div className="mx-auto -mt-6 w-fit rounded-2xl border border-teal-100 bg-white px-4 py-2.5 text-center shadow-[0_14px_30px_rgba(15,23,42,0.12)]">
-                      <p className="text-[11px] font-extrabold tracking-wide text-teal-500">
-                        {t("about.technicalManagerLicense")}
-                      </p>
-                      <bdi
-                        className="mt-0.5 block font-mono text-base font-black text-slate-950"
-                        dir="ltr"
-                      >
-                        {technicalManagerLicenseCode}
-                      </bdi>
-                    </div>
-                  ) : null}
-                </div>
+          <article
+            className="relative mx-auto max-w-4xl overflow-hidden rounded-[2rem] border border-teal-100 bg-white p-6 shadow-[0_22px_52px_rgba(15,23,42,0.08)] sm:p-10"
+            dir="rtl"
+            lang="fa"
+          >
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -left-24 -top-28 size-64 rounded-full bg-teal-50 blur-3xl"
+            />
 
-                <div className="min-w-0">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-teal-100 px-4 py-2 text-xs font-extrabold tracking-wide text-teal-600">
-                    <StethoscopeIcon />
-                    {t("about.technicalManagerBadge")}
-                  </span>
-                  <p className="mt-5 text-xs font-extrabold tracking-wide text-teal-500">
-                    {t("about.technicalManagerTitle")}
-                  </p>
-                  <h2 className="mt-2 text-3xl font-black tracking-[-0.05em] text-slate-950 sm:text-4xl">
-                    {technicalManagerName}
-                  </h2>
-                  {technicalManagerBio ? (
-                    <p className="mt-5 max-w-prose whitespace-pre-line text-sm font-medium leading-8 text-slate-600 sm:text-base sm:leading-9">
-                      {technicalManagerBio}
-                    </p>
-                  ) : null}
+            <div className="relative grid gap-8 sm:gap-10 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:items-center lg:gap-12">
+              <figure className="relative mx-auto w-full max-w-[13rem] sm:max-w-[15rem] lg:mx-0 lg:max-w-none">
+                <span
+                  aria-hidden="true"
+                  className="absolute -bottom-3 -left-3 size-24 rounded-[1.5rem] bg-teal-100 sm:-bottom-4 sm:-left-4 sm:size-32"
+                />
+                <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] bg-slate-100 shadow-[0_20px_44px_rgba(15,23,42,0.16)] ring-1 ring-teal-100/70">
+                  {settings.technicalManagerImageUrl ? (
+                    <Image
+                      alt={t("about.technicalManagerImageAlt", {
+                        name: technicalManagerName,
+                      })}
+                      className="object-cover object-center"
+                      fill
+                      sizes="(min-width: 1024px) 17rem, (min-width: 640px) 15rem, 13rem"
+                      src={settings.technicalManagerImageUrl}
+                    />
+                  ) : (
+                    <span className="grid size-full place-items-center bg-[linear-gradient(140deg,#ccfbf1,#f0fdfa)] text-teal-500">
+                      <PortraitIcon />
+                    </span>
+                  )}
                 </div>
+              </figure>
+
+              <div className="min-w-0 text-center lg:text-right">
+                <span className="inline-flex items-center gap-2 rounded-full bg-teal-100 px-4 py-2 text-xs font-extrabold tracking-wide text-teal-600">
+                  <StethoscopeIcon />
+                  {t("about.technicalManagerBadge")}
+                </span>
+                <h2 className="mt-5 text-2xl font-black leading-[1.35] tracking-[-0.04em] text-slate-950 sm:text-3xl lg:text-4xl">
+                  {technicalManagerName}
+                </h2>
+                {technicalManagerLicenseCode ? (
+                  <p className="mt-4 inline-flex flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl bg-[#f7fbfb] px-4 py-2.5 ring-1 ring-teal-100">
+                    <span className="text-teal-600">
+                      <BadgeIcon />
+                    </span>
+                    <span className="text-xs font-extrabold text-slate-600">
+                      {t("about.technicalManagerLicense")}
+                    </span>
+                    <bdi
+                      className="font-mono text-base font-black text-slate-950"
+                      dir="ltr"
+                    >
+                      {technicalManagerLicenseCode}
+                    </bdi>
+                  </p>
+                ) : null}
+                {technicalManagerBio ? (
+                  <p className="mx-auto mt-5 max-w-prose whitespace-pre-line text-right text-sm font-medium leading-8 text-slate-700 sm:text-base sm:leading-9 lg:mx-0">
+                    {technicalManagerBio}
+                  </p>
+                ) : null}
               </div>
             </div>
-          </div>
+          </article>
         </section>
       ) : null}
 
