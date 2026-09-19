@@ -1,7 +1,13 @@
 "use server";
 
+import { unlink } from "node:fs/promises";
+import { join } from "node:path";
 import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/admin-session";
+import {
+  isValidAdminImageUpload,
+  saveAdminImageAsWebp,
+} from "@/lib/admin-image-uploads";
 import { getPrisma } from "@/lib/prisma";
 import { SITE_SETTINGS_ID } from "@/lib/site-settings";
 import {
@@ -206,7 +212,7 @@ async function ensureSettings() {
   });
 }
 
-export async function saveSiteSettings(
+export async function saveLaboratoryIdentity(
   _previousState: SettingsActionState,
   formData: FormData,
 ): Promise<SettingsActionState> {
@@ -216,8 +222,41 @@ export async function saveSiteSettings(
   const laboratoryName = getString(formData, "laboratoryName");
   const shortDescription = getString(formData, "shortDescription");
   const ceoMessage = getString(formData, "ceoMessage");
-  const province = getString(formData, "province");
-  const city = getString(formData, "city");
+
+  if (
+    laboratoryName.length > 160 ||
+    shortDescription.length > 500 ||
+    ceoMessage.length > 5_000
+  )
+    return { message: "نام، توضیح کوتاه یا سخن مدیرعامل بیش از اندازه طولانی است." };
+
+  const identity = {
+    ceoMessage: ceoMessage || null,
+    laboratoryName: laboratoryName || null,
+    shortDescription: shortDescription || null,
+  };
+
+  try {
+    await getPrisma().siteSettings.upsert({
+      create: { id: SITE_SETTINGS_ID, ...identity },
+      update: identity,
+      where: { id: SITE_SETTINGS_ID },
+    });
+  } catch {
+    return { message: "ذخیره اطلاعات آزمایشگاه انجام نشد. دوباره تلاش کنید." };
+  }
+
+  revalidateSettingsPaths();
+  return { message: "اطلاعات آزمایشگاه ذخیره شد.", success: true };
+}
+
+export async function saveSiteLinks(
+  _previousState: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  if (!(await isAuthorizedAdmin()))
+    return { message: "دسترسی شما برای ویرایش تنظیمات معتبر نیست." };
+
   const instagramUrl = normalizeOptionalUrl(
     getString(formData, "instagramUrl"),
   );
@@ -227,19 +266,7 @@ export async function saveSiteSettings(
   const surveyFormUrl = normalizeOptionalUrl(
     getString(formData, "surveyFormUrl"),
   );
-  const latitude = getCoordinate(getString(formData, "latitude"), -90, 90);
-  const longitude = getCoordinate(getString(formData, "longitude"), -180, 180);
 
-  if (
-    laboratoryName.length > 160 ||
-    shortDescription.length > 500 ||
-    ceoMessage.length > 5_000 ||
-    province.length > 100 ||
-    city.length > 100
-  )
-    return {
-      message: "نام، توضیح کوتاه، استان یا شهر بیش از اندازه طولانی است.",
-    };
   if (
     instagramUrl.error ||
     whatsappUrl.error ||
@@ -255,6 +282,43 @@ export async function saveSiteSettings(
         eitaaUrl.error ??
         surveyFormUrl.error,
     };
+
+  const links = {
+    eitaaUrl: eitaaUrl.value,
+    instagramUrl: instagramUrl.value,
+    rubikaUrl: rubikaUrl.value,
+    surveyFormUrl: surveyFormUrl.value,
+    whatsappUrl: whatsappUrl.value,
+  };
+
+  try {
+    await getPrisma().siteSettings.upsert({
+      create: { id: SITE_SETTINGS_ID, ...links },
+      update: links,
+      where: { id: SITE_SETTINGS_ID },
+    });
+  } catch {
+    return { message: "ذخیره شبکه‌های اجتماعی انجام نشد. دوباره تلاش کنید." };
+  }
+
+  revalidateSettingsPaths();
+  return { message: "شبکه‌های اجتماعی و لینک‌ها ذخیره شد.", success: true };
+}
+
+export async function saveSiteLocation(
+  _previousState: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  if (!(await isAuthorizedAdmin()))
+    return { message: "دسترسی شما برای ویرایش تنظیمات معتبر نیست." };
+
+  const province = getString(formData, "province");
+  const city = getString(formData, "city");
+  const latitude = getCoordinate(getString(formData, "latitude"), -90, 90);
+  const longitude = getCoordinate(getString(formData, "longitude"), -180, 180);
+
+  if (province.length > 100 || city.length > 100)
+    return { message: "نام استان یا شهر بیش از اندازه طولانی است." };
   if (
     latitude.error ||
     longitude.error ||
@@ -264,45 +328,153 @@ export async function saveSiteSettings(
       message: "برای موقعیت، عرض و طول جغرافیایی معتبر را با هم وارد کنید.",
     };
 
+  const location = {
+    city: city || null,
+    latitude: latitude.value,
+    longitude: longitude.value,
+    province: province || null,
+  };
+
   try {
     await getPrisma().siteSettings.upsert({
-      create: {
-        id: SITE_SETTINGS_ID,
-        city: city || null,
-        ceoMessage: ceoMessage || null,
-        eitaaUrl: eitaaUrl.value,
-        instagramUrl: instagramUrl.value,
-        laboratoryName: laboratoryName || null,
-        latitude: latitude.value,
-        longitude: longitude.value,
-        province: province || null,
-        rubikaUrl: rubikaUrl.value,
-        shortDescription: shortDescription || null,
-        surveyFormUrl: surveyFormUrl.value,
-        whatsappUrl: whatsappUrl.value,
-      },
-      update: {
-        ceoMessage: ceoMessage || null,
-        eitaaUrl: eitaaUrl.value,
-        instagramUrl: instagramUrl.value,
-        city: city || null,
-        laboratoryName: laboratoryName || null,
-        latitude: latitude.value,
-        longitude: longitude.value,
-        province: province || null,
-        rubikaUrl: rubikaUrl.value,
-        shortDescription: shortDescription || null,
-        surveyFormUrl: surveyFormUrl.value,
-        whatsappUrl: whatsappUrl.value,
-      },
+      create: { id: SITE_SETTINGS_ID, ...location },
+      update: location,
       where: { id: SITE_SETTINGS_ID },
     });
   } catch {
-    return { message: "ذخیره تنظیمات انجام نشد. دوباره تلاش کنید." };
+    return { message: "ذخیره موقعیت انجام نشد. دوباره تلاش کنید." };
   }
 
   revalidateSettingsPaths();
-  return { message: "اطلاعات و راه‌های ارتباطی ذخیره شد.", success: true };
+  return { message: "موقعیت آزمایشگاه ذخیره شد.", success: true };
+}
+
+const MAX_TECHNICAL_MANAGER_IMAGE_SIZE = 6 * 1024 * 1024;
+const technicalManagerImageDirectory = join(
+  process.cwd(),
+  "public",
+  "uploads",
+  "technical-manager",
+);
+
+async function removeStoredTechnicalManagerImage(imageUrl: string | null) {
+  const fileName = imageUrl?.match(
+    /^\/uploads\/technical-manager\/([0-9a-f-]{36}\.webp)$/i,
+  )?.[1];
+  if (!fileName) return;
+
+  await unlink(join(technicalManagerImageDirectory, fileName)).catch(
+    () => undefined,
+  );
+}
+
+export async function saveTechnicalManager(
+  _previousState: SettingsActionState,
+  formData: FormData,
+): Promise<SettingsActionState> {
+  if (!(await isAuthorizedAdmin()))
+    return { message: "دسترسی شما برای ویرایش تنظیمات معتبر نیست." };
+
+  const name = getString(formData, "technicalManagerName");
+  const licenseCode = getString(formData, "technicalManagerLicenseCode");
+  const bio = getString(formData, "technicalManagerBio");
+
+  if (name.length > 160)
+    return { message: "نام مسئول فنی بیش از اندازه طولانی است." };
+  if (licenseCode.length > 40)
+    return { message: "کد نظام پزشکی بیش از اندازه طولانی است." };
+  if (bio.length > 4_000)
+    return { message: "معرفی مسئول فنی نباید بیش از ۴۰۰۰ نویسه باشد." };
+  if (licenseCode && !/^[0-9۰-۹-]{3,40}$/.test(licenseCode))
+    return { message: "کد نظام پزشکی فقط می‌تواند شامل رقم و خط تیره باشد." };
+  if (!name && (licenseCode || bio))
+    return { message: "برای ثبت کد نظام یا معرفی، نام مسئول فنی را وارد کنید." };
+
+  const imageFile = formData.get("technicalManagerImage");
+  const hasNewImage =
+    imageFile && typeof imageFile !== "string" && imageFile.size > 0;
+  if (hasNewImage && !isValidAdminImageUpload(imageFile, MAX_TECHNICAL_MANAGER_IMAGE_SIZE))
+    return {
+      message: "تصویر مسئول فنی باید PNG، JPG یا WebP و حداکثر ۶ مگابایت باشد.",
+    };
+
+  const current = await getPrisma()
+    .siteSettings.findUnique({
+      select: { technicalManagerImageUrl: true },
+      where: { id: SITE_SETTINGS_ID },
+    })
+    .catch(() => null);
+
+  let imageUrl = current?.technicalManagerImageUrl ?? null;
+  let savedImagePath: string | null = null;
+  if (hasNewImage) {
+    try {
+      const savedImage = await saveAdminImageAsWebp(imageFile, {
+        directory: technicalManagerImageDirectory,
+        maxHeight: 900,
+        maxInputBytes: MAX_TECHNICAL_MANAGER_IMAGE_SIZE,
+        maxWidth: 900,
+        urlPrefix: "/uploads/technical-manager",
+      });
+      imageUrl = savedImage.imageUrl;
+      savedImagePath = savedImage.filePath;
+    } catch {
+      return { message: "ذخیره تصویر مسئول فنی انجام نشد. دوباره تلاش کنید." };
+    }
+  }
+
+  const technicalManager = {
+    technicalManagerBio: bio || null,
+    technicalManagerImageUrl: name ? imageUrl : null,
+    technicalManagerLicenseCode: licenseCode || null,
+    technicalManagerName: name || null,
+  };
+
+  try {
+    await getPrisma().siteSettings.upsert({
+      create: { id: SITE_SETTINGS_ID, ...technicalManager },
+      update: technicalManager,
+      where: { id: SITE_SETTINGS_ID },
+    });
+  } catch {
+    // A failed write must not leave the freshly uploaded file behind.
+    if (savedImagePath) await unlink(savedImagePath).catch(() => undefined);
+    return { message: "ذخیره اطلاعات مسئول فنی انجام نشد. دوباره تلاش کنید." };
+  }
+
+  const replacedImageUrl = current?.technicalManagerImageUrl ?? null;
+  if (replacedImageUrl && replacedImageUrl !== technicalManager.technicalManagerImageUrl)
+    await removeStoredTechnicalManagerImage(replacedImageUrl);
+
+  revalidateSettingsPaths();
+  return { message: "اطلاعات مسئول فنی ذخیره شد.", success: true };
+}
+
+export async function clearTechnicalManagerImage(): Promise<SettingsActionState> {
+  if (!(await isAuthorizedAdmin()))
+    return { message: "دسترسی شما برای حذف تصویر معتبر نیست." };
+
+  let removedImageUrl: string | null = null;
+  try {
+    const current = await getPrisma().siteSettings.findUnique({
+      select: { technicalManagerImageUrl: true },
+      where: { id: SITE_SETTINGS_ID },
+    });
+    removedImageUrl = current?.technicalManagerImageUrl ?? null;
+    if (!removedImageUrl)
+      return { message: "تصویری برای حذف ثبت نشده است." };
+
+    await getPrisma().siteSettings.update({
+      data: { technicalManagerImageUrl: null },
+      where: { id: SITE_SETTINGS_ID },
+    });
+  } catch {
+    return { message: "حذف تصویر مسئول فنی انجام نشد. دوباره تلاش کنید." };
+  }
+
+  await removeStoredTechnicalManagerImage(removedImageUrl);
+  revalidateSettingsPaths();
+  return { message: "تصویر مسئول فنی حذف شد.", success: true };
 }
 
 export async function clearLaboratoryIdentity(): Promise<SettingsActionState> {

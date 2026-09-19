@@ -48,6 +48,10 @@ export type SiteSettingsMinAggregateOutputType = {
   rubikaUrl: string | null
   eitaaUrl: string | null
   surveyFormUrl: string | null
+  technicalManagerName: string | null
+  technicalManagerLicenseCode: string | null
+  technicalManagerBio: string | null
+  technicalManagerImageUrl: string | null
   latitude: runtime.Decimal | null
   longitude: runtime.Decimal | null
   createdAt: Date | null
@@ -66,6 +70,10 @@ export type SiteSettingsMaxAggregateOutputType = {
   rubikaUrl: string | null
   eitaaUrl: string | null
   surveyFormUrl: string | null
+  technicalManagerName: string | null
+  technicalManagerLicenseCode: string | null
+  technicalManagerBio: string | null
+  technicalManagerImageUrl: string | null
   latitude: runtime.Decimal | null
   longitude: runtime.Decimal | null
   createdAt: Date | null
@@ -84,6 +92,10 @@ export type SiteSettingsCountAggregateOutputType = {
   rubikaUrl: number
   eitaaUrl: number
   surveyFormUrl: number
+  technicalManagerName: number
+  technicalManagerLicenseCode: number
+  technicalManagerBio: number
+  technicalManagerImageUrl: number
   latitude: number
   longitude: number
   createdAt: number
@@ -114,6 +126,10 @@ export type SiteSettingsMinAggregateInputType = {
   rubikaUrl?: true
   eitaaUrl?: true
   surveyFormUrl?: true
+  technicalManagerName?: true
+  technicalManagerLicenseCode?: true
+  technicalManagerBio?: true
+  technicalManagerImageUrl?: true
   latitude?: true
   longitude?: true
   createdAt?: true
@@ -132,6 +148,10 @@ export type SiteSettingsMaxAggregateInputType = {
   rubikaUrl?: true
   eitaaUrl?: true
   surveyFormUrl?: true
+  technicalManagerName?: true
+  technicalManagerLicenseCode?: true
+  technicalManagerBio?: true
+  technicalManagerImageUrl?: true
   latitude?: true
   longitude?: true
   createdAt?: true
@@ -150,6 +170,10 @@ export type SiteSettingsCountAggregateInputType = {
   rubikaUrl?: true
   eitaaUrl?: true
   surveyFormUrl?: true
+  technicalManagerName?: true
+  technicalManagerLicenseCode?: true
+  technicalManagerBio?: true
+  technicalManagerImageUrl?: true
   latitude?: true
   longitude?: true
   createdAt?: true
@@ -255,6 +279,10 @@ export type SiteSettingsGroupByOutputType = {
   rubikaUrl: string | null
   eitaaUrl: string | null
   surveyFormUrl: string | null
+  technicalManagerName: string | null
+  technicalManagerLicenseCode: string | null
+  technicalManagerBio: string | null
+  technicalManagerImageUrl: string | null
   latitude: runtime.Decimal | null
   longitude: runtime.Decimal | null
   createdAt: Date
@@ -296,6 +324,10 @@ export type SiteSettingsWhereInput = {
   rubikaUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   eitaaUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   surveyFormUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  technicalManagerName?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  technicalManagerLicenseCode?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  technicalManagerBio?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  technicalManagerImageUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   latitude?: Prisma.DecimalNullableFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.DecimalNullableFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"SiteSettings"> | Date | string
@@ -317,6 +349,10 @@ export type SiteSettingsOrderByWithRelationInput = {
   rubikaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   eitaaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   surveyFormUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  technicalManagerName?: Prisma.SortOrderInput | Prisma.SortOrder
+  technicalManagerLicenseCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  technicalManagerBio?: Prisma.SortOrderInput | Prisma.SortOrder
+  technicalManagerImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
   longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -341,6 +377,10 @@ export type SiteSettingsWhereUniqueInput = Prisma.AtLeast<{
   rubikaUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   eitaaUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   surveyFormUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  technicalManagerName?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  technicalManagerLicenseCode?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  technicalManagerBio?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
+  technicalManagerImageUrl?: Prisma.StringNullableFilter<"SiteSettings"> | string | null
   latitude?: Prisma.DecimalNullableFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.DecimalNullableFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"SiteSettings"> | Date | string
@@ -362,6 +402,10 @@ export type SiteSettingsOrderByWithAggregationInput = {
   rubikaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   eitaaUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   surveyFormUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  technicalManagerName?: Prisma.SortOrderInput | Prisma.SortOrder
+  technicalManagerLicenseCode?: Prisma.SortOrderInput | Prisma.SortOrder
+  technicalManagerBio?: Prisma.SortOrderInput | Prisma.SortOrder
+  technicalManagerImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
   longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -388,6 +432,10 @@ export type SiteSettingsScalarWhereWithAggregatesInput = {
   rubikaUrl?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
   eitaaUrl?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
   surveyFormUrl?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
+  technicalManagerName?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
+  technicalManagerLicenseCode?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
+  technicalManagerBio?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
+  technicalManagerImageUrl?: Prisma.StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
   latitude?: Prisma.DecimalNullableWithAggregatesFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.DecimalNullableWithAggregatesFilter<"SiteSettings"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SiteSettings"> | Date | string
@@ -406,6 +454,10 @@ export type SiteSettingsCreateInput = {
   rubikaUrl?: string | null
   eitaaUrl?: string | null
   surveyFormUrl?: string | null
+  technicalManagerName?: string | null
+  technicalManagerLicenseCode?: string | null
+  technicalManagerBio?: string | null
+  technicalManagerImageUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -427,6 +479,10 @@ export type SiteSettingsUncheckedCreateInput = {
   rubikaUrl?: string | null
   eitaaUrl?: string | null
   surveyFormUrl?: string | null
+  technicalManagerName?: string | null
+  technicalManagerLicenseCode?: string | null
+  technicalManagerBio?: string | null
+  technicalManagerImageUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -448,6 +504,10 @@ export type SiteSettingsUpdateInput = {
   rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -469,6 +529,10 @@ export type SiteSettingsUncheckedUpdateInput = {
   rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -490,6 +554,10 @@ export type SiteSettingsCreateManyInput = {
   rubikaUrl?: string | null
   eitaaUrl?: string | null
   surveyFormUrl?: string | null
+  technicalManagerName?: string | null
+  technicalManagerLicenseCode?: string | null
+  technicalManagerBio?: string | null
+  technicalManagerImageUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -508,6 +576,10 @@ export type SiteSettingsUpdateManyMutationInput = {
   rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -526,6 +598,10 @@ export type SiteSettingsUncheckedUpdateManyInput = {
   rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -544,6 +620,10 @@ export type SiteSettingsCountOrderByAggregateInput = {
   rubikaUrl?: Prisma.SortOrder
   eitaaUrl?: Prisma.SortOrder
   surveyFormUrl?: Prisma.SortOrder
+  technicalManagerName?: Prisma.SortOrder
+  technicalManagerLicenseCode?: Prisma.SortOrder
+  technicalManagerBio?: Prisma.SortOrder
+  technicalManagerImageUrl?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -567,6 +647,10 @@ export type SiteSettingsMaxOrderByAggregateInput = {
   rubikaUrl?: Prisma.SortOrder
   eitaaUrl?: Prisma.SortOrder
   surveyFormUrl?: Prisma.SortOrder
+  technicalManagerName?: Prisma.SortOrder
+  technicalManagerLicenseCode?: Prisma.SortOrder
+  technicalManagerBio?: Prisma.SortOrder
+  technicalManagerImageUrl?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -585,6 +669,10 @@ export type SiteSettingsMinOrderByAggregateInput = {
   rubikaUrl?: Prisma.SortOrder
   eitaaUrl?: Prisma.SortOrder
   surveyFormUrl?: Prisma.SortOrder
+  technicalManagerName?: Prisma.SortOrder
+  technicalManagerLicenseCode?: Prisma.SortOrder
+  technicalManagerBio?: Prisma.SortOrder
+  technicalManagerImageUrl?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
   longitude?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -663,6 +751,10 @@ export type SiteSettingsCreateWithoutPhoneNumbersInput = {
   rubikaUrl?: string | null
   eitaaUrl?: string | null
   surveyFormUrl?: string | null
+  technicalManagerName?: string | null
+  technicalManagerLicenseCode?: string | null
+  technicalManagerBio?: string | null
+  technicalManagerImageUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -683,6 +775,10 @@ export type SiteSettingsUncheckedCreateWithoutPhoneNumbersInput = {
   rubikaUrl?: string | null
   eitaaUrl?: string | null
   surveyFormUrl?: string | null
+  technicalManagerName?: string | null
+  technicalManagerLicenseCode?: string | null
+  technicalManagerBio?: string | null
+  technicalManagerImageUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -719,6 +815,10 @@ export type SiteSettingsUpdateWithoutPhoneNumbersInput = {
   rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -739,6 +839,10 @@ export type SiteSettingsUncheckedUpdateWithoutPhoneNumbersInput = {
   rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -759,6 +863,10 @@ export type SiteSettingsCreateWithoutAddressesInput = {
   rubikaUrl?: string | null
   eitaaUrl?: string | null
   surveyFormUrl?: string | null
+  technicalManagerName?: string | null
+  technicalManagerLicenseCode?: string | null
+  technicalManagerBio?: string | null
+  technicalManagerImageUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -779,6 +887,10 @@ export type SiteSettingsUncheckedCreateWithoutAddressesInput = {
   rubikaUrl?: string | null
   eitaaUrl?: string | null
   surveyFormUrl?: string | null
+  technicalManagerName?: string | null
+  technicalManagerLicenseCode?: string | null
+  technicalManagerBio?: string | null
+  technicalManagerImageUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -815,6 +927,10 @@ export type SiteSettingsUpdateWithoutAddressesInput = {
   rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -835,6 +951,10 @@ export type SiteSettingsUncheckedUpdateWithoutAddressesInput = {
   rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -855,6 +975,10 @@ export type SiteSettingsCreateWithoutWorkingHoursInput = {
   rubikaUrl?: string | null
   eitaaUrl?: string | null
   surveyFormUrl?: string | null
+  technicalManagerName?: string | null
+  technicalManagerLicenseCode?: string | null
+  technicalManagerBio?: string | null
+  technicalManagerImageUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -875,6 +999,10 @@ export type SiteSettingsUncheckedCreateWithoutWorkingHoursInput = {
   rubikaUrl?: string | null
   eitaaUrl?: string | null
   surveyFormUrl?: string | null
+  technicalManagerName?: string | null
+  technicalManagerLicenseCode?: string | null
+  technicalManagerBio?: string | null
+  technicalManagerImageUrl?: string | null
   latitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
@@ -911,6 +1039,10 @@ export type SiteSettingsUpdateWithoutWorkingHoursInput = {
   rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -931,6 +1063,10 @@ export type SiteSettingsUncheckedUpdateWithoutWorkingHoursInput = {
   rubikaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   eitaaUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   surveyFormUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerLicenseCode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerBio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  technicalManagerImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   latitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   longitude?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1000,6 +1136,10 @@ export type SiteSettingsSelect<ExtArgs extends runtime.Types.Extensions.Internal
   rubikaUrl?: boolean
   eitaaUrl?: boolean
   surveyFormUrl?: boolean
+  technicalManagerName?: boolean
+  technicalManagerLicenseCode?: boolean
+  technicalManagerBio?: boolean
+  technicalManagerImageUrl?: boolean
   latitude?: boolean
   longitude?: boolean
   createdAt?: boolean
@@ -1022,6 +1162,10 @@ export type SiteSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   rubikaUrl?: boolean
   eitaaUrl?: boolean
   surveyFormUrl?: boolean
+  technicalManagerName?: boolean
+  technicalManagerLicenseCode?: boolean
+  technicalManagerBio?: boolean
+  technicalManagerImageUrl?: boolean
   latitude?: boolean
   longitude?: boolean
   createdAt?: boolean
@@ -1040,6 +1184,10 @@ export type SiteSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   rubikaUrl?: boolean
   eitaaUrl?: boolean
   surveyFormUrl?: boolean
+  technicalManagerName?: boolean
+  technicalManagerLicenseCode?: boolean
+  technicalManagerBio?: boolean
+  technicalManagerImageUrl?: boolean
   latitude?: boolean
   longitude?: boolean
   createdAt?: boolean
@@ -1058,13 +1206,17 @@ export type SiteSettingsSelectScalar = {
   rubikaUrl?: boolean
   eitaaUrl?: boolean
   surveyFormUrl?: boolean
+  technicalManagerName?: boolean
+  technicalManagerLicenseCode?: boolean
+  technicalManagerBio?: boolean
+  technicalManagerImageUrl?: boolean
   latitude?: boolean
   longitude?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type SiteSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "laboratoryName" | "shortDescription" | "ceoMessage" | "province" | "city" | "instagramUrl" | "whatsappUrl" | "rubikaUrl" | "eitaaUrl" | "surveyFormUrl" | "latitude" | "longitude" | "createdAt" | "updatedAt", ExtArgs["result"]["siteSettings"]>
+export type SiteSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "laboratoryName" | "shortDescription" | "ceoMessage" | "province" | "city" | "instagramUrl" | "whatsappUrl" | "rubikaUrl" | "eitaaUrl" | "surveyFormUrl" | "technicalManagerName" | "technicalManagerLicenseCode" | "technicalManagerBio" | "technicalManagerImageUrl" | "latitude" | "longitude" | "createdAt" | "updatedAt", ExtArgs["result"]["siteSettings"]>
 export type SiteSettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   phoneNumbers?: boolean | Prisma.SiteSettings$phoneNumbersArgs<ExtArgs>
   addresses?: boolean | Prisma.SiteSettings$addressesArgs<ExtArgs>
@@ -1093,6 +1245,10 @@ export type $SiteSettingsPayload<ExtArgs extends runtime.Types.Extensions.Intern
     rubikaUrl: string | null
     eitaaUrl: string | null
     surveyFormUrl: string | null
+    technicalManagerName: string | null
+    technicalManagerLicenseCode: string | null
+    technicalManagerBio: string | null
+    technicalManagerImageUrl: string | null
     latitude: runtime.Decimal | null
     longitude: runtime.Decimal | null
     createdAt: Date
@@ -1534,6 +1690,10 @@ export interface SiteSettingsFieldRefs {
   readonly rubikaUrl: Prisma.FieldRef<"SiteSettings", 'String'>
   readonly eitaaUrl: Prisma.FieldRef<"SiteSettings", 'String'>
   readonly surveyFormUrl: Prisma.FieldRef<"SiteSettings", 'String'>
+  readonly technicalManagerName: Prisma.FieldRef<"SiteSettings", 'String'>
+  readonly technicalManagerLicenseCode: Prisma.FieldRef<"SiteSettings", 'String'>
+  readonly technicalManagerBio: Prisma.FieldRef<"SiteSettings", 'String'>
+  readonly technicalManagerImageUrl: Prisma.FieldRef<"SiteSettings", 'String'>
   readonly latitude: Prisma.FieldRef<"SiteSettings", 'Decimal'>
   readonly longitude: Prisma.FieldRef<"SiteSettings", 'Decimal'>
   readonly createdAt: Prisma.FieldRef<"SiteSettings", 'DateTime'>

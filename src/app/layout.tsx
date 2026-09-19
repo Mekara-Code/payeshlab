@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Vazirmatn } from "next/font/google";
 import { SiteAnalytics } from "@/components/analytics/site-analytics";
 import { DictionaryProvider } from "@/components/i18n/dictionary-provider";
+import { ConfirmProvider } from "@/components/ui/confirm-provider";
 import { ToastProvider } from "@/components/ui/toast-provider";
 import { getContentLocaleInfo } from "@/lib/content-locale";
 import { getSelectedContentLocale } from "@/lib/content-locale-server";
@@ -88,7 +89,9 @@ export default async function RootLayout({
     <html className={`${vazirmatn.variable} ${geistMono.variable} h-full antialiased`} data-scroll-behavior="smooth" dir={localeInfo.direction} lang={localeInfo.languageTag}>
       <body className="min-h-full flex flex-col">
         <DictionaryProvider dictionary={dictionary} locale={locale}>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <ConfirmProvider>{children}</ConfirmProvider>
+          </ToastProvider>
         </DictionaryProvider>
       </body>
       {/* Page views on client-side navigation are tracked by GA4 enhanced measurement (history events). */}

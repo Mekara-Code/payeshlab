@@ -37,6 +37,7 @@ import {
   type ArticleActionState,
   type ManagedContentType,
 } from "@/app/admin/articles/actions";
+import { useConfirm } from "@/components/ui/confirm-provider";
 import { useToast } from "@/components/ui/toast-provider";
 
 type BlockType = "paragraph" | "heading" | "list" | "quote" | "table";
@@ -343,6 +344,7 @@ function RichTextComposer({
   value: string;
 }) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const { prompt } = useConfirm();
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value)
@@ -359,9 +361,29 @@ function RichTextComposer({
     updateValue();
   }
 
-  function addLink() {
-    const href = window.prompt("نشانی پیوند را وارد کنید:");
-    if (href) executeCommand("createLink", href);
+  async function addLink() {
+    /* The selection is dropped while the dialog owns focus, so it is restored first. */
+    const selection = window.getSelection();
+    const savedRange =
+      selection && selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
+    const href = await prompt({
+      confirmLabel: "افزودن پیوند",
+      inputLabel: "نشانی پیوند",
+      inputType: "url",
+      placeholder: "https://example.com",
+      required: true,
+      title: "افزودن پیوند",
+      tone: "neutral",
+    });
+    if (!href) return;
+
+    editorRef.current?.focus();
+    if (savedRange) {
+      const restoredSelection = window.getSelection();
+      restoredSelection?.removeAllRanges();
+      restoredSelection?.addRange(savedRange);
+    }
+    executeCommand("createLink", href);
   }
 
   const toolButtonClass =
@@ -439,7 +461,7 @@ function RichTextComposer({
           className={toolButtonClass}
           onMouseDown={(event) => {
             event.preventDefault();
-            addLink();
+            void addLink();
           }}
           title="افزودن پیوند"
           type="button"

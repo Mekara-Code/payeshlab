@@ -11,6 +11,7 @@ import {
   updateSlideshowSlide,
   type SlideshowActionState,
 } from "@/app/admin/slideshow/actions";
+import { useConfirm } from "@/components/ui/confirm-provider";
 import { useToast } from "@/components/ui/toast-provider";
 import type { SlideshowSlideData } from "@/lib/slideshow-data";
 
@@ -55,6 +56,7 @@ export function SlideshowManager({ slides }: { slides: ManagedSlide[] }) {
   const previewUrlRef = useRef<string | null>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const isModalOpen = modalMode !== null;
   const isEditing = modalMode === "edit" && editingSlide !== null;
   const displayedImageUrl = previewUrl ?? editingSlide?.imageUrl ?? null;
@@ -167,8 +169,13 @@ export function SlideshowManager({ slides }: { slides: ManagedSlide[] }) {
     });
   }
 
-  function deleteSlide(slide: ManagedSlide) {
-    if (!window.confirm(`از حذف «${slide.title || "این اسلاید"}» مطمئن هستید؟`)) return;
+  async function deleteSlide(slide: ManagedSlide) {
+    const isConfirmed = await confirm({
+      confirmLabel: "حذف اسلاید",
+      description: `«${slide.title || "این اسلاید"}» از اسلایدشو حذف می‌شود.`,
+      title: "حذف اسلاید؟",
+    });
+    if (!isConfirmed) return;
 
     startTransition(async () => {
       const result = await deleteSlideshowSlide(slide.id);
@@ -201,7 +208,7 @@ export function SlideshowManager({ slides }: { slides: ManagedSlide[] }) {
                 <span className="text-xs font-bold text-slate-500">اولویت {slide.sortOrder}</span>
                 <div className="flex flex-wrap gap-2">
                   <button className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-slate-200 px-3 text-sm font-extrabold text-slate-700 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-60" disabled={isPending} onClick={() => openEditModal(slide)} type="button"><EditIcon />ویرایش</button>
-                  <button className="inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-extrabold text-rose-700 transition hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700 disabled:cursor-not-allowed disabled:opacity-60" disabled={isPending} onClick={() => deleteSlide(slide)} type="button"><TrashIcon />حذف</button>
+                  <button className="inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-extrabold text-rose-700 transition hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700 disabled:cursor-not-allowed disabled:opacity-60" disabled={isPending} onClick={() => void deleteSlide(slide)} type="button"><TrashIcon />حذف</button>
                   <button className="min-h-11 rounded-xl border border-slate-200 px-3 text-sm font-extrabold text-slate-700 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-60" disabled={isPending} onClick={() => toggleSlide(slide)} type="button">{slide.isActive ? "توقف نمایش" : "فعال‌سازی"}</button>
                 </div>
               </div>

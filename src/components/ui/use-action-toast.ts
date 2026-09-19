@@ -18,22 +18,20 @@ export function useActionToast(
   titles: ActionToastTitles = {},
 ) {
   const { toast } = useToast();
-  const lastMessage = useRef<string | null>(null);
+  /* Each action result is a fresh object, so tracking the state itself keeps
+     repeated actions with the very same message toasting every time. */
+  const lastState = useRef<ActionMessageState | null>(null);
 
   useEffect(() => {
+    if (lastState.current === state) return;
+    lastState.current = state;
+
     const message = state.message?.trim();
-    if (!message) {
-      lastMessage.current = null;
-      return;
-    }
+    if (!message) return;
 
-    const messageKey = `${state.success ? "success" : "error"}:${message}`;
-    if (lastMessage.current === messageKey) return;
-
-    lastMessage.current = messageKey;
     toast(message, {
       title: state.success ? titles.success : titles.error,
       variant: state.success ? "success" : "error",
     });
-  }, [state.message, state.success, titles.error, titles.success, toast]);
+  }, [state, titles.error, titles.success, toast]);
 }

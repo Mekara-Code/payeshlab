@@ -6,7 +6,7 @@ import { SiteNavigation } from "@/components/navigation/site-navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { getSelectedContentLocale } from "@/lib/content-locale-server";
 import { getDictionary } from "@/lib/dictionaries";
-import { translate } from "@/lib/dictionaries/types";
+import { translate, type TranslationValues } from "@/lib/dictionaries/types";
 import { createSeoMetadata } from "@/lib/seo";
 import { defaultCeoMessage } from "@/lib/site-settings-content";
 import { getSiteSettings } from "@/lib/site-settings";
@@ -60,6 +60,36 @@ function EquipmentIcon() {
   );
 }
 
+function PortraitIcon() {
+  return (
+    <svg aria-hidden="true" className="size-16" fill="none" viewBox="0 0 24 24">
+      <circle cx="12" cy="8.5" r="3.5" stroke="currentColor" strokeWidth="1.6" />
+      <path
+        d="M4.5 20c.9-3.7 3.9-5.5 7.5-5.5s6.6 1.8 7.5 5.5"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeWidth="1.6"
+      />
+    </svg>
+  );
+}
+
+function StethoscopeIcon() {
+  return (
+    <svg aria-hidden="true" className="size-4" fill="none" viewBox="0 0 24 24">
+      <path
+        d="M6 3v5a4 4 0 0 0 8 0V3M6 3H4.5M6 3h1.5M14 3h1.5M14 3h-1.5M10 15.5v1a4.5 4.5 0 0 0 9 0V14"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.8"
+      />
+      <circle cx="19" cy="12" r="2" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M10 12v3.5" stroke="currentColor" strokeLinecap="round" strokeWidth="1.8" />
+    </svg>
+  );
+}
+
 function CheckIcon() {
   return (
     <svg aria-hidden="true" className="size-6" fill="none" viewBox="0 0 24 24">
@@ -100,8 +130,12 @@ const qualitySteps = [
 export default async function AboutPage() {
   const [locale, settings] = await Promise.all([getSelectedContentLocale(), getSiteSettings()]);
   const dictionary = getDictionary(locale);
-  const t = (key: string) => translate(dictionary, key);
+  const t = (key: string, values?: TranslationValues) =>
+    translate(dictionary, key, values);
   const ceoMessage = settings.ceoMessage?.trim() || defaultCeoMessage;
+  const technicalManagerName = settings.technicalManagerName?.trim();
+  const technicalManagerBio = settings.technicalManagerBio?.trim();
+  const technicalManagerLicenseCode = settings.technicalManagerLicenseCode?.trim();
 
   return (
     <main
@@ -179,6 +213,74 @@ export default async function AboutPage() {
           </p>
         </article>
       </section>
+
+      {technicalManagerName ? (
+        <section
+          className="scroll-mt-24 bg-white px-5 py-16 sm:px-10 sm:py-24 lg:px-20"
+          id="technical-manager"
+        >
+          <div className="mx-auto max-w-6xl">
+            <div className="relative overflow-hidden rounded-[2.25rem] border border-teal-100 bg-[linear-gradient(130deg,#ffffff,rgba(240,253,250,0.92))] p-6 shadow-[0_26px_60px_rgba(15,23,42,0.09)] sm:p-10">
+              <div
+                aria-hidden="true"
+                className="absolute -left-24 -top-24 size-72 rounded-full bg-teal-100/60 blur-3xl"
+              />
+              <div className="relative grid gap-8 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:items-center lg:gap-12">
+                <div className="mx-auto w-full max-w-[17rem] lg:mx-0">
+                  <div className="relative aspect-[4/5] overflow-hidden rounded-[1.9rem] border-8 border-white bg-slate-100 shadow-[0_22px_48px_rgba(15,23,42,0.16)]">
+                    {settings.technicalManagerImageUrl ? (
+                      <Image
+                        alt={t("about.technicalManagerImageAlt", {
+                          name: technicalManagerName,
+                        })}
+                        className="object-cover object-center"
+                        fill
+                        sizes="(min-width: 1024px) 17rem, (min-width: 640px) 17rem, calc(100vw - 4.5rem)"
+                        src={settings.technicalManagerImageUrl}
+                      />
+                    ) : (
+                      <span className="grid size-full place-items-center bg-teal-50 text-teal-500">
+                        <PortraitIcon />
+                      </span>
+                    )}
+                  </div>
+                  {technicalManagerLicenseCode ? (
+                    <div className="mx-auto -mt-6 w-fit rounded-2xl border border-teal-100 bg-white px-4 py-2.5 text-center shadow-[0_14px_30px_rgba(15,23,42,0.12)]">
+                      <p className="text-[11px] font-extrabold tracking-wide text-teal-500">
+                        {t("about.technicalManagerLicense")}
+                      </p>
+                      <bdi
+                        className="mt-0.5 block font-mono text-base font-black text-slate-950"
+                        dir="ltr"
+                      >
+                        {technicalManagerLicenseCode}
+                      </bdi>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="min-w-0">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-teal-100 px-4 py-2 text-xs font-extrabold tracking-wide text-teal-600">
+                    <StethoscopeIcon />
+                    {t("about.technicalManagerBadge")}
+                  </span>
+                  <p className="mt-5 text-xs font-extrabold tracking-wide text-teal-500">
+                    {t("about.technicalManagerTitle")}
+                  </p>
+                  <h2 className="mt-2 text-3xl font-black tracking-[-0.05em] text-slate-950 sm:text-4xl">
+                    {technicalManagerName}
+                  </h2>
+                  {technicalManagerBio ? (
+                    <p className="mt-5 max-w-prose whitespace-pre-line text-sm font-medium leading-8 text-slate-600 sm:text-base sm:leading-9">
+                      {technicalManagerBio}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section
         className="scroll-mt-24 bg-white px-5 py-16 sm:px-10 sm:py-24 lg:px-20"

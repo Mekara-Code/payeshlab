@@ -49,6 +49,10 @@ export type SiteSettingsData = {
   rubikaUrl: string | null;
   shortDescription: string | null;
   surveyFormUrl: string | null;
+  technicalManagerBio: string | null;
+  technicalManagerImageUrl: string | null;
+  technicalManagerLicenseCode: string | null;
+  technicalManagerName: string | null;
   whatsappUrl: string | null;
   workingHours: SiteWorkingHourData[];
 };
@@ -67,6 +71,10 @@ export const emptySiteSettings: SiteSettingsData = {
   rubikaUrl: null,
   shortDescription: null,
   surveyFormUrl: null,
+  technicalManagerBio: null,
+  technicalManagerImageUrl: null,
+  technicalManagerLicenseCode: null,
+  technicalManagerName: null,
   whatsappUrl: null,
   workingHours: [],
 };
@@ -109,6 +117,10 @@ export async function getSiteSettings(): Promise<SiteSettingsData> {
       rubikaUrl: settings.rubikaUrl,
       shortDescription: settings.shortDescription,
       surveyFormUrl: settings.surveyFormUrl,
+      technicalManagerBio: settings.technicalManagerBio,
+      technicalManagerImageUrl: settings.technicalManagerImageUrl,
+      technicalManagerLicenseCode: settings.technicalManagerLicenseCode,
+      technicalManagerName: settings.technicalManagerName,
       whatsappUrl: settings.whatsappUrl,
       workingHours: settings.workingHours.map((workingHour) => ({
         endDay: isWorkingDayId(workingHour.endDay)

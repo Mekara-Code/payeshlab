@@ -11,6 +11,7 @@ import {
   updateGalleryMedia,
   type GalleryActionState,
 } from "@/app/admin/gallery/actions";
+import { useConfirm } from "@/components/ui/confirm-provider";
 import { useToast } from "@/components/ui/toast-provider";
 import type { GalleryMediaData } from "@/lib/gallery-data";
 
@@ -84,6 +85,7 @@ export function GalleryManager({ media }: { media: ManagedGalleryMedia[] }) {
   const posterInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const { confirm } = useConfirm();
   const isModalOpen = modalMode !== null;
   const isEditing = modalMode === "edit" && editingMedia !== null;
 
@@ -217,8 +219,13 @@ export function GalleryManager({ media }: { media: ManagedGalleryMedia[] }) {
     });
   }
 
-  function deleteMedia(item: ManagedGalleryMedia) {
-    if (!window.confirm(`از حذف «${item.title}» مطمئن هستید؟ فایل رسانه نیز پاک می‌شود.`)) return;
+  async function deleteMedia(item: ManagedGalleryMedia) {
+    const isConfirmed = await confirm({
+      confirmLabel: "حذف رسانه",
+      description: `«${item.title}» همراه با فایل ذخیره‌شدهٔ آن پاک می‌شود.`,
+      title: "حذف رسانه؟",
+    });
+    if (!isConfirmed) return;
     startTransition(async () => {
       const result = await deleteGalleryMedia(item.id);
       if (result.message) toast(result.message, { variant: result.success ? "success" : "error" });
@@ -253,7 +260,7 @@ export function GalleryManager({ media }: { media: ManagedGalleryMedia[] }) {
           </div>
           <div className="p-5">
             <div className="flex items-start justify-between gap-3"><div className="min-w-0"><h3 className="line-clamp-2 text-lg font-black text-slate-950">{item.title}</h3>{item.description ? <p className="mt-1 line-clamp-2 text-sm font-medium leading-6 text-slate-600">{item.description}</p> : null}</div><span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-extrabold ${item.isActive ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-600"}`}>{item.isActive ? "فعال" : "غیرفعال"}</span></div>
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4"><span className="text-xs font-bold text-slate-500">اولویت {item.sortOrder}</span><div className="flex flex-wrap gap-2"><button className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-slate-200 px-3 text-sm font-extrabold text-slate-700 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-60" disabled={isPending} onClick={() => openEditModal(item)} type="button"><EditIcon />ویرایش</button><button className="inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-extrabold text-rose-700 transition hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700 disabled:cursor-not-allowed disabled:opacity-60" disabled={isPending} onClick={() => deleteMedia(item)} type="button"><TrashIcon />حذف</button></div></div>
+            <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4"><span className="text-xs font-bold text-slate-500">اولویت {item.sortOrder}</span><div className="flex flex-wrap gap-2"><button className="inline-flex min-h-11 items-center gap-1.5 rounded-xl border border-slate-200 px-3 text-sm font-extrabold text-slate-700 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-60" disabled={isPending} onClick={() => openEditModal(item)} type="button"><EditIcon />ویرایش</button><button className="inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-extrabold text-rose-700 transition hover:bg-rose-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose-700 disabled:cursor-not-allowed disabled:opacity-60" disabled={isPending} onClick={() => void deleteMedia(item)} type="button"><TrashIcon />حذف</button></div></div>
             <button className="mt-3 min-h-11 w-full rounded-xl border border-slate-200 px-3 text-sm font-extrabold text-slate-700 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-500 disabled:cursor-not-allowed disabled:opacity-60" disabled={isPending} onClick={() => toggleMedia(item)} type="button">{item.isActive ? "توقف نمایش در گالری" : "فعال‌سازی نمایش در گالری"}</button>
           </div>
         </article>)}

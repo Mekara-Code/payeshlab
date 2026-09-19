@@ -263,6 +263,10 @@ model SiteSettings {
   rubikaUrl        String?       @db.Text
   eitaaUrl         String?       @db.Text
   surveyFormUrl    String?       @db.Text
+  technicalManagerName        String?  @db.VarChar(160)
+  technicalManagerLicenseCode String?  @db.VarChar(40)
+  technicalManagerBio         String?  @db.Text
+  technicalManagerImageUrl    String?  @db.Text
   latitude         Decimal?      @db.Decimal(9, 6)
   longitude        Decimal?      @db.Decimal(9, 6)
   createdAt        DateTime      @default(now())
